@@ -4,6 +4,7 @@
  * Servicio de autenticación y peticiones autenticadas para el módulo SUPERADMIN.
  */
 
+import { createApiClient } from "../apiService";
 import { createAuthService, extractErrorMessage } from "../authService";
 
 const BASE_URL = (import.meta.env.VITE_API_URL as string ?? "").replace(/\/$/, "");
@@ -71,47 +72,6 @@ export interface EntityGroup {
 
 // ── Helper de fetch autenticado ───────────────────────────────────────────────
 
-export async function superadminApiFetch<T>(
-  path: string,
-  options?: RequestInit,
-  _isRetry = false
-): Promise<T> {
-  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...options?.headers,
-  };
-
-  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
-
-  if ((res.status === 401 || res.status === 403) && !_isRetry) {
-    const refreshed = await superadminAuthService.refreshSession();
-    if (!refreshed) {
-      superadminAuthService.logout();
-      throw new Error("Sesión expirada. Por favor, inicia sesión de nuevo.");
-    }
-    return superadminApiFetch<T>(path, options, true);
-  }
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    let body: unknown;
-    try { body = JSON.parse(text); } catch { body = text; }
-    throw new Error(extractErrorMessage(body, res.status, res.statusText));
-  }
-
-  if (res.status === 204) return undefined as T;
-  if (res.headers.get("content-length") === "0") return undefined as T;
-  const respText = await res.text();
-  if (!respText) return undefined as T;
-  try {
-    return JSON.parse(respText) as T;
-  } catch {
-    return undefined as T;
-  }
-}
-
 export async function superadminApiUploadFile<T>(
   path: string,
   formData: FormData,
@@ -158,3 +118,5 @@ export const superadminAuthService = createAuthService({
   sessionKey: SESSION_KEY,
   requestedRole: "Super Administrador",
 });
+
+export const superadminApiClient = createApiClient(superadminAuthService);

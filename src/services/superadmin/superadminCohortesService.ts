@@ -1,4 +1,4 @@
-import { superadminApiFetch, superadminAuthService } from './superadminService';
+import { superadminApiClient, superadminAuthService } from './superadminService';
 import type { EstadoOutput } from './superadminSemestresService';
 export { superadminSemestresService } from './superadminSemestresService';
 export type { EstadoOutput, SemestreOutput } from './superadminSemestresService';
@@ -99,22 +99,22 @@ export interface CrearCohorteProgramaPayload {
 
 export const superadminFacultadesService = {
   listar: () =>
-    superadminApiFetch<FacultadOutput[]>('/api/dev/endpoint/facultad/listall', { method: 'GET' }),
+    superadminApiClient.fetch<FacultadOutput[]>('/api/dev/endpoint/facultad/listall', { method: 'GET' }),
 
   crear: (data: { nombre: string; correo: string; idAdministrativo?: number }) =>
-    superadminApiFetch<unknown>('/api/dev/endpoint/facultad/create', {
+    superadminApiClient.fetch<unknown>('/api/dev/endpoint/facultad/create', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
   actualizar: (data: { id: number; nombre: string; correo: string; idAdministrativo?: number }) =>
-    superadminApiFetch<unknown>('/api/dev/endpoint/facultad/update', {
+    superadminApiClient.fetch<unknown>('/api/dev/endpoint/facultad/update', {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
 
   eliminar: (id: number) =>
-    superadminApiFetch<unknown>('/api/dev/endpoint/facultad/delete', {
+    superadminApiClient.fetch<unknown>('/api/dev/endpoint/facultad/delete', {
       method: 'DELETE',
       body: JSON.stringify({ id }),
     }),
@@ -124,16 +124,16 @@ export const superadminFacultadesService = {
 
 export const superadminProgramasService = {
   listar: () =>
-    superadminApiFetch<ProgramaOutput[]>('/api/dev/endpoint/programa/listall', { method: 'GET' }),
+    superadminApiClient.fetch<ProgramaOutput[]>('/api/dev/endpoint/programa/listall', { method: 'GET' }),
 
   listarPorFacultad: (idFacultad: number) =>
-    superadminApiFetch<ProgramaOutput[]>('/api/dev/endpoint/programa/listbyfacultad', {
+    superadminApiClient.fetch<ProgramaOutput[]>('/api/dev/endpoint/programa/listbyfacultad', {
       method: 'POST',
       body: JSON.stringify({ id: idFacultad }),
     }),
 
   listarFacultades: () =>
-    superadminApiFetch<FacultadOutput[]>('/api/dev/endpoint/facultad/listall', { method: 'GET' }),
+    superadminApiClient.fetch<FacultadOutput[]>('/api/dev/endpoint/facultad/listall', { method: 'GET' }),
 
   crear: async (data: {
     codigo: number; nombre: string; duracion: number; correo: string;
@@ -154,7 +154,7 @@ export const superadminProgramasService = {
       throw new Error(`Error al crear programa: ${response.status} ${response.statusText}`);
     }
 
-    superadminApiFetch<unknown>('/api/dev/endpoint/cargo/create', {
+    superadminApiClient.fetch<unknown>('/api/dev/endpoint/cargo/create', {
       method: 'POST',
       body: JSON.stringify({
         'nombre': `Director ${data.nombre}`,
@@ -171,13 +171,13 @@ export const superadminProgramasService = {
     valormatricula: number; idSede: number; idTiporegistro: number; idModalidad: number;
     idFacultad: number; idOtros: number;
   }) =>
-    superadminApiFetch<unknown>('/api/dev/endpoint/programa/update', {
+    superadminApiClient.fetch<unknown>('/api/dev/endpoint/programa/update', {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
 
   eliminar: (id: number) =>
-    superadminApiFetch<unknown>('/api/dev/endpoint/programa/delete', {
+    superadminApiClient.fetch<unknown>('/api/dev/endpoint/programa/delete', {
       method: 'DELETE',
       body: JSON.stringify({ id }),
     }),
@@ -187,7 +187,7 @@ export const superadminProgramasService = {
 
 export const superadminCohortesService = {
   listar: () =>
-    superadminApiFetch<CohorteOutput[]>('/api/dev/endpoint/cohortes/listall', { method: 'GET' }),
+    superadminApiClient.fetch<CohorteOutput[]>('/api/dev/endpoint/cohortes/listall', { method: 'GET' }),
 
   crear: (data: {
     nombre: string; cupos: number;
@@ -195,13 +195,13 @@ export const superadminCohortesService = {
     idPlazodocumentacion: number; idPlazoinscripcion: number; idPlazopago: number;
     idPrograma: number;
   }) =>
-    superadminApiFetch<unknown>('/api/dev/endpoint/cohortes/create', {
+    superadminApiClient.fetch<unknown>('/api/dev/endpoint/cohortes/create', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
   crearPorPrograma: (programaId: number, data: CrearCohorteProgramaPayload) =>
-    superadminApiFetch<unknown>(`/api/application/case/director-programa/programa/${programaId}/cohortes`, {
+    superadminApiClient.fetch<unknown>(`/api/application/case/director-programa/programa/${programaId}/cohortes`, {
       method: 'POST',
       body: JSON.stringify(data),
     }),
@@ -212,13 +212,13 @@ export const superadminCohortesService = {
     idPlazodocumentacion: number; idPlazoinscripcion: number; idPlazopago: number;
     idPrograma: number;
   }) =>
-    superadminApiFetch<unknown>('/api/dev/endpoint/cohortes/update', {
+    superadminApiClient.fetch<unknown>('/api/dev/endpoint/cohortes/update', {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
 
   eliminar: (id: number) =>
-    superadminApiFetch<unknown>('/api/dev/endpoint/cohortes/delete', {
+    superadminApiClient.fetch<unknown>('/api/dev/endpoint/cohortes/delete', {
       method: 'DELETE',
       body: JSON.stringify({ id }),
     }),
@@ -245,23 +245,23 @@ export const superadminCohortesService = {
 
 export const superadminModalidadesService = {
   listar: () =>
-    superadminApiFetch<ModalidadOutput[]>('/api/dev/endpoint/modalidad/listall', { method: 'GET' }),
+    superadminApiClient.fetch<ModalidadOutput[]>('/api/dev/endpoint/modalidad/listall', { method: 'GET' }),
 };
 
 // ── Plazos ────────────────────────────────────────────────────────────────────
 
 export const superadminPlazosService = {
   listar: () =>
-    superadminApiFetch<PlazoOutput[]>('/api/dev/endpoint/plazo/listall', { method: 'GET' }),
+    superadminApiClient.fetch<PlazoOutput[]>('/api/dev/endpoint/plazo/listall', { method: 'GET' }),
 
   crear: (data: { fechainicio: string; fechafin: string; idTipoplazo: number }) =>
-    superadminApiFetch<PlazoOutput>('/api/dev/endpoint/plazo/create', {
+    superadminApiClient.fetch<PlazoOutput>('/api/dev/endpoint/plazo/create', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
   actualizar: (data: { id: number; fechainicio: string; fechafin: string; idTipoplazo: number }) =>
-    superadminApiFetch<PlazoOutput>('/api/dev/endpoint/plazo/update', {
+    superadminApiClient.fetch<PlazoOutput>('/api/dev/endpoint/plazo/update', {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
@@ -278,7 +278,7 @@ export interface AdministrativoOutput {
 
 export const superadminAdministrativosService = {
   listar: () =>
-    superadminApiFetch<AdministrativoOutput[]>('/api/dev/endpoint/administrativo/listall', { method: 'GET' }),
+    superadminApiClient.fetch<AdministrativoOutput[]>('/api/dev/endpoint/administrativo/listall', { method: 'GET' }),
 };
 
 // ── Sedes ─────────────────────────────────────────────────────────────────────
@@ -291,7 +291,7 @@ export interface SedeOutput {
 
 export const superadminSedesService = {
   listar: () =>
-    superadminApiFetch<SedeOutput[]>('/api/dev/endpoint/sedes/listall', { method: 'GET' }),
+    superadminApiClient.fetch<SedeOutput[]>('/api/dev/endpoint/sedes/listall', { method: 'GET' }),
 };
 
 // ── Otros valores ─────────────────────────────────────────────────────────────
@@ -305,5 +305,5 @@ export interface OtrosValoresOutput {
 
 export const superadminOtrosValoresService = {
   listar: () =>
-    superadminApiFetch<OtrosValoresOutput[]>('/api/dev/endpoint/otrosvalores/listall', { method: 'GET' }),
+    superadminApiClient.fetch<OtrosValoresOutput[]>('/api/dev/endpoint/otrosvalores/listall', { method: 'GET' }),
 };

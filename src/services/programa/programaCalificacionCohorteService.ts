@@ -1,4 +1,4 @@
-import { programaApiFetch } from "./programaService";
+import { programaApiClient } from "./programaService";
 
 export interface AspiranteCalificacion {
   id: number;
@@ -11,19 +11,19 @@ export interface AspiranteCalificacion {
 }
 
 export async function getAspirantes(idCohorte: number): Promise<AspiranteCalificacion[]> {
-  return programaApiFetch<AspiranteCalificacion[]>(
+  return programaApiClient.fetch<AspiranteCalificacion[]>(
     `/api/application/case/director-programa/calificacion/programa/cohorte/${idCohorte}/aspirante-validados`
   );
 }
 
 export async function getCountPorCalificar(idCohorte: number): Promise<number> {
-  return programaApiFetch<number>(
+  return programaApiClient.fetch<number>(
     `/api/application/case/director-programa/calificacion/programa/cohorte/${idCohorte}/aspirante-validados/count/por-calificar`
   );
 }
 
 export async function getCountCalificados(idCohorte: number): Promise<number> {
-  return programaApiFetch<number>(
+  return programaApiClient.fetch<number>(
     `/api/application/case/director-programa/calificacion/programa/cohorte/${idCohorte}/aspirante-validados/count/calificados`
   );
 }

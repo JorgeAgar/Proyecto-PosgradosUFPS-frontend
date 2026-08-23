@@ -5,7 +5,7 @@
   - Usa el backend real
 */
 
-import { programaApiFetch } from './programaService';
+import { programaApiClient } from './programaService';
 import type { FiltroAdmision, CohorteAdmitidosResumen, AspiranteRankingItem, AdmitidosRankingResponse } from './programaAdmitidosService';
 import { normalizeRankingResponse } from './programaAdmitidosService';
 
@@ -14,13 +14,13 @@ export type { FiltroAdmision, CohorteAdmitidosResumen, AspiranteRankingItem, Adm
 
 export async function fetchRankingAdmitidosByCohorte(cohorteId: string): Promise<AdmitidosRankingResponse> {
   const url = `/api/application/case/director-programa/cohorte/${cohorteId}/admitidos/ranking`;
-  const data = await programaApiFetch<unknown>(url, { method: 'GET' });
+  const data = await programaApiClient.fetch<unknown>(url, { method: 'GET' });
   return normalizeRankingResponse(data);
 }
 
 export async function admitirAspirante(cohorteId: string, aspiranteId: string): Promise<{ success: boolean; aspiranteId: string; admitido: boolean }> {
   const url = `/api/application/case/director-programa/cohorte/${cohorteId}/admitidos/${aspiranteId}`;
-  return programaApiFetch<{ success: boolean; aspiranteId: string; admitido: boolean }>(url, {
+  return programaApiClient.fetch<{ success: boolean; aspiranteId: string; admitido: boolean }>(url, {
     method: 'POST',
     body: JSON.stringify({ admitido: true }),
   });
@@ -28,7 +28,7 @@ export async function admitirAspirante(cohorteId: string, aspiranteId: string): 
 
 export async function revertirAdmision(cohorteId: string, aspiranteId: string): Promise<{ success: boolean; aspiranteId: string; admitido: boolean }> {
   const url = `/api/application/case/director-programa/cohorte/${cohorteId}/admitidos/${aspiranteId}`;
-  return programaApiFetch<{ success: boolean; aspiranteId: string; admitido: boolean }>(url, {
+  return programaApiClient.fetch<{ success: boolean; aspiranteId: string; admitido: boolean }>(url, {
     method: 'POST',
     body: JSON.stringify({ admitido: false }),
   });
@@ -36,14 +36,14 @@ export async function revertirAdmision(cohorteId: string, aspiranteId: string): 
 
 export async function finalizarProcesoAdmision(cohorteId: string): Promise<void> {
   const url = `/api/application/case/director-programa/cohorte/${cohorteId}/admitidos/finalize`;
-  await programaApiFetch<void>(url, {
+  await programaApiClient.fetch<void>(url, {
     method: 'POST',
   });
 }
 
 export async function estaFinalizadoProcesoAdmision(cohorteId: string): Promise<boolean> {
   const url = `/api/application/case/director-programa/admitidos/exists/cohorte/${cohorteId}`;
-  return programaApiFetch<boolean>(url, {
+  return programaApiClient.fetch<boolean>(url, {
     method: 'GET',
   });
 }

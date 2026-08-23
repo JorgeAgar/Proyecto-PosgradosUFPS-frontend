@@ -15,9 +15,9 @@
 ## Estructura de servicios
 
 Cada rol tiene su propia subcarpeta en `src/services/`:
-- Los servicios de auth (login, logout, refresh, fetch autenticado) van en el archivo principal del rol: ej. `programa/programaService.ts`, `superadmin/superadminService.ts`.
+- Los servicios de auth (login, logout y refresh) y la instancia de `ApiClient` van en el archivo principal del rol: ej. `programa/programaService.ts`, `superadmin/superadminService.ts`.
 - Los servicios de features específicas van en archivos separados dentro de la subcarpeta: ej. `programa/programaCalificacionService.ts`.
-- El fetch autenticado (`programaApiFetch`, `superadminApiFetch`) maneja automáticamente el refresh del token y debe usarse en todos los servicios del rol en lugar de `fetch` directo.
+- Los clientes autenticados de cada rol (`programaApiClient`, `superadminApiClient`, etc.) manejan automáticamente el refresh del token y deben usarse mediante `.fetch()` en lugar de `fetch` directo.
 
 ## Archivos que no se suben en los commits normalmente (pero que no están en el gitignore)
 

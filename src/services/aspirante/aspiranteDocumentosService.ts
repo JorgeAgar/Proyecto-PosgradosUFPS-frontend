@@ -1,4 +1,4 @@
-import { aspiranteApiFetch, getAspiranteRealId, ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "./aspiranteService";
+import { aspiranteApiClient, getAspiranteRealId, ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "./aspiranteService";
 
 const BASE_URL = import.meta.env.VITE_API_URL as string;
 
@@ -35,14 +35,14 @@ export interface DocumentosSubidosResponse {
 
 export async function fetchDocumentosRequeridos(): Promise<DocumentoRequerido[]> {
   const idAspirante = await getAspiranteRealId();
-  return aspiranteApiFetch<DocumentoRequerido[]>(
+  return aspiranteApiClient.fetch<DocumentoRequerido[]>(
     `/api/application/case/aspirantes/${idAspirante}/documentos/requeridos`
   );
 }
 
 export async function fetchDocumentosSubidos(): Promise<DocumentosSubidosResponse> {
   const idAspirante = await getAspiranteRealId();
-  return aspiranteApiFetch<DocumentosSubidosResponse>(
+  return aspiranteApiClient.fetch<DocumentosSubidosResponse>(
     `/api/application/case/aspirantes/${idAspirante}/documentos`
   );
 }
@@ -103,7 +103,7 @@ async function _enviarDocumento(
     });
   };
 
-  let token = localStorage.getItem(ACCESS_TOKEN_KEY);
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
   let res = await doFetch(token);
 
   if (res.status === 401 || res.status === 403) {

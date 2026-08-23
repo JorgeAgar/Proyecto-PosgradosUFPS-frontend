@@ -6,7 +6,7 @@
   - Devuelve una lista de cohortes activas/relacionadas al programa.
 */
 
-import { programaApiFetch, getProgramaRealId } from './programaService';
+import { programaApiClient, getProgramaRealId } from './programaService';
 
 export interface CohorteActual {
   id: number;
@@ -35,7 +35,7 @@ export interface ProgramaInicioData {
 export type ProgramaInicioItem = ProgramaInicioData;
 
 // NOTE: Removed MOCK fallback data — service now delegates to backend and
-// relies on `programaApiFetch` (which adds auth headers and refresh logic).
+// relies on `programaApiClient` (which adds auth headers and refresh logic).
 
 function isProgramaInicioData(value: unknown): value is ProgramaInicioData {
   if (!value || typeof value !== 'object') return false;
@@ -64,7 +64,7 @@ function normalizeProgramaInicioResponse(response: unknown): ProgramaInicioData[
 export async function fetchProgramaInicioData(): Promise<ProgramaInicioData[]> {
   const programaId = await getProgramaRealId();
   const inicioPath = `/api/application/case/director-programa/programa/${programaId}/inicio`;
-  const response = await programaApiFetch<unknown>(inicioPath, {
+  const response = await programaApiClient.fetch<unknown>(inicioPath, {
     method: 'GET',
   });
   return normalizeProgramaInicioResponse(response);

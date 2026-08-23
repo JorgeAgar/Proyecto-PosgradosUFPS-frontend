@@ -1,4 +1,4 @@
-import { superadminApiFetch, superadminApiUploadFile } from './superadminService';
+import { superadminApiClient, superadminApiUploadFile } from './superadminService';
 
 export interface DocumentoConsejoOutput {
 	id: number;
@@ -132,7 +132,7 @@ export const superadminDocumentosService = {
 		}
 
 		if (!documentosPromise || forceRefresh) {
-			documentosPromise = superadminApiFetch<unknown>('/api/dev/endpoint/documentosrequisitoconsejo/listall', {
+			documentosPromise = superadminApiClient.fetch<unknown>('/api/dev/endpoint/documentosrequisitoconsejo/listall', {
 				method: 'GET',
 			})
 				.then((data) => syncCache(mergeDocumentosWithCache(normalizeDocumentos(data))))
@@ -170,7 +170,7 @@ export const superadminDocumentosService = {
 			form.append('file', file);
 			updated = await superadminApiUploadFile<unknown>(`/api/dev/endpoint/documentosrequisitoconsejo/superadmin/${data.id}`, form, false, 'PUT');
 		} else {
-			updated = await superadminApiFetch<unknown>('/api/dev/endpoint/documentosrequisitoconsejo/update', {
+			updated = await superadminApiClient.fetch<unknown>('/api/dev/endpoint/documentosrequisitoconsejo/update', {
 				method: 'PUT',
 				body: JSON.stringify({
 					id: data.id,
@@ -183,7 +183,7 @@ export const superadminDocumentosService = {
 			if (data.formatoEliminado) {
 				formatosEliminados.add(data.id);
 				documentosCache = documentosCache.map((item) => item.id === data.id ? { ...item, urlformato: null } : item);
-				updated = await superadminApiFetch<unknown>(`/api/dev/endpoint/documentosrequisitoconsejo/${data.id}/formato`, {
+				updated = await superadminApiClient.fetch<unknown>(`/api/dev/endpoint/documentosrequisitoconsejo/${data.id}/formato`, {
 					method: 'PUT',
 					body: JSON.stringify({ urlformato: null }),
 				});
@@ -212,7 +212,7 @@ export const superadminDocumentosService = {
 	},
 
 	async eliminar(id: number): Promise<DocumentoConsejoOutput[]> {
-		const deleted = await superadminApiFetch<unknown>('/api/dev/endpoint/documentosrequisitoconsejo/delete', {
+		const deleted = await superadminApiClient.fetch<unknown>('/api/dev/endpoint/documentosrequisitoconsejo/delete', {
 			method: 'DELETE',
 			body: JSON.stringify({ id }),
 		});

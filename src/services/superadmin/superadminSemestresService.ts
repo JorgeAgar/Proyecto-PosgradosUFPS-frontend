@@ -1,18 +1,4 @@
-import { superadminAuthService } from './superadminService';
-
-const BASE_URL = (import.meta.env.VITE_API_URL as string ?? '').replace(/\/$/, '');
-
-const HTTP_STATUS_TEXT: Record<number, string> = {
-	400: 'Solicitud incorrecta',
-	401: 'No autorizado',
-	403: 'Acceso denegado',
-	404: 'Recurso no encontrado',
-	409: 'Conflicto con el estado actual',
-	422: 'Datos no procesables',
-	500: 'Error interno del servidor',
-	502: 'Error de puerta de enlace',
-	503: 'Servicio no disponible',
-};
+import { superadminApiClient } from './superadminService';
 
 export interface EstadoOutput {
 	id: number;
@@ -41,24 +27,6 @@ let semestresCache: SemestreOutput[] | null = null;
 let semestresPromise: Promise<SemestreOutput[]> | null = null;
 let estadosCache: EstadoOutput[] | null = null;
 let estadosPromise: Promise<EstadoOutput[]> | null = null;
-
-function extractErrorMessage(body: unknown, status: number, statusText: string): string {
-	if (typeof body === 'string') {
-		const trimmed = body.trim();
-		if (trimmed && !trimmed.startsWith('<')) return trimmed;
-	}
-	if (body && typeof body === 'object') {
-		const obj = body as Record<string, unknown>;
-		if (typeof obj.message === 'string' && obj.message) return obj.message;
-		if (typeof obj.mensaje === 'string' && obj.mensaje) return obj.mensaje;
-		const skip = new Set(['timestamp', 'path', 'trace', 'error', 'status']);
-		for (const [key, val] of Object.entries(obj)) {
-			if (!skip.has(key) && typeof val === 'string' && val) return val;
-		}
-	}
-	const desc = statusText || HTTP_STATUS_TEXT[status];
-	return desc ? `Error ${status}: ${desc}` : `Error ${status}`;
-}
 
 function normalizeEstado(estado: unknown): EstadoOutput | string | null | undefined {
 	if (!estado || typeof estado !== 'object') return estado as string | null | undefined;
@@ -114,49 +82,6 @@ function reconcileSemestresEstados(next: SemestreOutput[]): SemestreOutput[] {
 	return next.map((semestre) => enrichSemestre(semestre));
 }
 
-async function request<T>(path: string, options?: RequestInit, retry = false): Promise<T> {
-	const token = superadminAuthService.getAccessToken();
-	const headers: HeadersInit = {
-		'Content-Type': 'application/json',
-		...(token ? { Authorization: `Bearer ${token}` } : {}),
-		...options?.headers,
-	};
-
-	const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
-
-	if (res.status === 403 && !retry) {
-		const refreshed = await superadminAuthService.refreshSession();
-		if (refreshed) {
-			return request<T>(path, options, true);
-		}
-		superadminAuthService.logout();
-		throw new Error('Sesión expirada. Por favor, inicia sesión de nuevo.');
-	}
-
-	if (!res.ok) {
-		const text = await res.text().catch(() => '');
-		let body: unknown;
-		try {
-			body = JSON.parse(text);
-		} catch {
-			body = text;
-		}
-		throw new Error(extractErrorMessage(body, res.status, res.statusText));
-	}
-
-	if (res.status === 204) return undefined as T;
-	if (res.headers.get('content-length') === '0') return undefined as T;
-
-	const text = await res.text();
-	if (!text) return undefined as T;
-
-	try {
-		return JSON.parse(text) as T;
-	} catch {
-		return undefined as T;
-	}
-}
-
 function syncSemestreCache(next: SemestreOutput[]): SemestreOutput[] {
 	const normalized = reconcileSemestresEstados(next);
 	semestresCache = normalized;
@@ -174,7 +99,7 @@ export const superadminSemestresService = {
 			return [...semestresCache];
 		}
 		if (!semestresPromise || forceRefresh) {
-			semestresPromise = request<SemestreOutput[]>('/api/dev/endpoint/semestre/listall', { method: 'GET' })
+			semestresPromise = superadminApiClient.fetch<SemestreOutput[]>('/api/dev/endpoint/semestre/listall', { method: 'GET' })
 				.then((data) => syncSemestreCache(normalizeSemestres(data)))
 				.finally(() => {
 					semestresPromise = null;
@@ -188,7 +113,7 @@ export const superadminSemestresService = {
 			return [...estadosCache];
 		}
 		if (!estadosPromise || forceRefresh) {
-			estadosPromise = request<EstadoOutput[]>('/api/dev/endpoint/estado/listall', { method: 'GET' })
+			estadosPromise = superadminApiClient.fetch<EstadoOutput[]>('/api/dev/endpoint/estado/listall', { method: 'GET' })
 				.then((data) => {
 					const nextEstados = syncEstadoCache(normalizeEstados(data));
 					if (semestresCache) {
@@ -204,7 +129,7 @@ export const superadminSemestresService = {
 	},
 
 	async crear(data: SemestreFormPayload): Promise<SemestreOutput[]> {
-		const created = normalizeSemestre(await request<unknown>('/api/dev/endpoint/semestre/create', {
+		const created = normalizeSemestre(await superadminApiClient.fetch<unknown>('/api/dev/endpoint/semestre/create', {
 			method: 'POST',
 			body: JSON.stringify(data),
 		}), data);
@@ -214,7 +139,7 @@ export const superadminSemestresService = {
 	},
 
 	async actualizar(data: SemestreFormPayload & { id: number }): Promise<SemestreOutput[]> {
-		const updated = normalizeSemestre(await request<unknown>('/api/dev/endpoint/semestre/update', {
+		const updated = normalizeSemestre(await superadminApiClient.fetch<unknown>('/api/dev/endpoint/semestre/update', {
 			method: 'PUT',
 			body: JSON.stringify(data),
 		}), data);
@@ -227,7 +152,7 @@ export const superadminSemestresService = {
 	},
 
 	async eliminar(id: number): Promise<SemestreOutput[]> {
-		await request<unknown>('/api/dev/endpoint/semestre/delete', {
+		await superadminApiClient.fetch<unknown>('/api/dev/endpoint/semestre/delete', {
 			method: 'DELETE',
 			body: JSON.stringify({ id }),
 		});

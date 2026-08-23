@@ -1,4 +1,4 @@
-import { aspiranteApiFetch, aspiranteApiUploadFile } from './aspiranteService';
+import { aspiranteApiClient, aspiranteApiUploadFile } from './aspiranteService';
 import type { ResumenPagoResponse, WompiCheckoutResponse } from './aspirantePagosService';
 
 export interface MatriculaReciboResponse {
@@ -20,13 +20,13 @@ export interface MatriculaReciboResponse {
 }
 
 export async function fetchMatriculaResumen(aspiranteId: string): Promise<ResumenPagoResponse> {
-  return aspiranteApiFetch<ResumenPagoResponse>(
+  return aspiranteApiClient.fetch<ResumenPagoResponse>(
     `/api/application/case/aspirantes/${aspiranteId}/pagos/matricula/resumen`
   );
 }
 
 export async function fetchMatriculaCheckout(aspiranteId: string, montoElegido: number): Promise<WompiCheckoutResponse> {
-  return aspiranteApiFetch<WompiCheckoutResponse>(
+  return aspiranteApiClient.fetch<WompiCheckoutResponse>(
     `/api/application/case/aspirantes/${aspiranteId}/pagos/matricula/checkout?montoelegido=${montoElegido}`,
     { method: 'POST' }
   );

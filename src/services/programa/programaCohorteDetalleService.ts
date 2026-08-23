@@ -5,7 +5,7 @@
   - Endpoints del backend real
 */
 
-import { programaApiFetch } from './programaService';
+import { programaApiClient } from './programaService';
 import type { CohorteItem, CohorteDetalle, NuevaCohortePayload, DocumentoCohorte, DocumentAssignItem, CriterioItem } from './programaCohorteService';
 
 export type { CohorteItem, CohorteDetalle, NuevaCohortePayload, DocumentoCohorte, DocumentAssignItem, CriterioItem };
@@ -16,7 +16,7 @@ function isObject(v: unknown): v is Record<string, unknown> {
 
 export async function fetchCohorteDetalle(cohorteId: string): Promise<CohorteDetalle> {
   const path = `/api/application/case/director-programa/cohorte/${cohorteId}`;
-  const data = await programaApiFetch<unknown>(path, { method: 'GET' });
+  const data = await programaApiClient.fetch<unknown>(path, { method: 'GET' });
   const cohorte = data as Record<string, unknown>;
   const nombreSemestre = String(
     cohorte.nombreSemestre ??
@@ -142,17 +142,17 @@ export async function fetchCohorteDetalle(cohorteId: string): Promise<CohorteDet
 
 export async function updateCohorte(cohorteId: string, payload: Partial<NuevaCohortePayload & { cupos: number; activa: boolean }>): Promise<CohorteItem> {
   const path = `/api/application/case/director-programa/cohorte/${cohorteId}`;
-  return programaApiFetch<CohorteItem>(path, { method: 'PUT', body: JSON.stringify(payload) });
+  return programaApiClient.fetch<CohorteItem>(path, { method: 'PUT', body: JSON.stringify(payload) });
 }
 
 export async function abrirCohorte(cohorteId: string): Promise<CohorteItem> {
   const path = `/api/application/case/director-programa/cohorte/${cohorteId}/abrir`;
-  return programaApiFetch<CohorteItem>(path, { method: 'POST' });
+  return programaApiClient.fetch<CohorteItem>(path, { method: 'POST' });
 }
 
 export async function cerrarCohorte(cohorteId: string): Promise<CohorteItem> {
   const path = `/api/application/case/director-programa/cohorte/${cohorteId}/cerrar`;
-  return programaApiFetch<CohorteItem>(path, { method: 'POST' });
+  return programaApiClient.fetch<CohorteItem>(path, { method: 'POST' });
 }
 
 export default {

@@ -26,8 +26,9 @@
     - `PosgradosLayout.tsx`
 
 - `services/` — Servicios de conexión con el backend, agrupados por rol
+    - `apiService.ts` — Factory de clientes HTTP autenticados con refresh y retry
     - `aspirante/`
-        - `aspiranteService.ts` — Auth del aspirante: login, logout, refreshSession, y `aspiranteApiFetch` (fetch autenticado con retry)
+        - `aspiranteService.ts` — Auth del aspirante y `aspiranteApiClient` (fetch autenticado con retry)
         - `aspiranteInicioService.ts`
         - `aspiranteEstadoService.ts`
         - `aspiranteDocumentosService.ts`
@@ -38,7 +39,7 @@
         - `aspirantePagosInscripcionService.ts`
         - `aspirantePagosMatriculaService.ts`
     - `programa/`
-        - `programaService.ts` — Auth del director de programa: login, logout, refreshSession, y `programaApiFetch` (fetch autenticado con retry)
+        - `programaService.ts` — Auth del director de programa y `programaApiClient` (fetch autenticado con retry)
         - `programaInicioService.ts`
         - `programaCohorteService.ts`
         - `programaCohorteDetalleService.ts`
@@ -56,7 +57,7 @@
         - `validacionPagosMatriculaService.ts`
         - `validacionPagosCohorteService.ts`
     - `superadmin/`
-        - `superadminService.ts` — Auth del superadmin: login, logout, refreshSession, y `superadminApiFetch`
+        - `superadminService.ts` — Auth del superadmin y `superadminApiClient`
         - `superadminUsuariosService.ts`
         - `superadminCohortesService.ts`
         - `superadminSemestresService.ts`
@@ -64,7 +65,7 @@
         - `superadminDocumentosService.ts`
         - `superadminUltimosCodigosService.ts`
     - `posgrados/`
-        - `posgradosService.ts` — Auth del usuario posgrados
+        - `posgradosService.ts` — Auth del usuario posgrados y `posgradosApiClient`
         - `posgradosProgramasService.ts`
     - `registroService.ts` — Servicio de inscripción pública (sin auth)
 

@@ -1,4 +1,4 @@
-import { superadminApiFetch } from './superadminService';
+import { superadminApiClient } from './superadminService';
 
 export interface ValorGlobalOutput {
 	id: number;
@@ -153,7 +153,7 @@ function upsertCache(slot: ValorGlobalSlot, item: ValorGlobalOutput): ValorGloba
 
 async function fetchValorGlobal(slot: ValorGlobalSlot): Promise<ValorGlobalOutput> {
 	return normalizeValorGlobal(
-		await superadminApiFetch<unknown>(VALORES_GLOBALES_CONFIG[slot].listar, {
+		await superadminApiClient.fetch<unknown>(VALORES_GLOBALES_CONFIG[slot].listar, {
 			method: 'GET',
 		}),
 		undefined,
@@ -190,7 +190,7 @@ export const superadminGlobalesService = {
 		}
 
 		const updated = normalizeValorGlobal(
-			await superadminApiFetch<unknown>(VALORES_GLOBALES_CONFIG[slot].crear, {
+			await superadminApiClient.fetch<unknown>(VALORES_GLOBALES_CONFIG[slot].crear, {
 				method: 'POST',
 				body: JSON.stringify({
 					clave: VALORES_GLOBALES_CONFIG[slot].displayClave,

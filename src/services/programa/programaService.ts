@@ -6,55 +6,13 @@
  * usado en `superadminService.ts`.
  */
 
-import { createAuthService, extractErrorMessage } from "../authService";
-
-const BASE_URL = import.meta.env.VITE_API_URL;
+import { createApiClient } from "../apiService";
+import { createAuthService } from "../authService";
 
 const ACCESS_TOKEN_KEY = "ufps_programa_access_token";
 const REFRESH_TOKEN_KEY = "ufps_programa_refresh_token";
 const SESSION_KEY = "ufps_programa_session";
 const PROGRAMA_KEY = "ufps_programa_id";
-
-export async function programaApiFetch<T>(path: string, options?: RequestInit, _isRetry = false): Promise<T> {
-  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...options?.headers,
-  };
-
-  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
-
-  if ((res.status === 401 || res.status === 403) && !_isRetry) {
-    const refreshed = await programaAuthService.refreshSession();
-    if (!refreshed) {
-      programaAuthService.logout();
-      throw new Error("Sesión expirada. Por favor, inicia sesión de nuevo.");
-    }
-    return programaApiFetch<T>(path, options, true);
-  }
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    let body: unknown;
-    try { body = JSON.parse(text); } catch { body = text; }
-    const err = new Error(extractErrorMessage(body, res.status, res.statusText)) as Error & { body?: unknown; status?: number; statusText?: string };
-    err.body = body;
-    err.status = res.status;
-    err.statusText = res.statusText;
-    throw err;
-  }
-
-  // Handle empty responses (204 No Content or 200 with empty body)
-  const text = await res.text().catch(() => "");
-  if (!text) return undefined as unknown as T;
-  try {
-    return JSON.parse(text) as T;
-  } catch {
-    // Not JSON — return raw text as unknown
-    return text as unknown as T;
-  }
-}
 
 let _programaIdCache: number | null = null;
 
@@ -73,7 +31,7 @@ export async function getProgramaRealId(): Promise<number> {
   interface ProgramaIdResponse {
     idPrograma: number;
   }
-  const resp = await programaApiFetch<ProgramaIdResponse>(
+  const resp = await programaApiClient.fetch<ProgramaIdResponse>(
     `/api/application/case/director-programa/programa/director/${userId}`,
     { method: "GET" }
   );
@@ -116,3 +74,5 @@ export const programaAuthService = {
     await getProgramaRealId();
   },
 };
+
+export const programaApiClient = createApiClient(programaAuthService);

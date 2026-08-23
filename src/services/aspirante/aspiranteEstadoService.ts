@@ -1,6 +1,4 @@
-import { aspiranteApiFetch, getAspiranteRealId } from "./aspiranteService";
-
-const apiFetch = aspiranteApiFetch;
+import { aspiranteApiClient, getAspiranteRealId } from "./aspiranteService";
 
 // ── Tipos backend ─────────────────────────────────────────────────────────────
 
@@ -34,7 +32,7 @@ function mapEstado(apiStatus: string): EstadoPaso {
 // GET /api/application/case/aspirantes/{idAspirante}/estado-proceso
 export async function fetchEstadoProceso(): Promise<PasoProceso[]> {
   const idAspirante = await getAspiranteRealId();
-  const list = await apiFetch<PasoBackend[]>(
+  const list = await aspiranteApiClient.fetch<PasoBackend[]>(
     `/api/application/case/aspirantes/${idAspirante}/estado-proceso`
   );
   return (list ?? []).map(p => ({

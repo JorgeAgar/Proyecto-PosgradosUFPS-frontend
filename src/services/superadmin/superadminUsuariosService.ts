@@ -1,4 +1,4 @@
-import { superadminApiFetch, superadminAuthService } from './superadminService';
+import { superadminApiClient, superadminAuthService } from './superadminService';
 
 export interface PersonaBasica {
   id: number;
@@ -185,13 +185,13 @@ interface AdministrativoOutput {
 
 export const superadminUsuariosService = {
   listar: () =>
-    superadminApiFetch<UsuarioOutput[]>(`/api/dev/endpoint/usuario/listall`, { method: 'GET' }),
+    superadminApiClient.fetch<UsuarioOutput[]>(`/api/dev/endpoint/usuario/listall`, { method: 'GET' }),
 
   listarRoles: () =>
-    superadminApiFetch<RolOutput[]>(`/api/dev/endpoint/rol/listall`, { method: 'GET' }),
+    superadminApiClient.fetch<RolOutput[]>(`/api/dev/endpoint/rol/listall`, { method: 'GET' }),
 
   listarPersonas: () =>
-    superadminApiFetch<PersonaBasica[]>(`/api/dev/endpoint/persona/listall`, { method: 'GET' }),
+    superadminApiClient.fetch<PersonaBasica[]>(`/api/dev/endpoint/persona/listall`, { method: 'GET' }),
 
   listarProgramasDirigibles: async (): Promise<ProgramaDirigibleOutput[]> => {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/dev/endpoint/superadmin/cargos-director-programa/listall`, {
@@ -226,7 +226,7 @@ export const superadminUsuariosService = {
   },
 
   desasignarProgramaDirector: async (idPersona: number): Promise<void> => {
-    const administrativos = await superadminApiFetch<AdministrativoOutput[]>(`/api/dev/endpoint/administrativo/listall`, { method: 'GET' });
+    const administrativos = await superadminApiClient.fetch<AdministrativoOutput[]>(`/api/dev/endpoint/administrativo/listall`, { method: 'GET' });
     const administrativo = administrativos.find((item) => (item.idPersona ?? item.id_persona) === idPersona);
 
     if (!administrativo) return;
@@ -248,44 +248,44 @@ export const superadminUsuariosService = {
   },
 
   obtenerCargoDirectorActual: async (idPersona: number): Promise<number | ''> => {
-    const administrativos = await superadminApiFetch<AdministrativoOutput[]>(`/api/dev/endpoint/administrativo/listall`, { method: 'GET' });
+    const administrativos = await superadminApiClient.fetch<AdministrativoOutput[]>(`/api/dev/endpoint/administrativo/listall`, { method: 'GET' });
     const administrativo = administrativos.find((item) => (item.idPersona ?? item.id_persona) === idPersona);
 
     return administrativo?.cargo?.id ?? '';
   },
 
   crearPersona: (data: PersonaCompletaPayload) =>
-    superadminApiFetch<PersonaCreadaOutput>(`/api/application/case/superadmin/persona/crear-completo`, {
+    superadminApiClient.fetch<PersonaCreadaOutput>(`/api/application/case/superadmin/persona/crear-completo`, {
       method: 'POST',
       body: JSON.stringify(buildPersonaPayload(data)),
     }),
 
   actualizarPersona: (data: PersonaCompletaPayload & { id: number }) =>
-    superadminApiFetch<PersonaCreadaOutput>(`/api/dev/endpoint/persona/update`, {
+    superadminApiClient.fetch<PersonaCreadaOutput>(`/api/dev/endpoint/persona/update`, {
       method: 'PUT',
       body: JSON.stringify(buildPersonaUpdatePayload(data)),
     }),
 
   crearClave: (valor: string) =>
-    superadminApiFetch<ClaveOutput>(`/api/dev/endpoint/clave/create`, {
+    superadminApiClient.fetch<ClaveOutput>(`/api/dev/endpoint/clave/create`, {
       method: 'POST',
       body: JSON.stringify({ valor }),
     }),
 
   crear: (data: { nombreusuario: string; idPersona: number; idRol: number; idClave: number }) =>
-    superadminApiFetch<unknown>(`/api/dev/endpoint/usuario/create`, {
+    superadminApiClient.fetch<unknown>(`/api/dev/endpoint/usuario/create`, {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
   actualizar: (data: { id: number; nombreusuario: string; idPersona: number; idRol: number; idClave: number }) =>
-    superadminApiFetch<unknown>(`/api/dev/endpoint/usuario/update`, {
+    superadminApiClient.fetch<unknown>(`/api/dev/endpoint/usuario/update`, {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
 
   eliminar: (id: number) =>
-    superadminApiFetch<unknown>(`/api/dev/endpoint/usuario/delete`, {
+    superadminApiClient.fetch<unknown>(`/api/dev/endpoint/usuario/delete`, {
       method: 'DELETE',
       body: JSON.stringify({ id }),
     }),

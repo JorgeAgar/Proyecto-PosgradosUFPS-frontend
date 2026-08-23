@@ -1,4 +1,4 @@
-import { aspiranteApiFetch } from './aspiranteService';
+import { aspiranteApiClient } from './aspiranteService';
 
 export type PagoEstado = 'pendiente' | 'pagado';
 
@@ -98,7 +98,7 @@ function formatPagoConcepto(tipo: string | undefined): string {
 }
 
 export async function fetchPayments(aspiranteId: string): Promise<PaymentSummary[]> {
-  const pagos = await aspiranteApiFetch<BackendPagoItem[]>(
+  const pagos = await aspiranteApiClient.fetch<BackendPagoItem[]>(
     `/api/application/case/aspirantes/${aspiranteId}/pagos`
   );
   return pagos.map((pago) => ({

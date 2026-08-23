@@ -1,14 +1,14 @@
-import { aspiranteApiFetch, aspiranteApiUploadFile } from './aspiranteService';
+import { aspiranteApiClient, aspiranteApiUploadFile } from './aspiranteService';
 import type { ResumenPagoResponse, WompiCheckoutResponse } from './aspirantePagosService';
 
 export async function fetchInscripcionResumen(aspiranteId: string): Promise<ResumenPagoResponse> {
-  return aspiranteApiFetch<ResumenPagoResponse>(
+  return aspiranteApiClient.fetch<ResumenPagoResponse>(
     `/api/application/case/aspirantes/${aspiranteId}/pagos/inscripcion/resumen`
   );
 }
 
 export async function fetchInscripcionCheckout(aspiranteId: string): Promise<WompiCheckoutResponse> {
-  return aspiranteApiFetch<WompiCheckoutResponse>(
+  return aspiranteApiClient.fetch<WompiCheckoutResponse>(
     `/api/application/case/aspirantes/${aspiranteId}/pagos/inscripcion/checkout`,
     { method: 'POST' }
   );

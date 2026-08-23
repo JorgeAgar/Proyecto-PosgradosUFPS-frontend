@@ -1,4 +1,4 @@
-import { programaApiFetch } from './programaService';
+import { programaApiClient } from './programaService';
 
 export interface DocumentoAspiranteValidacionApi {
   idDocumento: number;
@@ -26,13 +26,13 @@ export interface AccionDocumentoResponse {
 }
 
 export async function obtenerDocumentosAspirante(idAspirante: number): Promise<DocumentosAspiranteResponse> {
-  return programaApiFetch<DocumentosAspiranteResponse>(
+  return programaApiClient.fetch<DocumentosAspiranteResponse>(
     `/api/application/case/director-programa/aspirantes/${idAspirante}/documentos`
   );
 }
 
 export async function aprobarDocumento(idDocumento: number): Promise<AccionDocumentoResponse> {
-  return programaApiFetch<AccionDocumentoResponse>(
+  return programaApiClient.fetch<AccionDocumentoResponse>(
     `/api/application/case/director-programa/documentos/${idDocumento}/aprobar`,
     { method: "PATCH" }
   );
@@ -42,7 +42,7 @@ export async function rechazarDocumento(
   idDocumento: number,
   motivoRechazo: string,
 ): Promise<AccionDocumentoResponse> {
-  return programaApiFetch<AccionDocumentoResponse>(
+  return programaApiClient.fetch<AccionDocumentoResponse>(
     `/api/application/case/director-programa/documentos/${idDocumento}/rechazar`,
     { method: "PATCH", body: JSON.stringify(motivoRechazo) }
   );

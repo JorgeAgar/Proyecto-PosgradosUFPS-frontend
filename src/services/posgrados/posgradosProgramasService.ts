@@ -1,4 +1,4 @@
-import { posgradosApiFetch } from './posgradosService';
+import { posgradosApiClient } from './posgradosService';
 
 // ── Interfaces ────────────────────────────────────────────────────────────────
 
@@ -85,25 +85,25 @@ export interface CohorteOutput {
 
 export const superadminSemestresService = {
   listar: () =>
-    posgradosApiFetch<SemestreOutput[]>('/api/dev/endpoint/semestre/listall', { method: 'GET' }),
+    posgradosApiClient.fetch<SemestreOutput[]>('/api/dev/endpoint/semestre/listall', { method: 'GET' }),
 
   listarEstados: () =>
-    posgradosApiFetch<EstadoOutput[]>('/api/dev/endpoint/estado/listall', { method: 'GET' }),
+    posgradosApiClient.fetch<EstadoOutput[]>('/api/dev/endpoint/estado/listall', { method: 'GET' }),
 
   crear: (data: { nombre: string; fechaInicio: string; fechaFin: string; idEstado: number }) =>
-    posgradosApiFetch<unknown>('/api/dev/endpoint/semestre/create', {
+    posgradosApiClient.fetch<unknown>('/api/dev/endpoint/semestre/create', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
   actualizar: (data: { id: number; nombre: string; fechaInicio: string; fechaFin: string; idEstado: number }) =>
-    posgradosApiFetch<unknown>('/api/dev/endpoint/semestre/update', {
+    posgradosApiClient.fetch<unknown>('/api/dev/endpoint/semestre/update', {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
 
   eliminar: (id: number) =>
-    posgradosApiFetch<unknown>('/api/dev/endpoint/semestre/delete', {
+    posgradosApiClient.fetch<unknown>('/api/dev/endpoint/semestre/delete', {
       method: 'DELETE',
       body: JSON.stringify({ id }),
     }),
@@ -113,22 +113,22 @@ export const superadminSemestresService = {
 
 export const superadminFacultadesService = {
   listar: () =>
-    posgradosApiFetch<FacultadOutput[]>('/api/dev/endpoint/facultad/listall', { method: 'GET' }),
+    posgradosApiClient.fetch<FacultadOutput[]>('/api/dev/endpoint/facultad/listall', { method: 'GET' }),
 
   crear: (data: { nombre: string; correo: string; idAdministrativo?: number }) =>
-    posgradosApiFetch<unknown>('/api/dev/endpoint/facultad/create', {
+    posgradosApiClient.fetch<unknown>('/api/dev/endpoint/facultad/create', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
   actualizar: (data: { id: number; nombre: string; correo: string; idAdministrativo?: number }) =>
-    posgradosApiFetch<unknown>('/api/dev/endpoint/facultad/update', {
+    posgradosApiClient.fetch<unknown>('/api/dev/endpoint/facultad/update', {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
 
   eliminar: (id: number) =>
-    posgradosApiFetch<unknown>('/api/dev/endpoint/facultad/delete', {
+    posgradosApiClient.fetch<unknown>('/api/dev/endpoint/facultad/delete', {
       method: 'DELETE',
       body: JSON.stringify({ id }),
     }),
@@ -138,16 +138,16 @@ export const superadminFacultadesService = {
 
 export const superadminProgramasService = {
   listar: () =>
-    posgradosApiFetch<ProgramaOutput[]>('/api/dev/endpoint/programa/listall', { method: 'GET' }),
+    posgradosApiClient.fetch<ProgramaOutput[]>('/api/dev/endpoint/programa/listall', { method: 'GET' }),
 
   listarPorFacultad: (idFacultad: number) =>
-    posgradosApiFetch<ProgramaOutput[]>('/api/dev/endpoint/programa/listbyfacultad', {
+    posgradosApiClient.fetch<ProgramaOutput[]>('/api/dev/endpoint/programa/listbyfacultad', {
       method: 'POST',
       body: JSON.stringify({ id: idFacultad }),
     }),
 
   listarFacultades: () =>
-    posgradosApiFetch<FacultadOutput[]>('/api/dev/endpoint/facultad/listall', { method: 'GET' }),
+    posgradosApiClient.fetch<FacultadOutput[]>('/api/dev/endpoint/facultad/listall', { method: 'GET' }),
 
   crear: (data: {
     codigo: number; nombre: string; semestres: number; correo: string;
@@ -156,7 +156,7 @@ export const superadminProgramasService = {
     valormatricula: number; idSede: number; idAdministrativo: number;
     idFacultad: number; idOtros: number;
   }) =>
-    posgradosApiFetch<unknown>('/api/dev/endpoint/programa/create', {
+    posgradosApiClient.fetch<unknown>('/api/dev/endpoint/programa/create', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
@@ -168,13 +168,13 @@ export const superadminProgramasService = {
     valormatricula: number; idSede: number; idAdministrativo: number;
     idFacultad: number; idOtros: number;
   }) =>
-    posgradosApiFetch<unknown>('/api/dev/endpoint/programa/update', {
+    posgradosApiClient.fetch<unknown>('/api/dev/endpoint/programa/update', {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
 
   eliminar: (id: number) =>
-    posgradosApiFetch<unknown>('/api/dev/endpoint/programa/delete', {
+    posgradosApiClient.fetch<unknown>('/api/dev/endpoint/programa/delete', {
       method: 'DELETE',
       body: JSON.stringify({ id }),
     }),
@@ -191,14 +191,14 @@ export interface AdministrativoOutput {
 
 export const superadminAdministrativosService = {
   listar: () =>
-    posgradosApiFetch<AdministrativoOutput[]>('/api/dev/endpoint/administrativo/listall', { method: 'GET' }),
+    posgradosApiClient.fetch<AdministrativoOutput[]>('/api/dev/endpoint/administrativo/listall', { method: 'GET' }),
 };
 
 // ── Cohortes ──────────────────────────────────────────────────────────────────
 
 export const superadminCohortesService = {
   listar: () =>
-    posgradosApiFetch<CohorteOutput[]>('/api/dev/endpoint/cohortes/listall', { method: 'GET' }),
+    posgradosApiClient.fetch<CohorteOutput[]>('/api/dev/endpoint/cohortes/listall', { method: 'GET' }),
 
   crear: (data: {
     nombre: string; cupos: number; requiereentrevista: boolean; requiereprueba: boolean;
@@ -206,7 +206,7 @@ export const superadminCohortesService = {
     idPlazodocumentacion: number; idPlazoinscripcion: number; idPlazopago: number;
     idPrograma: number;
   }) =>
-    posgradosApiFetch<unknown>('/api/dev/endpoint/cohortes/create', {
+    posgradosApiClient.fetch<unknown>('/api/dev/endpoint/cohortes/create', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
@@ -217,13 +217,13 @@ export const superadminCohortesService = {
     idPlazodocumentacion: number; idPlazoinscripcion: number; idPlazopago: number;
     idPrograma: number;
   }) =>
-     posgradosApiFetch<unknown>('/api/dev/endpoint/cohortes/update', {
+     posgradosApiClient.fetch<unknown>('/api/dev/endpoint/cohortes/update', {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
 
   eliminar: (id: number) =>
-     posgradosApiFetch<unknown>('/api/dev/endpoint/cohortes/delete', {
+     posgradosApiClient.fetch<unknown>('/api/dev/endpoint/cohortes/delete', {
       method: 'DELETE',
       body: JSON.stringify({ id }),
     }),
@@ -239,7 +239,7 @@ export interface SedeOutput {
 
 export const superadminSedesService = {
   listar: () =>
-    posgradosApiFetch<SedeOutput[]>('/api/dev/endpoint/sedes/listall', { method: 'GET' }),
+    posgradosApiClient.fetch<SedeOutput[]>('/api/dev/endpoint/sedes/listall', { method: 'GET' }),
 };
 
 // ── Otros valores ─────────────────────────────────────────────────────────────
@@ -253,5 +253,5 @@ export interface OtrosValoresOutput {
 
 export const superadminOtrosValoresService = {
   listar: () =>
-    posgradosApiFetch<OtrosValoresOutput[]>('/api/dev/endpoint/otrosvalores/listall', { method: 'GET' }),
+    posgradosApiClient.fetch<OtrosValoresOutput[]>('/api/dev/endpoint/otrosvalores/listall', { method: 'GET' }),
 };

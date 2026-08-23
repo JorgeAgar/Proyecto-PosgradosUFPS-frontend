@@ -6,7 +6,7 @@
   - Contrato pensado para reemplazarse por backend real
 */
 
-import { programaApiFetch, getProgramaRealId } from './programaService';
+import { programaApiClient, getProgramaRealId } from './programaService';
 
 export interface CohorteActualResumen {
   id: string;
@@ -37,25 +37,25 @@ export interface CriterioPayload {
 export async function fetchCriteriosPrograma(): Promise<CriterioEvaluacion[]> {
   const programaId = await getProgramaRealId();
   const path = `/api/application/case/director-programa/programa/${programaId}/criterios`;
-  return programaApiFetch<CriterioEvaluacion[]>(path, { method: 'GET' });
+  return programaApiClient.fetch<CriterioEvaluacion[]>(path, { method: 'GET' });
 }
 
 export async function createCriterioPrograma(payload: CriterioPayload): Promise<CriterioEvaluacion> {
   const programaId = await getProgramaRealId();
   const path = `/api/application/case/director-programa/programa/${programaId}/criterios`;
-  return programaApiFetch<CriterioEvaluacion>(path, { method: 'POST', body: JSON.stringify(payload) });
+  return programaApiClient.fetch<CriterioEvaluacion>(path, { method: 'POST', body: JSON.stringify(payload) });
 }
 
 export async function updateCriterioPrograma(criterioId: string, payload: CriterioPayload): Promise<CriterioEvaluacion> {
   const programaId = await getProgramaRealId();
   const path = `/api/application/case/director-programa/programa/${programaId}/criterios/${criterioId}`;
-  return programaApiFetch<CriterioEvaluacion>(path, { method: 'PUT', body: JSON.stringify(payload) });
+  return programaApiClient.fetch<CriterioEvaluacion>(path, { method: 'PUT', body: JSON.stringify(payload) });
 }
 
 export async function deleteCriterioPrograma(criterioId: string): Promise<{ success: boolean }> {
   const programaId = await getProgramaRealId();
   const path = `/api/application/case/director-programa/programa/${programaId}/criterios/${criterioId}`;
-  await programaApiFetch<void>(path, { method: 'DELETE' });
+  await programaApiClient.fetch<void>(path, { method: 'DELETE' });
   return { success: true };
 }
 
@@ -66,7 +66,7 @@ export async function updateCriterio(
 ): Promise<CriterioEvaluacion> {
   const programaId = await getProgramaRealId();
   const path = `/api/application/case/director-programa/programa/${programaId}/cohorte/${cohorteId}/criterios/${criterioId}`;
-  return programaApiFetch<CriterioEvaluacion>(path, { method: 'PUT', body: JSON.stringify(payload) });
+  return programaApiClient.fetch<CriterioEvaluacion>(path, { method: 'PUT', body: JSON.stringify(payload) });
 }
 
 /*

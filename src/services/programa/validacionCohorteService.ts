@@ -1,4 +1,4 @@
-import { programaApiFetch } from './programaService';
+import { programaApiClient } from './programaService';
 
 export interface AspiranteValidacionApi {
   id: number;
@@ -11,7 +11,7 @@ export interface AspiranteValidacionApi {
 }
 
 export async function obtenerAspirantesPorCohorte(idCohorte: number): Promise<AspiranteValidacionApi[]> {
-  return programaApiFetch<AspiranteValidacionApi[]>(
+  return programaApiClient.fetch<AspiranteValidacionApi[]>(
     `/api/application/case/director-programa/cohorte/${idCohorte}/aspirantes-a-validar`
   );
 }

@@ -1,4 +1,4 @@
-import { programaApiFetch } from './programaService';
+import { programaApiClient } from './programaService';
 
 export interface PagoMatriculaApi {
   id: number;
@@ -29,20 +29,20 @@ export interface AccionPagoMatriculaAprobarResponse {
 }
 
 export async function obtenerPagosMatricula(idCohorte: number): Promise<PagoMatriculaApi[]> {
-  return programaApiFetch<PagoMatriculaApi[]>(
+  return programaApiClient.fetch<PagoMatriculaApi[]>(
     `/api/application/case/director-programa/pagos/${idCohorte}/matricula`,
   );
 }
 
 export async function aprobarPagoMatricula(idRecibo: number): Promise<AccionPagoMatriculaAprobarResponse> {
-  return programaApiFetch<AccionPagoMatriculaAprobarResponse>(
+  return programaApiClient.fetch<AccionPagoMatriculaAprobarResponse>(
     `/api/application/case/director-programa/pagos/matricula/${idRecibo}/aprobar`,
     { method: 'PATCH' },
   );
 }
 
 export async function rechazarPagoMatricula(idRecibo: number): Promise<PagoMatriculaApi> {
-  return programaApiFetch<PagoMatriculaApi>(
+  return programaApiClient.fetch<PagoMatriculaApi>(
     `/api/application/case/director-programa/pagos/matricula/${idRecibo}/estado`,
     { method: 'PATCH' },
   );

@@ -1,6 +1,4 @@
-import { aspiranteApiFetch, getAspiranteRealId } from "./aspiranteService";
-
-const apiFetch = aspiranteApiFetch;
+import { aspiranteApiClient, getAspiranteRealId } from "./aspiranteService";
 
 // ── Tipos backend ─────────────────────────────────────────────────────────────
 
@@ -57,7 +55,7 @@ function mapEstado(estado: string): EstadoPrueba {
 // GET /api/application/case/aspirantes/{idAspirante}/pruebas
 export async function getPruebas(): Promise<Prueba[]> {
   const idAspirante = await getAspiranteRealId();
-  const list = await apiFetch<PruebaBackend[]>(
+  const list = await aspiranteApiClient.fetch<PruebaBackend[]>(
     `/api/application/case/aspirantes/${idAspirante}/pruebas`
   );
   return (list ?? []).map(p => ({
@@ -75,7 +73,7 @@ export async function getPruebas(): Promise<Prueba[]> {
 
 // PATCH /api/application/case/aspirantes/pruebas/{idPrueba}/aceptar
 export async function aceptarPrueba(idPrueba: string): Promise<void> {
-  return apiFetch<void>(
+  return aspiranteApiClient.fetch<void>(
     `/api/application/case/aspirantes/pruebas/${idPrueba}/aceptar`,
     { method: "PATCH" }
   );
@@ -83,7 +81,7 @@ export async function aceptarPrueba(idPrueba: string): Promise<void> {
 
 // PATCH /api/application/case/aspirantes/pruebas/{idPrueba}/solicitar-cambio
 export async function solicitarCambioPrueba(idPrueba: string, motivocambio: string): Promise<void> {
-  return apiFetch<void>(
+  return aspiranteApiClient.fetch<void>(
     `/api/application/case/aspirantes/pruebas/${idPrueba}/solicitar-cambio`,
     { method: "PATCH", body: JSON.stringify({ motivocambio }) }
   );
@@ -91,7 +89,7 @@ export async function solicitarCambioPrueba(idPrueba: string, motivocambio: stri
 
 // PATCH /api/application/case/aspirantes/pruebas/{idPrueba}/cancelar
 export async function cancelarPrueba(idPrueba: string, motivocambio: string): Promise<void> {
-  return apiFetch<void>(
+  return aspiranteApiClient.fetch<void>(
     `/api/application/case/aspirantes/pruebas/${idPrueba}/cancelar`,
     { method: "PATCH", body: JSON.stringify({ motivocambio }) }
   );

@@ -5,7 +5,7 @@
   - Endpoints del backend real
 */
 
-import { programaApiFetch, getProgramaRealId } from './programaService';
+import { programaApiClient, getProgramaRealId } from './programaService';
 
 export interface CohorteItem {
   id: string;
@@ -137,7 +137,7 @@ function isObject(v: unknown): v is Record<string, unknown> {
 export async function fetchCohortes(): Promise<CohorteItem[]> {
   const programaId = await getProgramaRealId();
   const path = `/api/application/case/director-programa/programa/${programaId}/cohortes`;
-  const data = await programaApiFetch<unknown[]>(path, { method: 'GET' });
+  const data = await programaApiClient.fetch<unknown[]>(path, { method: 'GET' });
   const normalized = data.map((item) => {
     const cohorte = item as Record<string, unknown>;
     return {
@@ -188,12 +188,12 @@ export async function fetchCohortes(): Promise<CohorteItem[]> {
 export async function createCohorte(payload: NuevaCohortePayload): Promise<CohorteItem> {
   const programaId = await getProgramaRealId();
   const path = `/api/application/case/director-programa/programa/${programaId}/cohortes`;
-  return programaApiFetch<CohorteItem>(path, { method: 'POST', body: JSON.stringify(payload) });
+  return programaApiClient.fetch<CohorteItem>(path, { method: 'POST', body: JSON.stringify(payload) });
 }
 
 export async function fetchSemestresDisponibles(): Promise<SemestreItem[]> {
   const path = '/api/dev/endpoint/semestre/listall';
-  const data = await programaApiFetch<unknown[]>(path, { method: 'GET' });
+  const data = await programaApiClient.fetch<unknown[]>(path, { method: 'GET' });
   const semestres = (data ?? []).map((item) => {
     const semestre = item as Record<string, unknown>;
     return {
@@ -220,7 +220,7 @@ export async function fetchSemestresDisponibles(): Promise<SemestreItem[]> {
 export async function fetchModalidadesDisponibles(): Promise<ModalidadItem[]> {
   const programaId = await getProgramaRealId();
   const path = `/api/application/case/director-programa/programa/${programaId}/modalidades`;
-  const data = await programaApiFetch<unknown[]>(path, { method: 'GET' });
+  const data = await programaApiClient.fetch<unknown[]>(path, { method: 'GET' });
   return (data ?? []).map((item) => {
     const modalidad = item as Record<string, unknown>;
     return {

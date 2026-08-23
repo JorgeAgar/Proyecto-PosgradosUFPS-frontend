@@ -1,6 +1,4 @@
-import { aspiranteApiFetch, getAspiranteRealId } from "./aspiranteService";
-
-const apiFetch = aspiranteApiFetch;
+import { aspiranteApiClient, getAspiranteRealId } from "./aspiranteService";
 
 // ── Tipos backend ─────────────────────────────────────────────────────────────
 
@@ -53,7 +51,7 @@ function mapEstado(estado: string): EstadoEntrevista {
 // GET /api/application/case/aspirantes/{idAspirante}/entrevistas
 export async function getEntrevistas(): Promise<Entrevista[]> {
   const idAspirante = await getAspiranteRealId();
-  const list = await apiFetch<EntrevistaBackend[]>(
+  const list = await aspiranteApiClient.fetch<EntrevistaBackend[]>(
     `/api/application/case/aspirantes/${idAspirante}/entrevistas`
   );
   return (list ?? []).map(e => ({
@@ -69,7 +67,7 @@ export async function getEntrevistas(): Promise<Entrevista[]> {
 
 // PATCH /api/application/case/aspirantes/entrevistas/{idEntrevista}/aceptar
 export async function aceptarEntrevista(idEntrevista: string): Promise<void> {
-  return apiFetch<void>(
+  return aspiranteApiClient.fetch<void>(
     `/api/application/case/aspirantes/entrevistas/${idEntrevista}/aceptar`,
     { method: "PATCH" }
   );
@@ -77,7 +75,7 @@ export async function aceptarEntrevista(idEntrevista: string): Promise<void> {
 
 // PATCH /api/application/case/aspirantes/entrevistas/{idEntrevista}/solicitar-cambio
 export async function solicitarCambioEntrevista(idEntrevista: string, motivocambio: string): Promise<void> {
-  return apiFetch<void>(
+  return aspiranteApiClient.fetch<void>(
     `/api/application/case/aspirantes/entrevistas/${idEntrevista}/solicitar-cambio`,
     { method: "PATCH", body: JSON.stringify({ motivocambio }) }
   );
@@ -85,7 +83,7 @@ export async function solicitarCambioEntrevista(idEntrevista: string, motivocamb
 
 // PATCH /api/application/case/aspirantes/entrevistas/{idEntrevista}/cancelar
 export async function cancelarEntrevista(idEntrevista: string, motivocambio: string): Promise<void> {
-  return apiFetch<void>(
+  return aspiranteApiClient.fetch<void>(
     `/api/application/case/aspirantes/entrevistas/${idEntrevista}/cancelar`,
     { method: "PATCH", body: JSON.stringify({ motivocambio }) }
   );

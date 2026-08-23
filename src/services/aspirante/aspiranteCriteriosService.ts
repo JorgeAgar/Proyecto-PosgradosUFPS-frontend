@@ -1,4 +1,4 @@
-import { aspiranteApiFetch, getAspiranteRealId } from "./aspiranteService";
+import { aspiranteApiClient, getAspiranteRealId } from "./aspiranteService";
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
@@ -31,7 +31,7 @@ export interface CriteriosResult {
 // GET /api/application/case/aspirantes/{idAspirante}/criterios
 export async function getCriterios(): Promise<CriteriosResult> {
   const idAspirante = await getAspiranteRealId();
-  const res = await aspiranteApiFetch<CriteriosResponse>(
+  const res = await aspiranteApiClient.fetch<CriteriosResponse>(
     `/api/application/case/aspirantes/${idAspirante}/criterios`
   );
   return {

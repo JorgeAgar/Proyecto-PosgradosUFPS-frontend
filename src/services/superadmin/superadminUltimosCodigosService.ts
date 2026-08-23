@@ -1,4 +1,4 @@
-import { superadminApiFetch } from './superadminService';
+import { superadminApiClient } from './superadminService';
 
 export interface UltimoCodigoProgramaOutput {
 	id: number;
@@ -56,7 +56,7 @@ export const superadminUltimosCodigosService = {
 		}
 
 		if (!ultimosCodigosPromise || forceRefresh) {
-			ultimosCodigosPromise = superadminApiFetch<unknown[]>('/api/dev/endpoint/ultimocodigoprograma/listall', {
+			ultimosCodigosPromise = superadminApiClient.fetch<unknown[]>('/api/dev/endpoint/ultimocodigoprograma/listall', {
 				method: 'GET',
 			})
 				.then((data) => syncCache((Array.isArray(data) ? data : []).map(normalizeUltimoCodigo)))
@@ -70,7 +70,7 @@ export const superadminUltimosCodigosService = {
 
 	async actualizar(data: UltimoCodigoProgramaPayload): Promise<UltimoCodigoProgramaOutput> {
 		const updated = normalizeUltimoCodigo(
-			await superadminApiFetch<unknown>(`/api/application/case/director-programa/programa/${data.idPrograma}/ultimocodigo`, {
+			await superadminApiClient.fetch<unknown>(`/api/application/case/director-programa/programa/${data.idPrograma}/ultimocodigo`, {
 				method: 'PUT',
 				body: JSON.stringify({ codigo: data.codigo }),
 			}),

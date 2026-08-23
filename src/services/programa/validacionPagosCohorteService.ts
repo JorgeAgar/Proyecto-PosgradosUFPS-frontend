@@ -1,4 +1,4 @@
-import { programaApiFetch, getProgramaRealId } from './programaService';
+import { programaApiClient, getProgramaRealId } from './programaService';
 
 export interface CohortePagos {
   id: number;
@@ -21,7 +21,7 @@ export interface CohortePagos {
 
 export async function getCohortesPagos(): Promise<CohortePagos[]> {
   const idPrograma = await getProgramaRealId();
-  return programaApiFetch<CohortePagos[]>(
+  return programaApiClient.fetch<CohortePagos[]>(
     `/api/application/case/director-programa/programa/${idPrograma}/cohortes`
   );
 }

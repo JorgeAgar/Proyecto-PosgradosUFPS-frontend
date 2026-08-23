@@ -1,4 +1,4 @@
-import { programaApiFetch, programaAuthService, getProgramaRealId } from './programaService';
+import { programaApiClient, programaAuthService, getProgramaRealId } from './programaService';
 
 type RequiredDocPayload = { nombre: string; formato?: string | null; tamanomaximo?: number };
 
@@ -13,7 +13,7 @@ export type RequiredDoc = {
 const programaDocsService = {
   async fetchRequiredDocuments() {
     const programaId = await getProgramaRealId();
-    return programaApiFetch<{ documentosConsejo: RequiredDoc[]; documentosPrograma: RequiredDoc[] }>(
+    return programaApiClient.fetch<{ documentosConsejo: RequiredDoc[]; documentosPrograma: RequiredDoc[] }>(
       `/api/application/case/director-programa/programa/${programaId}/documentos/requeridos`,
       { method: 'GET' }
     );
@@ -78,7 +78,7 @@ const programaDocsService = {
   },
 
   async deleteRequiredDocument(docId: string) {
-    return programaApiFetch<{ success: boolean }>(
+    return programaApiClient.fetch<{ success: boolean }>(
       `/api/application/case/director-programa/programa/documento/${docId}`,
       { method: 'DELETE' }
     );
