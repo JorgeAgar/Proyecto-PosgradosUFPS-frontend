@@ -11,6 +11,7 @@ La aplicación comprende módulos para 4 roles: Aspirante, Director de programa,
 - React Router
 - Tailwind CSS 4
 - Heroicons
+- Oxlint
 
 ## Requisitos
 
