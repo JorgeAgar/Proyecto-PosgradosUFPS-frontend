@@ -4,6 +4,7 @@ import { createCohorte } from '../../../services/programa/programaCohorteService
 import { updateCohorte } from '../../../services/programa/programaCohorteDetalleService';
 import programaDocsService from '../../../services/programa/programaDocsService';
 import type { ProgramaOutletContext } from '../../../layouts/ProgramaLayout';
+import { SpinnerIcon } from "../../../assets/icons";
 
 type DocumentoRequerido = {
   idDocrequisito?: string | number;
@@ -44,15 +45,6 @@ function toDateInputValue(value?: string): string {
 
 function genLocalId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
-}
-
-function Spinner() {
-  return (
-    <svg className="animate-spin h-4 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
 }
 
 export default function CohorteForm({
@@ -266,7 +258,7 @@ export default function CohorteForm({
               <div className="mt-2 space-y-2">
                 {docsLoading ? (
                   <div className="flex items-center gap-2 text-sm text-neutral-400 p-3">
-                    <Spinner />
+                    <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />
                     Cargando documentos...
                   </div>
                 ) : (
@@ -285,7 +277,7 @@ export default function CohorteForm({
               <div className="mt-2 space-y-2">
                 {docsLoading ? (
                   <div className="flex items-center gap-2 text-sm text-neutral-400 p-3">
-                    <Spinner />
+                    <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />
                     Cargando documentos...
                   </div>
                 ) : (
@@ -314,7 +306,7 @@ export default function CohorteForm({
               disabled={disabled}
               className="flex items-center gap-2 px-4 py-2 bg-red-700 text-white text-sm rounded-lg hover:bg-red-800 transition-colors font-medium disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {loading && <Spinner />}
+              {loading && <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />}
               {loading ? 'Guardando...' : mode === 'create' ? 'Crear cohorte' : 'Guardar cambios'}
             </button>
           </div>

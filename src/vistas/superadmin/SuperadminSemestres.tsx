@@ -17,6 +17,7 @@ import {
 } from '../../services/superadmin/superadminSemestresService';
 import { SelectSA } from './components/SelectSA';
 import { DatePickerSA } from './components/DatePickerSA';
+import { SpinnerIcon } from "../../assets/icons";
 
 type SemestreForm = {
 	id?: number;
@@ -64,15 +65,6 @@ function getEstadoStyle(label: string) {
 		return 'bg-red-100 text-red-700 border-red-200';
 	}
 	return 'bg-gray-100 text-gray-700 border-gray-200';
-}
-
-function Spinner({ className = 'h-4 w-4' }: { className?: string }) {
-	return (
-		<svg className={`animate-spin shrink-0 ${className}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-			<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-			<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-		</svg>
-	);
 }
 
 function sortSemestres(items: SemestreOutput[]) {
@@ -243,7 +235,7 @@ export default function SuperadminSemestres() {
 			{loading ? (
 				<div className="flex items-center justify-center py-20 animate-fade-in">
 					<div className="flex items-center gap-3 text-neutral-400 text-sm">
-						<Spinner className="h-6 w-6 text-slate-700" />
+						<SpinnerIcon className="animate-spin shrink-0 h-6 w-6 text-slate-700" />
 						Cargando semestres...
 					</div>
 				</div>
@@ -289,7 +281,7 @@ export default function SuperadminSemestres() {
 						disabled={loading}
 						className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:border-gray-300 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
 					>
-						{loading ? <Spinner /> : <ArrowPathIcon className="h-4 w-4" />}
+						{loading ? <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" /> : <ArrowPathIcon className="h-4 w-4" />}
 						Recargar
 					</button>
 				</div>
@@ -427,7 +419,7 @@ export default function SuperadminSemestres() {
 							disabled={submitting}
 							className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
 						>
-							{submitting ? <><Spinner />Guardando...</> : editingSemestre ? 'Actualizar semestre' : 'Crear semestre'}
+							{submitting ? <><SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />Guardando...</> : editingSemestre ? 'Actualizar semestre' : 'Crear semestre'}
 						</button>
 					</div>
 				</form>
@@ -473,7 +465,7 @@ export default function SuperadminSemestres() {
 							disabled={deleting}
 							className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-slate-700 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
 						>
-							{deleting ? <><Spinner />Borrando...</> : 'Borrar semestre'}
+							{deleting ? <><SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />Borrando...</> : 'Borrar semestre'}
 						</button>
 					</div>
 				</div>

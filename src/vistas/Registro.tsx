@@ -17,6 +17,7 @@ import { DatePicker } from "../components/DatePicker.tsx";
 import { useNavigate } from "react-router";
 import ufpsLogo from "../assets/logoufps.png";
 import { listarCapacidadesExcepcionalesRegistro, listarCohortesRegistro, listarDepartamentosPorPaisRegistro, listarDepartamentosExpedicionRegistro, listarDiscapacidadesRegistro, listarDocumentosRegistro, listarEstadosCivilesRegistro, listarGruposEtnicosRegistro, listarMunicipiosPorDepartamentoRegistro, listarPaisesRegistro, listarPueblosIndigenasRegistro, listarProgramasInscripcionRegistro, listarSiNoRegistro, listarSexosBiologicosRegistro, listarVinculacionesProgramaRegistro, listarZonasResidenciaRegistro, registrarAspiranteCompleto, type RegistroSelectOption, type RegistroSelectOptions } from "../services/registroService.ts";
+import { SpinnerIcon } from "../assets/icons";
 
 type TabId = "personales" | "residencia" | "especial" | "laboral" | "academica" | "usuario";
 
@@ -254,15 +255,6 @@ function fieldClass(error?: string) {
 		"mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition",
 		error ? "border-red-200 focus:border-red-300 focus:ring-2 focus:ring-red-200" : "border-gray-200 focus:border-red-300 focus:ring-2 focus:ring-red-200",
 	].join(" ");
-}
-
-function Spinner() {
-	return (
-		<svg className="animate-spin h-4 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-			<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-			<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-		</svg>
-	);
 }
 
 function Label({ children, htmlFor }: { children: ReactNode; htmlFor: string }) {
@@ -1203,7 +1195,7 @@ export default function Registro() {
 											disabled={submitting}
 											className="inline-flex items-center justify-center gap-2 rounded-lg bg-red-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-800 disabled:opacity-70 disabled:cursor-not-allowed"
 										>
-											{submitting ? <><Spinner />Enviando inscripción...</> : <><CheckCircleIcon className="h-4 w-4" />Enviar inscripción</>}
+											{submitting ? <><SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />Enviando inscripción...</> : <><CheckCircleIcon className="h-4 w-4" />Enviar inscripción</>}
 										</button>
 									)}
 								</div>

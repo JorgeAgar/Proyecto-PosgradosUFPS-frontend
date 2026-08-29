@@ -3,6 +3,7 @@ import { useOutletContext } from "react-router";
 import { fetchEstadoProceso, type PasoProceso } from "../../services/aspirante/aspiranteInicioService";
 import { getCorreoAspirante, patchCorreoAspirante, enviarConfirmacionCorreo } from "../../services/aspirante/aspiranteService";
 import type { AspiranteOutletContext } from "../../layouts/AspiranteLayout";
+import { SpinnerIcon } from "../../assets/icons";
 
 // ── Íconos (Heroicons) ────────────────────────────────────────────────────────
 
@@ -34,16 +35,6 @@ function ExclamationIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4 shrink-0">
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-    </svg>
-  );
-}
-
-function Spinner({ className }: { className?: string }) {
-  const cls = className ?? "animate-spin h-6 w-6 text-red-700";
-  return (
-    <svg className={cls} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
     </svg>
   );
 }
@@ -205,7 +196,7 @@ export default function AspiranteInicio() {
         {cargando ? (
           <div className="flex items-center justify-center py-20 animate-fade-in">
             <div className="flex items-center gap-3 text-neutral-400 text-sm">
-              <Spinner />
+              <SpinnerIcon className="animate-spin h-6 w-6 text-red-700" />
               Cargando información del proceso...
             </div>
           </div>
@@ -234,7 +225,7 @@ export default function AspiranteInicio() {
 
                   {correoCargando ? (
                     <div className="flex items-center gap-3 text-neutral-400 text-sm">
-                      <Spinner /> Cargando correo...
+                      <SpinnerIcon className="animate-spin h-6 w-6 text-red-700" /> Cargando correo...
                     </div>
                   ) : (
                     <div className="flex flex-col gap-4">
@@ -261,7 +252,7 @@ export default function AspiranteInicio() {
                             }}
                             disabled={envioCargando}
                           >
-                            {envioCargando ? <><Spinner className="animate-spin h-4 w-4 text-white inline mr-2"/>Enviando...</> : "Enviar enlace de confirmación"}
+                            {envioCargando ? <><SpinnerIcon className="animate-spin h-4 w-4 text-white inline mr-2" />Enviando...</> : "Enviar enlace de confirmación"}
                           </button>
 
                           <button
@@ -298,7 +289,7 @@ export default function AspiranteInicio() {
                               }}
                               disabled={guardandoCorreo}
                             >
-                              {guardandoCorreo ? <><Spinner className="animate-spin h-4 w-4 text-white inline mr-2"/>Guardando...</> : "Guardar"}
+                              {guardandoCorreo ? <><SpinnerIcon className="animate-spin h-4 w-4 text-white inline mr-2" />Guardando...</> : "Guardar"}
                             </button>
                             <button
                               className="w-full sm:w-auto bg-white border border-gray-200 text-red-700 px-4 py-2 rounded-lg hover:border-gray-300"

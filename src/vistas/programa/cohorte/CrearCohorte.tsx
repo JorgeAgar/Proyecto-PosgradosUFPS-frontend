@@ -7,15 +7,7 @@ import programaDocsService, { type RequiredDoc } from '../../../services/program
 import type { ProgramaOutletContext } from '../../../layouts/ProgramaLayout';
 import { DatePicker } from '../../../components/DatePicker';
 import { Select, type SelectOption } from '../../../components/Select';
-
-function Spinner({ className = 'h-4 w-4' }: { className?: string }) {
-  return (
-    <svg className={`animate-spin shrink-0 ${className}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
+import { SpinnerIcon } from "../../../assets/icons";
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) {
@@ -357,7 +349,7 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
 
             {loading ? (
               <div className="rounded-lg border border-gray-200 bg-neutral-50 p-4 flex items-center gap-3 text-sm text-neutral-500">
-                <Spinner className="h-4 w-4 text-neutral-400" />
+                <SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-neutral-400" />
                 Cargando documentos...
               </div>
             ) : (
@@ -414,7 +406,7 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
 
             {loading ? (
               <div className="rounded-lg border border-gray-200 bg-neutral-50 p-4 flex items-center gap-3 text-sm text-neutral-500">
-                <Spinner className="h-4 w-4 text-neutral-400" />
+                <SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-neutral-400" />
                 Cargando criterios...
               </div>
             ) : (
@@ -479,7 +471,7 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
               disabled={disabled || selectedCriterios.length === 0}
               className="flex items-center gap-2 px-4 py-2 bg-red-700 text-white text-sm rounded-lg hover:bg-red-800 transition-colors font-medium disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {saving && <Spinner />}
+              {saving && <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />}
               <span>{saving ? 'Creando...' : 'Crear cohorte'}</span>
             </button>
           </div>
@@ -510,7 +502,7 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
               disabled={saving}
               className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg text-sm font-medium transition-colors hover:bg-red-800 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {saving ? <Spinner /> : null}
+              {saving ? <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" /> : null}
               {saving ? 'Creando...' : 'Sí, crear cohorte'}
             </button>
           </div>

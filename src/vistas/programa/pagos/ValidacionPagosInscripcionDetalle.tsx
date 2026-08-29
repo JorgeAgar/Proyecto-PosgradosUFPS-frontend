@@ -20,6 +20,7 @@ import {
 	rechazarPagoInscripcion,
 	type PagoInscripcionApi,
 } from "../../../services/programa/validacionPagosInscripcionService";
+import { SpinnerIcon } from "../../../assets/icons";
 
 function EstadoBadge({ estado }: { estado: string }) {
 	const norm = estado.trim().toUpperCase();
@@ -39,15 +40,6 @@ function EstadoBadge({ estado }: { estado: string }) {
 		<span className={`inline-block text-xs font-semibold px-3 py-1 rounded-lg ${clases[norm] ?? "bg-neutral-200 text-neutral-600"}`}>
 			{etiquetas[norm] ?? estado}
 		</span>
-	);
-}
-
-function Spinner({ className }: { className?: string }) {
-	return (
-		<svg className={`animate-spin shrink-0 ${className ?? "h-5 w-5 text-red-700"}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-			<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-			<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-		</svg>
 	);
 }
 
@@ -229,7 +221,7 @@ export default function ValidacionPagosInscripcionDetalle() {
 			{cargando ? (
 				<div className="flex items-center justify-center py-20 animate-fade-in">
 					<div className="flex items-center gap-3 text-neutral-400 text-sm">
-						<Spinner className="h-6 w-6 text-red-700" />
+						<SpinnerIcon className="animate-spin shrink-0 h-6 w-6 text-red-700" />
 						Cargando pagos...
 					</div>
 				</div>
@@ -330,7 +322,7 @@ export default function ValidacionPagosInscripcionDetalle() {
 													</span>
 													{downloadingId === pago.id && (
 														<span className="absolute inset-0 flex items-center justify-center gap-2">
-															<Spinner className="h-4 w-4 text-red-700" /> Abriendo...
+															<SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-red-700" /> Abriendo...
 														</span>
 													)}
 												</button>
@@ -372,7 +364,7 @@ export default function ValidacionPagosInscripcionDetalle() {
 													disabled={rechazado || accionEnviando !== null}
 													className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-red-700 border-2 border-red-700 rounded-lg hover:bg-red-50 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
 												>
-													{enviandoRechazar ? <><Spinner className="h-4 w-4 text-red-700" /> Rechazando...</> : "Rechazar"}
+													{enviandoRechazar ? <><SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-red-700" /> Rechazando...</> : "Rechazar"}
 												</button>
 												<button
 													type="button"
@@ -380,7 +372,7 @@ export default function ValidacionPagosInscripcionDetalle() {
 													disabled={aprobado || accionEnviando !== null}
 													className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
 												>
-													{enviandoAprobar ? <><Spinner className="h-4 w-4 text-white" /> Aprobando...</> : "Aprobar"}
+													{enviandoAprobar ? <><SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-white" /> Aprobando...</> : "Aprobar"}
 												</button>
 											</div>
 										</div>
@@ -435,7 +427,7 @@ export default function ValidacionPagosInscripcionDetalle() {
 								className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
 							>
 								{accionEnviando?.id === modalAprobar && accionEnviando.tipo === "APROBAR"
-									? <><Spinner className="h-4 w-4 text-white" /> Aprobando...</>
+									? <><SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-white" /> Aprobando...</>
 									: "Sí, aprobar"}
 							</button>
 						</div>
@@ -471,7 +463,7 @@ export default function ValidacionPagosInscripcionDetalle() {
 								className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
 							>
 								{accionEnviando?.id === modalRechazar && accionEnviando.tipo === "RECHAZAR"
-									? <><Spinner className="h-4 w-4 text-white" /> Rechazando...</>
+									? <><SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-white" /> Rechazando...</>
 									: "Sí, rechazar"}
 							</button>
 						</div>

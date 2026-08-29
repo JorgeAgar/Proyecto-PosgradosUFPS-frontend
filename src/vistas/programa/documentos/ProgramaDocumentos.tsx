@@ -8,17 +8,9 @@ import {
 import { useOutletContext } from 'react-router';
 import programaDocsService, { type RequiredDoc } from '../../../services/programa/programaDocsService';
 import type { ProgramaOutletContext } from '../../../layouts/ProgramaLayout';
+import { SpinnerIcon } from "../../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
-
-function Spinner({ className = 'h-4 w-4' }: { className?: string }) {
-  return (
-    <svg className={`animate-spin ${className}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
 
 // ── Componente principal ──────────────────────────────────────────────────────
 
@@ -189,7 +181,7 @@ export default function ProgramaDocumentos() {
       {cargando ? (
         <div className="flex items-center justify-center py-20 animate-fade-in">
           <div className="flex items-center gap-3 text-neutral-400 text-sm">
-            <Spinner className="h-6 w-6 text-red-700" />
+            <SpinnerIcon className="animate-spin h-6 w-6 text-red-700" />
             Cargando documentos...
           </div>
         </div>
@@ -258,7 +250,7 @@ export default function ProgramaDocumentos() {
                         className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition hover:border-red-300 hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {docEliminadoId === doc.id ? (
-                          <Spinner className="h-3.5 w-3.5" />
+                          <SpinnerIcon className="animate-spin h-3.5 w-3.5" />
                         ) : (
                           <TrashIcon className="h-3.5 w-3.5" />
                         )}
@@ -411,7 +403,7 @@ export default function ProgramaDocumentos() {
                 className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {guardando ? (
-                  <><Spinner className="h-4 w-4" />{docEditando ? 'Guardando...' : 'Creando...'}</>
+                  <><SpinnerIcon className="animate-spin h-4 w-4" />{docEditando ? 'Guardando...' : 'Creando...'}</>
                 ) : (
                   docEditando ? 'Guardar cambios' : 'Crear documento'
                 )}
