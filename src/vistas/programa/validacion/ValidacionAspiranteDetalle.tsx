@@ -18,6 +18,7 @@ import {
   type DocumentoAspiranteValidacionApi,
   type DocumentosAspiranteResponse,
 } from "../../../services/programa/validacionAspiranteService";
+import { SpinnerIcon } from "../../../assets/icons";
 
 interface Documento {
   id: string;
@@ -74,56 +75,6 @@ function VisualizadorDocumento({ url, nombre }: { url: string; nombre: string })
     <div className="flex h-full min-h-0 items-center justify-center text-sm text-gray-500 px-6 text-center">
       Formato no compatible para previsualización.
     </div>
-  );
-}
-
-function Spinner() {
-  return (
-    <svg
-      className="animate-spin h-5 w-5 text-red-700 shrink-0"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-      />
-    </svg>
-  );
-}
-
-function SpinnerSm() {
-  return (
-    <svg
-      className="animate-spin h-4 w-4 shrink-0"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-      />
-    </svg>
   );
 }
 
@@ -312,20 +263,20 @@ export default function ValidacionAspiranteDetalle() {
               <div className="space-y-4">
                 <div className="bg-white border border-gray-200 rounded-lg p-6 flex items-center justify-center min-h-36">
                   <div className="flex items-center gap-3 text-neutral-400 text-sm">
-                    <Spinner />
+                    <SpinnerIcon className="animate-spin h-5 w-5 text-red-700 shrink-0" />
                     Cargando información del aspirante...
                   </div>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-lg p-6 flex items-center justify-center min-h-40">
                   <div className="flex items-center gap-3 text-neutral-400 text-sm">
-                    <Spinner />
+                    <SpinnerIcon className="animate-spin h-5 w-5 text-red-700 shrink-0" />
                     Cargando documentos...
                   </div>
                 </div>
               </div>
               <div className="bg-white border border-gray-200 rounded-lg p-6 flex items-center justify-center min-h-52">
                 <div className="flex items-center gap-3 text-neutral-400 text-sm">
-                  <Spinner />
+                  <SpinnerIcon className="animate-spin h-5 w-5 text-red-700 shrink-0" />
                   Cargando visualizador...
                 </div>
               </div>
@@ -572,7 +523,7 @@ export default function ValidacionAspiranteDetalle() {
                 >
                   {accionEnviando === "APROBAR" ? (
                     <>
-                      <SpinnerSm />
+                      <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />
                       Aprobando...
                     </>
                   ) : (
@@ -634,7 +585,7 @@ export default function ValidacionAspiranteDetalle() {
                 >
                   {accionEnviando === "RECHAZAR" ? (
                     <>
-                      <SpinnerSm />
+                      <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />
                       Rechazando...
                     </>
                   ) : (

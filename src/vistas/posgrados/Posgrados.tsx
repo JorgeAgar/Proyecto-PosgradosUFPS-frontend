@@ -8,6 +8,7 @@ import {
   type ProgramaOutput,
   type CohorteOutput,
 } from '../../services/posgrados/posgradosProgramasService';
+import { SpinnerIcon } from "../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
 
@@ -33,15 +34,6 @@ function ChevronRightIcon({ open }: { open: boolean }) {
       className={`w-5 h-5 shrink-0 transition-transform duration-300 ${open ? 'rotate-90' : 'rotate-0'}`}
       stroke="currentColor" strokeWidth="1.5">
       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-    </svg>
-  );
-}
-
-function Spinner() {
-  return (
-    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
     </svg>
   );
 }
@@ -252,7 +244,7 @@ export default function Posgrados() {
       {/* Lista */}
       {loading ? (
         <div className="flex items-center justify-center py-16 text-gray-400 text-sm gap-2">
-          <Spinner />
+          <SpinnerIcon className="animate-spin h-4 w-4" />
           Cargando datos...
         </div>
       ) : (

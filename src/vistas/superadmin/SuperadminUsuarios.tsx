@@ -18,17 +18,9 @@ import {
   type RegistroSelectOption,
 } from '../../services/registroService';
 import { SelectSA } from './components/SelectSA';
+import { SpinnerIcon } from "../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
-
-function Spinner({ className = 'h-4 w-4' }: { className?: string }) {
-  return (
-    <svg className={`animate-spin shrink-0 ${className}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
 
 function UserPlusIcon() {
   return (
@@ -577,7 +569,7 @@ export default function SuperadminUsuarios() {
       {loading ? (
         <div className="flex items-center justify-center py-20 animate-fade-in">
           <div className="flex items-center gap-3 text-neutral-400 text-sm">
-            <Spinner className="h-6 w-6 text-slate-700" />
+            <SpinnerIcon className="animate-spin shrink-0 h-6 w-6 text-slate-700" />
             Cargando usuarios...
           </div>
         </div>
@@ -668,7 +660,7 @@ export default function SuperadminUsuarios() {
           )}
           {editLoading && (
             <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
-              <Spinner />
+              <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />
               Cargando datos del usuario...
             </div>
           )}
@@ -893,7 +885,7 @@ export default function SuperadminUsuarios() {
               disabled={formBusy}
               className="flex-1 bg-slate-900 text-white px-4 py-2.5 rounded-lg hover:bg-slate-800 transition-colors text-sm font-medium disabled:opacity-60 flex items-center justify-center gap-2"
             >
-              {submitting && <Spinner />}
+              {submitting && <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />}
               {editingUser ? 'Actualizar' : 'Crear'} Usuario
             </button>
             <button
@@ -940,7 +932,7 @@ export default function SuperadminUsuarios() {
               disabled={deleting}
               className="flex-1 px-4 py-2.5 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
             >
-              {deleting && <Spinner />}
+              {deleting && <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />}
               Eliminar
             </button>
           </div>

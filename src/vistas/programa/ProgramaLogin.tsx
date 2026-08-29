@@ -9,21 +9,7 @@ import {
   UserIcon,
   UserShieldIcon,
 } from "../posgrados/PosgradosLogin";
-
-function Spinner() {
-  return (
-    <svg
-      className="h-4 w-4 animate-spin text-white"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
-
+import { SpinnerIcon } from "../../assets/icons";
 
 export default function ProgramaLogin() {
   const navigate = useNavigate();
@@ -166,7 +152,7 @@ export default function ProgramaLogin() {
 
             <div>
               <button type="submit" disabled={loading} className="flex items-center justify-center gap-2 w-full rounded-md bg-red-700 p-3 font-bold text-white hover:bg-red-800 disabled:cursor-not-allowed disabled:bg-red-400">
-                {loading && <Spinner />}
+                {loading && <SpinnerIcon className="h-4 w-4 animate-spin text-white" />}
                 Iniciar sesión
               </button>
             </div>

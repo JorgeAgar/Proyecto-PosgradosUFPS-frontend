@@ -22,17 +22,9 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import ufpsLogo from "../assets/logoufps.png";
 import flujoabs from "../assets/flujoabs.jpg";
+import { SpinnerIcon } from "../assets/icons";
 
 // ── Íconos inline (misma convención que los otros logins) ──────────────────────
-
-function Spinner() {
-  return (
-    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
 
 function EnvelopeIcon() {
   return (
@@ -282,7 +274,7 @@ export default function RecuperarPassword() {
                     disabled={loading}
                     className="flex items-center justify-center gap-2 w-full text-white font-bold bg-red-700 rounded-md p-3 hover:bg-red-800 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:bg-red-400"
                   >
-                    {loading && <Spinner />}
+                    {loading && <SpinnerIcon className="animate-spin h-4 w-4 text-white" />}
                     {loading ? "Enviando..." : "Enviar nueva contraseña"}
                   </button>
                 </div>

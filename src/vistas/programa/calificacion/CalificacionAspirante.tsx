@@ -21,7 +21,7 @@ import type { DatosAspiranteResponse } from "../../../services/programa/programa
 import type { ProgramaOutletContext } from "../../../layouts/ProgramaLayout";
 import { DatePicker } from "../../../components/DatePicker";
 import { TimePicker } from "../../../components/TimePicker";
-import { CalendarIcon, ClockIcon, MapPinIcon } from "../../../assets/icons";
+import { CalendarIcon, ClockIcon, MapPinIcon, SpinnerIcon } from "../../../assets/icons";
 
 // ── Íconos (Heroicons) ────────────────────────────────────────────────────────
 
@@ -45,15 +45,6 @@ function RefreshIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4 shrink-0">
       <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-    </svg>
-  );
-}
-
-function Spinner() {
-  return (
-    <svg className="animate-spin h-4 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
     </svg>
   );
 }
@@ -780,7 +771,7 @@ export default function CalificacionAspirante() {
           </h2>
           {cargandoDatos ? (
             <div className="flex items-center gap-2 py-4 text-sm text-neutral-400">
-              <Spinner />
+              <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />
               Cargando información...
             </div>
           ) : datosAspirante ? (
@@ -858,7 +849,7 @@ export default function CalificacionAspirante() {
                 title="Recargar entrevistas"
                 className="p-2 text-neutral-400 hover:text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {cargandoEntrevistas ? <Spinner /> : <RefreshIcon />}
+                {cargandoEntrevistas ? <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" /> : <RefreshIcon />}
               </button>
               <button
                 onClick={() => {
@@ -1019,7 +1010,7 @@ export default function CalificacionAspirante() {
 
           {cargandoEntrevistas ? (
             <div className="flex items-center justify-center gap-2 py-8 text-sm text-neutral-400">
-              <Spinner />
+              <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />
               Cargando entrevistas...
             </div>
           ) : entrevistas.length === 0 && (
@@ -1040,7 +1031,7 @@ export default function CalificacionAspirante() {
                 title="Recargar pruebas"
                 className="p-2 text-neutral-400 hover:text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {cargandoPruebas ? <Spinner /> : <RefreshIcon />}
+                {cargandoPruebas ? <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" /> : <RefreshIcon />}
               </button>
               <button
                 onClick={() => {
@@ -1213,7 +1204,7 @@ export default function CalificacionAspirante() {
 
           {cargandoPruebas ? (
             <div className="flex items-center justify-center gap-2 py-8 text-sm text-neutral-400">
-              <Spinner />
+              <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />
               Cargando pruebas...
             </div>
           ) : pruebas.length === 0 && (
@@ -1233,7 +1224,7 @@ export default function CalificacionAspirante() {
               title="Recargar criterios"
               className="p-2 text-neutral-400 hover:text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {cargandoCriterios ? <Spinner /> : <RefreshIcon />}
+              {cargandoCriterios ? <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" /> : <RefreshIcon />}
             </button>
           </div>
           <div className="overflow-x-auto">
@@ -1251,7 +1242,7 @@ export default function CalificacionAspirante() {
                 <tr>
                   <td colSpan={4} className="px-6 py-8 text-center">
                     <div className="flex items-center justify-center gap-2 text-sm text-neutral-400">
-                      <Spinner />
+                      <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />
                       Cargando criterios...
                     </div>
                   </td>
@@ -1286,7 +1277,7 @@ export default function CalificacionAspirante() {
                         disabled={cargandoGuardar || cargandoLimpiar === c.id || c.puntajeGuardado === null}
                         className="inline-flex items-center justify-center gap-1.5 w-24 px-3 py-2 text-neutral-400 enabled:hover:text-red-700 border border-gray-200 rounded-lg enabled:hover:bg-red-50 enabled:hover:border-red-200 transition-colors text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {cargandoLimpiar === c.id ? <Spinner /> : <><BroomIcon />Limpiar</>}
+                        {cargandoLimpiar === c.id ? <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" /> : <><BroomIcon />Limpiar</>}
                       </button>
                     </td>
                   </tr>
@@ -1316,7 +1307,7 @@ export default function CalificacionAspirante() {
               disabled={cargandoGuardar || criterios.length === 0 || criterios.every(c => c.puntaje === null)}
               className="flex items-center gap-2 px-6 py-2.5 bg-red-700 text-white text-sm rounded-lg enabled:hover:bg-red-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {cargandoGuardar ? <><Spinner />Guardando...</> : "Guardar calificación"}
+              {cargandoGuardar ? <><SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />Guardando...</> : "Guardar calificación"}
             </button>
           </div>
         </div>
@@ -1411,7 +1402,7 @@ export default function CalificacionAspirante() {
                 className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {cargandoEntrevista
-                  ? <><Spinner />{entrevistaEditando ? (modoEdicionEntrevista === "editar" ? "Guardando..." : "Reagendando...") : "Agendando..."}</>
+                  ? <><SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />{entrevistaEditando ? (modoEdicionEntrevista === "editar" ? "Guardando..." : "Reagendando...") : "Agendando..."}</>
                   : (entrevistaEditando ? (modoEdicionEntrevista === "editar" ? "Guardar cambios" : "Reagendar") : "Agendar")}
               </button>
             </div>
@@ -1485,7 +1476,7 @@ export default function CalificacionAspirante() {
                 disabled={!motivoCancelacion.trim() || cargandoCancelar}
                 className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {cargandoCancelar ? <><Spinner />Cancelando...</> : "Cancelar entrevista"}
+                {cargandoCancelar ? <><SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />Cancelando...</> : "Cancelar entrevista"}
               </button>
             </div>
           </div>
@@ -1618,7 +1609,7 @@ export default function CalificacionAspirante() {
                 className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {cargandoPrueba
-                  ? <><Spinner />{pruebaEditando ? (modoEdicionPrueba === "editar" ? "Guardando..." : "Reagendando...") : "Creando..."}</>
+                  ? <><SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />{pruebaEditando ? (modoEdicionPrueba === "editar" ? "Guardando..." : "Reagendando...") : "Creando..."}</>
                   : (pruebaEditando ? (modoEdicionPrueba === "editar" ? "Guardar cambios" : "Reagendar") : "Crear")}
               </button>
             </div>
@@ -1651,7 +1642,7 @@ export default function CalificacionAspirante() {
                 disabled={cargandoCompletar}
                 className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {cargandoCompletar ? <><Spinner />Completando...</> : "Sí, completar"}
+                {cargandoCompletar ? <><SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />Completando...</> : "Sí, completar"}
               </button>
             </div>
           </div>
@@ -1683,7 +1674,7 @@ export default function CalificacionAspirante() {
                 disabled={cargandoCompletarPrueba}
                 className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {cargandoCompletarPrueba ? <><Spinner />Completando...</> : "Sí, completar"}
+                {cargandoCompletarPrueba ? <><SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />Completando...</> : "Sí, completar"}
               </button>
             </div>
           </div>
@@ -1756,7 +1747,7 @@ export default function CalificacionAspirante() {
                 disabled={!motivoCancelacionPrueba.trim() || cargandoCancelarPrueba}
                 className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {cargandoCancelarPrueba ? <><Spinner />Cancelando...</> : "Cancelar prueba"}
+                {cargandoCancelarPrueba ? <><SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />Cancelando...</> : "Cancelar prueba"}
               </button>
             </div>
           </div>

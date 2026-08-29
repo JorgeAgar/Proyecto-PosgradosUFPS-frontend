@@ -12,6 +12,7 @@ import {
 	superadminUltimosCodigosService,
 	type UltimoCodigoProgramaOutput,
 } from '../../services/superadmin/superadminUltimosCodigosService';
+import { SpinnerIcon } from "../../assets/icons";
 
 type UltimoCodigoForm = {
 	idPrograma: number;
@@ -24,15 +25,6 @@ const EMPTY_FORM: UltimoCodigoForm = {
 	nombrePrograma: '',
 	codigo: '',
 };
-
-function Spinner({ className = 'h-4 w-4' }: { className?: string }) {
-	return (
-		<svg className={`animate-spin shrink-0 ${className}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-			<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-			<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-		</svg>
-	);
-}
 
 function sortUltimosCodigos(items: UltimoCodigoProgramaOutput[]) {
 	return [...items].sort((a, b) => a.nombrePrograma.localeCompare(b.nombrePrograma, 'es', { sensitivity: 'base' }));
@@ -151,7 +143,7 @@ export default function SuperadminUltimosCodigos() {
 			{loading ? (
 				<div className="flex items-center justify-center py-20 animate-fade-in">
 					<div className="flex items-center gap-3 text-neutral-400 text-sm">
-						<Spinner className="h-6 w-6 text-slate-700" />
+						<SpinnerIcon className="animate-spin shrink-0 h-6 w-6 text-slate-700" />
 						Cargando últimos códigos...
 					</div>
 				</div>
@@ -285,7 +277,7 @@ export default function SuperadminUltimosCodigos() {
 							disabled={submitting}
 							className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
 						>
-							{submitting && <Spinner />}
+							{submitting && <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />}
 							Guardar cambios
 						</button>
 					</div>

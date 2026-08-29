@@ -24,15 +24,7 @@ import { fetchMatriculaResumen, fetchMatriculaCheckout, uploadMatriculaFactura, 
 import { getAspiranteRealId } from '../../../services/aspirante/aspiranteService';
 import type { ResumenPagoResponse, WompiCheckoutResponse, PaymentReceipt } from '../../../services/aspirante/aspirantePagosService';
 import type { AspiranteOutletContext } from '../../../layouts/AspiranteLayout';
-
-function Spinner({ className }: { className?: string }) {
-  return (
-    <svg className={`animate-spin shrink-0 ${className ?? 'h-4 w-4 text-red-700'}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
+import { SpinnerIcon } from "../../../assets/icons";
 
 function EstadoPagoBadge({ estado }: { estado: string }) {
   const norm = estado.trim().toUpperCase();
@@ -219,7 +211,7 @@ export default function AspirantePagosMatricula() {
           {encabezado}
           <div className="flex items-center justify-center py-20 animate-fade-in">
             <div className="flex items-center gap-3 text-neutral-400 text-sm">
-              <Spinner className="h-6 w-6 text-red-700" />
+              <SpinnerIcon className="animate-spin shrink-0 h-6 w-6 text-red-700" />
               Cargando información del pago...
             </div>
           </div>
@@ -348,7 +340,7 @@ export default function AspirantePagosMatricula() {
                 className="flex items-center justify-center gap-2 px-6 py-2.5 bg-red-700 text-white font-semibold text-sm rounded-lg hover:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full"
               >
                 {uploadingFactura
-                  ? <><Spinner className="h-4 w-4 text-white" /> Subiendo factura...</>
+                  ? <><SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-white" /> Subiendo factura...</>
                   : <><DocumentArrowUpIcon className="w-4 h-4 shrink-0" /> {resumen.urlfactura ? 'Reemplazar Factura' : 'Subir Factura'}</>}
               </button>
             </div>
@@ -383,7 +375,7 @@ export default function AspirantePagosMatricula() {
                     </span>
                     {downloadingFactura && (
                       <span className="absolute inset-0 flex items-center justify-center gap-2">
-                        <Spinner className="h-4 w-4 text-white" /> Cargando...
+                        <SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-white" /> Cargando...
                       </span>
                     )}
                   </button>
@@ -411,7 +403,7 @@ export default function AspirantePagosMatricula() {
                     </span>
                     {downloadingFactura && (
                       <span className="absolute inset-0 flex items-center justify-center gap-2">
-                        <Spinner className="h-4 w-4 text-white" /> Cargando...
+                        <SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-white" /> Cargando...
                       </span>
                     )}
                   </button>
@@ -448,7 +440,7 @@ export default function AspirantePagosMatricula() {
                       </span>
                       {downloadingRecibo && (
                         <span className="absolute inset-0 flex items-center justify-center gap-2">
-                          <Spinner className="h-4 w-4 text-white" /> Abriendo...
+                          <SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-white" /> Abriendo...
                         </span>
                       )}
                     </button>
@@ -464,7 +456,7 @@ export default function AspirantePagosMatricula() {
                       </span>
                       {downloadingFactura && (
                         <span className="absolute inset-0 flex items-center justify-center gap-2">
-                          <Spinner className="h-4 w-4 text-green-700" /> Abriendo...
+                          <SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-green-700" /> Abriendo...
                         </span>
                       )}
                     </button>
@@ -495,7 +487,7 @@ export default function AspirantePagosMatricula() {
                 className={`font-bold px-6 py-3 rounded-lg flex items-center justify-center gap-2 w-full transition ${receiptGenerated ? 'bg-green-700 text-white cursor-not-allowed' : 'bg-red-700 text-white hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed'}`}
               >
                 {receiptGenerated ? <><CheckCircleIcon className="w-5 h-5" /> Recibo Generado</>
-                  : loadingCheckout ? <><Spinner className="h-5 w-5 text-white" /> Generando recibo...</>
+                  : loadingCheckout ? <><SpinnerIcon className="animate-spin shrink-0 h-5 w-5 text-white" /> Generando recibo...</>
                   : <><DocumentCurrencyDollarIcon className="w-5 h-5" /> Generar Recibo de Pago</>}
               </button>
             </div>
@@ -556,7 +548,7 @@ export default function AspirantePagosMatricula() {
                       disabled={downloadingRecibo || !(resumen.urlrecibo ?? miniReceipt?.pdfUrl ?? wompiCheckout?.checkoutUrl)}
                       className="font-semibold text-sm text-red-700 border border-red-200 bg-white flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {downloadingRecibo ? <><Spinner /> Abriendo...</> : <><ArrowTopRightOnSquareIcon className="w-4 h-4 shrink-0" /> Ver recibo</>}
+                      {downloadingRecibo ? <><SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-red-700" /> Abriendo...</> : <><ArrowTopRightOnSquareIcon className="w-4 h-4 shrink-0" /> Ver recibo</>}
                     </button>
                   </div>
                 )}
@@ -599,7 +591,7 @@ export default function AspirantePagosMatricula() {
                 disabled={uploadingFactura}
                 className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {uploadingFactura ? <><Spinner className="h-4 w-4 text-white" /> Subiendo...</> : resumen?.urlfactura ? 'Sí, reemplazar' : 'Sí, subir factura'}
+                {uploadingFactura ? <><SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-white" /> Subiendo...</> : resumen?.urlfactura ? 'Sí, reemplazar' : 'Sí, subir factura'}
               </button>
             </div>
           </div>
@@ -647,7 +639,7 @@ export default function AspirantePagosMatricula() {
                 disabled={loadingCheckout || !montoValido}
                 className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loadingCheckout ? <><Spinner className="h-4 w-4 text-white" /> Generando...</> : 'Sí, generar recibo'}
+                {loadingCheckout ? <><SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-white" /> Generando...</> : 'Sí, generar recibo'}
               </button>
             </div>
           </div>

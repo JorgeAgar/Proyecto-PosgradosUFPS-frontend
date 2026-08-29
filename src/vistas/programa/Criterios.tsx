@@ -18,6 +18,7 @@ import {
   type CriterioPayload,
 } from '../../services/programa/programaCriteriosService';
 import type { ProgramaOutletContext } from '../../layouts/ProgramaLayout';
+import { SpinnerIcon } from "../../assets/icons";
 
 type ModalMode = 'create' | 'edit';
 
@@ -33,15 +34,6 @@ const EMPTY_FORM: CriterioPayload = {
 };
 
 const POR_PAGINA = 10;
-
-function Spinner({ className = 'h-4 w-4' }: { className?: string }) {
-  return (
-    <svg className={`animate-spin shrink-0 ${className}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
 
 const isObject = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null;
 
@@ -221,7 +213,7 @@ export default function Criterios() {
         {loading ? (
           <div className="flex items-center justify-center py-20 animate-fade-in">
             <div className="flex items-center gap-3 text-neutral-400 text-sm">
-              <Spinner className="h-6 w-6 text-red-700" />
+              <SpinnerIcon className="animate-spin shrink-0 h-6 w-6 text-red-700" />
               Cargando criterios...
             </div>
           </div>
@@ -341,7 +333,7 @@ export default function Criterios() {
                 disabled={deleting}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-700 text-white text-sm font-medium hover:bg-red-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {deleting && <Spinner className="h-4 w-4" />}
+                {deleting && <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />}
                 Eliminar
               </button>
             </div>
@@ -446,7 +438,7 @@ export default function Criterios() {
                 disabled={modalSubmitting}
                 className="flex items-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {modalSubmitting && <Spinner className="h-4 w-4" />}
+                {modalSubmitting && <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />}
                 {modalMode === 'create' ? (modalSubmitting ? 'Agregando...' : 'Agregar criterio') : (modalSubmitting ? 'Guardando...' : 'Guardar cambios')}
               </button>
             </div>
