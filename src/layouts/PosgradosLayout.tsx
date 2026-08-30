@@ -1,15 +1,8 @@
 import { useState } from "react";
 import { Outlet, Navigate, useNavigate } from "react-router";
 import ufpsLogo from "../assets/logoufps.png";
+import { MenuIcon } from "../assets/icons";
 import { posgradosAuthService } from "../services/posgrados/posgradosService";
-
-function MenuIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  );
-}
 
 function LogoutIcon() {
   return (

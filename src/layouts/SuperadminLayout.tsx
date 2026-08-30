@@ -4,19 +4,12 @@ import SuperadminSidebar from "../vistas/superadmin/components/Sidebar";
 import Alerta, { type TipoAlerta } from "../components/Alerta";
 import Confirm from "../components/Confirm";
 import ufpsLogo from "../assets/NEGROufps.png";
+import { MenuIcon } from "../assets/icons";
 import { superadminAuthService } from "../services/superadmin/superadminService";
 
 export interface SuperadminOutletContext {
   mostrarAlerta: (mensaje: string, tipo?: TipoAlerta) => void;
   mostrarConfirm: (mensaje: string) => void;
-}
-
-function MenuIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  );
 }
 
 export default function SuperadminLayout() {
