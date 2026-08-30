@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router";
 import AppSidebar, { type AppNavItem } from "../../../components/AppSidebar";
 import { aspiranteAuthService } from "../../../services/aspirante/aspiranteService";
+import { CheckCircleIcon as StatusIcon } from "../../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
 
@@ -9,14 +10,6 @@ function HomeIcon() {
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="1.8">
       <path strokeLinecap="round" strokeLinejoin="round" d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 21V12h6v9" />
-    </svg>
-  );
-}
-
-function StatusIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="1.8">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
   );
 }

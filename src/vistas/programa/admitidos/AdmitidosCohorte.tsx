@@ -11,7 +11,7 @@ import {
   type FiltroAdmision,
 } from "../../../services/programa/programaAdmitidosCohorteService";
 import type { ProgramaOutletContext } from "../../../layouts/ProgramaLayout";
-import { ArrowLeftIcon, ChevronRightIcon, SpinnerIcon } from "../../../assets/icons";
+import { ArrowLeftIcon, CheckCircleIcon, ChevronRightIcon, SpinnerIcon } from "../../../assets/icons";
 
 // ── Íconos (Heroicons) ────────────────────────────────────────────────────────
 
@@ -43,14 +43,6 @@ function ListBulletIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4 shrink-0">
       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-    </svg>
-  );
-}
-
-function CheckCircleIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
     </svg>
   );
 }
@@ -473,7 +465,7 @@ export default function AdmitidosCohorte() {
                             {aspirante.admitido ? (
                               <div className="flex flex-col items-center gap-2">
                                 <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-lg border border-green-200">
-                                  <CheckCircleIcon />
+                                  <CheckCircleIcon className="h-4 w-4" />
                                   Admitido
                                 </span>
                                 {!procesoFinalizado ? (
