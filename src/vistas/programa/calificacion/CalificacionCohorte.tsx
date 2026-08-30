@@ -7,7 +7,7 @@ import {
   type AspiranteCalificacion,
 } from "../../../services/programa/programaCalificacionCohorteService";
 import type { ProgramaOutletContext } from "../../../layouts/ProgramaLayout";
-import { SpinnerIcon } from "../../../assets/icons";
+import { ChevronRightIcon, SpinnerIcon } from "../../../assets/icons";
 
 // ── Íconos (Heroicons) ────────────────────────────────────────────────────────
 
@@ -39,14 +39,6 @@ function ChevronLeftIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4">
       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-    </svg>
-  );
-}
-
-function ChevronRightIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4">
-      <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
     </svg>
   );
 }
@@ -390,7 +382,7 @@ export default function CalificacionCohorte() {
                       className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-gray-700"
                     >
                       Siguiente
-                      <ChevronRightIcon />
+                      <ChevronRightIcon className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
