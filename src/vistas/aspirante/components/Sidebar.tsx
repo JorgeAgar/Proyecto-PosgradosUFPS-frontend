@@ -1,19 +1,9 @@
 import { useNavigate } from "react-router";
 import AppSidebar, { type AppNavItem } from "../../../components/AppSidebar";
 import { aspiranteAuthService } from "../../../services/aspirante/aspiranteService";
-import { CheckCircleIcon as StatusIcon, DocumentsIcon, HomeIcon, PaymentCardIcon, UsersIcon as InterviewIcon } from "../../../assets/icons";
+import { CheckCircleIcon as StatusIcon, DocumentsIcon, HomeIcon, PaymentCardIcon, TestIcon, UsersIcon as InterviewIcon } from "../../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
-
-function TestIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="1.8">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
-      <rect x="9" y="3" width="6" height="4" rx="1" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
-    </svg>
-  );
-}
 
 function CriteriosIcon() {
   return (
