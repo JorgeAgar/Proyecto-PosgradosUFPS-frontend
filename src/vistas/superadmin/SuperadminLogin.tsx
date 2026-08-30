@@ -9,17 +9,9 @@ import {
   SpinnerIcon,
   UserCheckIcon as FacultyUserCheckIcon,
   UserIcon as FacultyUserIcon,
+  UserIconLabel,
   UserShieldIcon as FacultyUserShieldIcon,
 } from "../../assets/icons";
-
-function UserIconLabel({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="1.8">
-      <circle cx="12" cy="8" r="4" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-    </svg>
-  );
-}
 
 function LockIcon() {
   return (
