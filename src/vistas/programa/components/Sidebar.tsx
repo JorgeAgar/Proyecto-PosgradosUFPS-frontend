@@ -1,26 +1,9 @@
 import { useNavigate } from "react-router";
 import AppSidebar, { type AppNavItem } from "../../../components/AppSidebar";
 import { fetchCohortes } from '../../../services/programa/programaCohorteService';
-import { AdmissionIcon, CriteriaListIcon, DocumentsIcon, HomeIcon as InicioIcon, ProgramCohorteIcon, ValidationDocumentIcon } from "../../../assets/icons";
+import { AdmissionIcon, CriteriaListIcon, DocumentsIcon, HomeIcon as InicioIcon, PaymentCardDetailsIcon, ProgramCohorteIcon, ValidationDocumentIcon } from "../../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
-
-function PagoIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="h-5 w-5 shrink-0"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <rect x="2" y="5" width="20" height="14" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M2 10h20" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6 15h2M10 15h4" />
-    </svg>
-  );
-}
 
 // ── Navegación ────────────────────────────────────────────────────────────────
 
@@ -31,7 +14,7 @@ const NAV_ITEMS: AppNavItem[] = [
   { label: "Criterios", to: "/programa/criterios", Icon: CriteriaListIcon },
   {
     label: "Validación de pagos",
-    Icon: PagoIcon,
+    Icon: PaymentCardDetailsIcon,
     base: "/programa/pagos",
     subItems: [
       { label: "Inscripción", to: "/programa/pagos/inscripcion" },
