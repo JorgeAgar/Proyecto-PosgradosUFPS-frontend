@@ -21,17 +21,9 @@ import type { DatosAspiranteResponse } from "../../../services/programa/programa
 import type { ProgramaOutletContext } from "../../../layouts/ProgramaLayout";
 import { DatePicker } from "../../../components/DatePicker";
 import { TimePicker } from "../../../components/TimePicker";
-import { CalendarIcon, ClockIcon, MapPinIcon, SpinnerIcon } from "../../../assets/icons";
+import { ArrowLeftIcon, CalendarIcon, ClockIcon, MapPinIcon, SpinnerIcon } from "../../../assets/icons";
 
 // ── Íconos (Heroicons) ────────────────────────────────────────────────────────
-
-function ArrowLeftIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4.5 w-4.5 shrink-0">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-    </svg>
-  );
-}
 
 function PlusIcon() {
   return (
@@ -749,7 +741,7 @@ export default function CalificacionAspirante() {
           )}
           className="flex items-center gap-2 text-red-700 hover:text-red-800 mb-6 transition-colors animate-fade-in group"
         >
-          <ArrowLeftIcon />
+          <ArrowLeftIcon className="h-4.5 w-4.5 shrink-0" />
           <div className="flex flex-col items-start">
             <span className="font-medium text-sm leading-tight">Volver</span>
             {nombreCohorte && (

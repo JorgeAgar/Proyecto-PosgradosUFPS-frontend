@@ -22,7 +22,7 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import ufpsLogo from "../assets/logoufps.png";
 import flujoabs from "../assets/flujoabs.jpg";
-import { SpinnerIcon } from "../assets/icons";
+import { ArrowLeftIcon, SpinnerIcon } from "../assets/icons";
 
 // ── Íconos inline (misma convención que los otros logins) ──────────────────────
 
@@ -46,14 +46,6 @@ function CheckCircleIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-  );
-}
-
-function ArrowLeftIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="1.8">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
     </svg>
   );
 }
@@ -222,7 +214,7 @@ export default function RecuperarPassword() {
                   onClick={handleVolverLogin}
                   className="flex items-center justify-center gap-2 w-full text-white font-bold bg-red-700 rounded-md p-3 hover:bg-red-800 transition-colors cursor-pointer"
                 >
-                  <ArrowLeftIcon />
+                  <ArrowLeftIcon className="h-4 w-4" />
                   Volver al login
                 </button>
               </div>
@@ -286,7 +278,7 @@ export default function RecuperarPassword() {
                     onClick={handleVolverLogin}
                     className="inline-flex items-center gap-1 text-xs text-red-700 hover:text-red-900 hover:underline transition-colors"
                   >
-                    <ArrowLeftIcon />
+                    <ArrowLeftIcon className="h-4 w-4" />
                     Volver al login
                   </button>
                 </div>
