@@ -18,7 +18,7 @@ import {
   type DocumentoAspiranteValidacionApi,
   type DocumentosAspiranteResponse,
 } from "../../../services/programa/validacionAspiranteService";
-import { SpinnerIcon, XMarkIcon } from "../../../assets/icons";
+import { CheckIcon, SpinnerIcon, XMarkIcon } from "../../../assets/icons";
 
 interface Documento {
   id: string;
@@ -361,17 +361,7 @@ export default function ValidacionAspiranteDetalle() {
                           }`}
                         >
                           {documento.estado === "APROBADO" && (
-                            <svg
-                              className="w-2.5 h-2.5 text-white"
-                              fill="none"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2.5"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path d="M5 13l4 4L19 7" />
-                            </svg>
+                            <CheckIcon className="w-2.5 h-2.5 text-white" />
                           )}
                           {documento.estado === "RECHAZADO" && (
                             <XMarkIcon className="w-2.5 h-2.5 text-white" strokeWidth="2.5" />
@@ -427,19 +417,7 @@ export default function ValidacionAspiranteDetalle() {
                     {todosValidados && (
                       <div className="text-center">
                         <span className="inline-flex items-center gap-2 bg-green-100 text-green-700 text-sm font-semibold px-4 py-2 rounded-lg border border-green-200">
-                          <svg
-                            className="w-4 h-4 shrink-0"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
+                          <CheckIcon className="w-4 h-4 shrink-0" strokeWidth="2" />
                           Todos los documentos validados
                         </span>
                       </div>

@@ -357,6 +357,26 @@ export function HashtagIcon({
   );
 }
 
+export function CheckIcon({
+  className = "h-5 w-5",
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      stroke="currentColor"
+      strokeWidth="2.5"
+      aria-hidden="true"
+      {...props}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  );
+}
+
 export function SearchIcon({
   className = "h-4 w-4 shrink-0",
   ...props
