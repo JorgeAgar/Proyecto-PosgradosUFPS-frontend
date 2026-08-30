@@ -18,7 +18,7 @@ import {
   type DocumentoAspiranteValidacionApi,
   type DocumentosAspiranteResponse,
 } from "../../../services/programa/validacionAspiranteService";
-import { SpinnerIcon } from "../../../assets/icons";
+import { SpinnerIcon, XMarkIcon } from "../../../assets/icons";
 
 interface Documento {
   id: string;
@@ -374,17 +374,7 @@ export default function ValidacionAspiranteDetalle() {
                             </svg>
                           )}
                           {documento.estado === "RECHAZADO" && (
-                            <svg
-                              className="w-2.5 h-2.5 text-white"
-                              fill="none"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2.5"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            <XMarkIcon className="w-2.5 h-2.5 text-white" strokeWidth="2.5" />
                           )}
                         </div>
                       </button>
