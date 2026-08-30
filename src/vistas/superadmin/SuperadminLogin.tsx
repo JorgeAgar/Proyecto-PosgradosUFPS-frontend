@@ -9,7 +9,7 @@ import {
   UserIcon as FacultyUserIcon,
   UserShieldIcon as FacultyUserShieldIcon,
 } from "../posgrados/PosgradosLogin";
-import { SpinnerIcon } from "../../assets/icons";
+import { ExclamationCircleIcon, SpinnerIcon } from "../../assets/icons";
 
 function UserIconLabel({ className = "h-4 w-4" }: { className?: string }) {
   return (
@@ -33,14 +33,6 @@ function ShieldIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="1.8">
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z" />
-    </svg>
-  );
-}
-
-function ExclamationIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-4 w-4 shrink-0" stroke="currentColor" strokeWidth="1.8">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
     </svg>
   );
 }
@@ -148,7 +140,7 @@ export default function LoginSuperAdmin() {
               </div>
               {mostrarErrorUsuario && (
                 <p className="mt-1 inline-flex items-center gap-1 text-xs text-red-600">
-                  <ExclamationIcon />
+                  <ExclamationCircleIcon strokeWidth="1.8" />
                   {fieldErrors.usuario}
                 </p>
               )}
@@ -172,7 +164,7 @@ export default function LoginSuperAdmin() {
               </div>
               {mostrarErrorPassword && (
                 <p className="mt-1 inline-flex items-center gap-1 text-xs text-red-600">
-                  <ExclamationIcon />
+                  <ExclamationCircleIcon strokeWidth="1.8" />
                   {fieldErrors.password}
                 </p>
               )}
