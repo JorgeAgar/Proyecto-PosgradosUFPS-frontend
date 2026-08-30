@@ -4,8 +4,7 @@ import { UserIcon as FieldUserIcon, LockClosedIcon, ExclamationCircleIcon } from
 import InputField from "../../components/InputField";
 import ufpsLogo from "../../assets/logoufps.png";
 import { programaAuthService } from "../../services/programa/programaService";
-import { UserShieldIcon } from "../posgrados/PosgradosLogin";
-import { SpinnerIcon, UserCheckIcon, UserIcon } from "../../assets/icons";
+import { SpinnerIcon, UserCheckIcon, UserIcon, UserShieldIcon } from "../../assets/icons";
 
 export default function ProgramaLogin() {
   const navigate = useNavigate();

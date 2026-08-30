@@ -4,12 +4,12 @@ import InputField from "../../components/InputField";
 import ufpsLogo from "../../assets/NEGROufps.png";
 import flujoabs from "../../assets/flujoabs.jpg";
 import { superadminAuthService } from "../../services/superadmin/superadminService";
-import { UserShieldIcon as FacultyUserShieldIcon } from "../posgrados/PosgradosLogin";
 import {
   ExclamationCircleIcon,
   SpinnerIcon,
   UserCheckIcon as FacultyUserCheckIcon,
   UserIcon as FacultyUserIcon,
+  UserShieldIcon as FacultyUserShieldIcon,
 } from "../../assets/icons";
 
 function UserIconLabel({ className = "h-4 w-4" }: { className?: string }) {
