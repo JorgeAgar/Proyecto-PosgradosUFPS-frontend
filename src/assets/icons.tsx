@@ -671,6 +671,26 @@ export function StarIcon({
   );
 }
 
+export function ProgramCohorteIcon({
+  className = "h-5 w-5 shrink-0",
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      stroke="currentColor"
+      strokeWidth="1.8"
+      aria-hidden="true"
+      {...props}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 7h18M3 12h18M7 17h10" />
+    </svg>
+  );
+}
+
 export const UserIcon = ({
   size = 4,
   color = "#000000",

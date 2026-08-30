@@ -1,28 +1,9 @@
 import { useNavigate } from "react-router";
 import AppSidebar, { type AppNavItem } from "../../../components/AppSidebar";
 import { fetchCohortes } from '../../../services/programa/programaCohorteService';
-import { DocumentsIcon, HomeIcon as InicioIcon } from "../../../assets/icons";
+import { DocumentsIcon, HomeIcon as InicioIcon, ProgramCohorteIcon } from "../../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
-
-function CohorteIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="h-5 w-5 shrink-0"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M3 7h18M3 12h18M7 17h10"
-      />
-    </svg>
-  );
-}
 
 function CriteriosIcon() {
   return (
@@ -107,7 +88,7 @@ function PagoIcon() {
 
 const NAV_ITEMS: AppNavItem[] = [
   { label: "Inicio", to: "/programa/inicio", Icon: InicioIcon },
-  { label: "Cohortes", to: "/programa/cohortes", Icon: CohorteIcon },
+  { label: "Cohortes", to: "/programa/cohortes", Icon: ProgramCohorteIcon },
   { label: "Documentos requeridos", to: "/programa/documentos", Icon: DocumentsIcon },
   { label: "Criterios", to: "/programa/criterios", Icon: CriteriosIcon },
   {
