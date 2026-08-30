@@ -1,18 +1,9 @@
 import { useNavigate } from "react-router";
 import AppSidebar, { type AppNavItem } from "../../../components/AppSidebar";
 import { aspiranteAuthService } from "../../../services/aspirante/aspiranteService";
-import { CheckCircleIcon as StatusIcon, DocumentsIcon, HomeIcon, UsersIcon as InterviewIcon } from "../../../assets/icons";
+import { CheckCircleIcon as StatusIcon, DocumentsIcon, HomeIcon, PaymentCardIcon, UsersIcon as InterviewIcon } from "../../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
-
-function PagosIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="1.8">
-      <rect x="2" y="5" width="20" height="14" rx="2" strokeLinejoin="round" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M2 10h20" />
-    </svg>
-  );
-}
 
 function TestIcon() {
   return (
@@ -37,7 +28,7 @@ function CriteriosIcon() {
 const NAV_ITEMS: AppNavItem[] = [
   { label: "Inicio",               to: "/aspirante/inicio",     Icon: HomeIcon },
   { label: "Estado del aspirante", to: "/aspirante/estado",     Icon: StatusIcon },
-  { label: "Pagos",                to: "/aspirante/pagos",      Icon: PagosIcon },
+  { label: "Pagos",                to: "/aspirante/pagos",      Icon: PaymentCardIcon },
   { label: "Documentos",           to: "/aspirante/documentos", Icon: DocumentsIcon },
   { label: "Entrevista",           to: "/aspirante/entrevista", Icon: InterviewIcon },
   { label: "Prueba",               to: "/aspirante/prueba",     Icon: TestIcon },
