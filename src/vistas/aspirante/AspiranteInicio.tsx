@@ -3,17 +3,9 @@ import { useOutletContext } from "react-router";
 import { fetchEstadoProceso, type PasoProceso } from "../../services/aspirante/aspiranteInicioService";
 import { getCorreoAspirante, patchCorreoAspirante, enviarConfirmacionCorreo } from "../../services/aspirante/aspiranteService";
 import type { AspiranteOutletContext } from "../../layouts/AspiranteLayout";
-import { CalendarIcon, CheckCircleIcon, SpinnerIcon } from "../../assets/icons";
+import { CalendarIcon, CheckCircleIcon, ClockIcon, SpinnerIcon } from "../../assets/icons";
 
 // ── Íconos (Heroicons) ────────────────────────────────────────────────────────
-
-function ClockIcon({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={className ?? "w-6 h-6"}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-    </svg>
-  );
-}
 
 function ExclamationIcon() {
   return (
