@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router';
 import type { ComponentType } from 'react';
-import { AcademicCapIcon, CalendarIcon, UserPlusIcon } from '../../assets/icons';
+import { AcademicCapIcon, CalendarIcon, HashtagIcon, UserPlusIcon } from '../../assets/icons';
 
 function ClipboardIcon() {
   return (
@@ -18,20 +18,12 @@ function DocumentIcon() {
   );
 }
 
-function HashtagIcon() {
-  return (
-     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
-</svg>
-
-  );
-}
-
 type ActionCard = {
   title: string;
   description: string;
   to: string;
   Icon: ComponentType<{ className?: string }>;
+  iconClassName?: string;
   delay: string;
 };
 
@@ -76,6 +68,7 @@ const ACTION_CARDS: ActionCard[] = [
     description: 'Actualizar consecutivos de codigo por programa',
     to: '/superadmin/ultimos-codigos',
     Icon: HashtagIcon,
+    iconClassName: 'size-6',
     delay: 'delay-600',
   },
 ];
@@ -91,7 +84,7 @@ export default function SuperadminInicio() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-        {ACTION_CARDS.map(({ title, description, to, Icon, delay }) => (
+        {ACTION_CARDS.map(({ title, description, to, Icon, iconClassName, delay }) => (
           <div key={to} className={`animate-fade-in-up ${delay}`}>
             <button
               onClick={() => navigate(to)}
@@ -99,7 +92,7 @@ export default function SuperadminInicio() {
             >
               <div className="w-12 h-12 bg-slate-50 rounded-lg flex items-center justify-center mb-4 group-hover:bg-slate-900 transition-colors">
                 <span className="text-slate-700 group-hover:text-white transition-colors">
-                  <Icon className="w-7 h-7 shrink-0" />
+                  <Icon className={iconClassName ?? "w-7 h-7 shrink-0"} />
                 </span>
               </div>
               <h2 className="text-lg font-semibold text-gray-900 mb-1">{title}</h2>

@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from "react-router";
 import type { ComponentType } from "react";
 import ufpsLogoBlanco from "../../../assets/BLANCOufps.png";
 import { superadminAuthService } from "../../../services/superadmin/superadminService";
-import { CalendarIcon, HomeIcon, LogoutIcon, UsersIcon, XMarkIcon } from "../../../assets/icons";
+import { CalendarIcon, HashtagIcon as CodesIcon, HomeIcon, LogoutIcon, UsersIcon, XMarkIcon } from "../../../assets/icons";
 
 // ── Íconos ───────────────────────────────────────────────────────────────────
 
@@ -57,14 +57,6 @@ function documentsIcon() {
   );
 }
 
-function codesIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
-</svg>
-  );
-}
-
 // ── Tipos ────────────────────────────────────────────────────────────────────
 
 interface SuperadminSidebarProps {
@@ -89,7 +81,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Programas", to: `${BASE}/programas`, Icon: CohorteIcon },
   { label: "Semestres", to: `${BASE}/semestres`, Icon: CalendarIcon, iconClassName: "size-6" },
   { label: "Valores globales", to: `${BASE}/valores-globales`, Icon: valoresIcon },
-  { label: "Últimos códigos", to: `${BASE}/ultimos-codigos`, Icon: codesIcon },
+  { label: "Últimos códigos", to: `${BASE}/ultimos-codigos`, Icon: CodesIcon },
   { label: "Documentos consejo", to: `${BASE}/documentos-consejo`, Icon: documentsIcon },
 ];
 
