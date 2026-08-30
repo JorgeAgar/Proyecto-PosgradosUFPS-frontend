@@ -4,13 +4,11 @@ import InputField from "../../components/InputField";
 import ufpsLogo from "../../assets/NEGROufps.png";
 import flujoabs from "../../assets/flujoabs.jpg";
 import { superadminAuthService } from "../../services/superadmin/superadminService";
-import {
-  UserCheckIcon as FacultyUserCheckIcon,
-  UserShieldIcon as FacultyUserShieldIcon,
-} from "../posgrados/PosgradosLogin";
+import { UserShieldIcon as FacultyUserShieldIcon } from "../posgrados/PosgradosLogin";
 import {
   ExclamationCircleIcon,
   SpinnerIcon,
+  UserCheckIcon as FacultyUserCheckIcon,
   UserIcon as FacultyUserIcon,
 } from "../../assets/icons";
 
