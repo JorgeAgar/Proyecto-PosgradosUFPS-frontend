@@ -5,45 +5,15 @@ import ufpsLogo from "../../assets/NEGROufps.png";
 import flujoabs from "../../assets/flujoabs.jpg";
 import { superadminAuthService } from "../../services/superadmin/superadminService";
 import {
+  ExclamationCircleIcon,
+  LockBoxIcon,
+  SpinnerIcon,
+  ShieldIcon,
   UserCheckIcon as FacultyUserCheckIcon,
   UserIcon as FacultyUserIcon,
+  UserIconLabel,
   UserShieldIcon as FacultyUserShieldIcon,
-} from "../posgrados/PosgradosLogin";
-import { SpinnerIcon } from "../../assets/icons";
-
-function UserIconLabel({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="1.8">
-      <circle cx="12" cy="8" r="4" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-    </svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="1.8">
-      <rect x="4" y="11" width="16" height="9" rx="2" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8 11V8a4 4 0 118 0v3" />
-    </svg>
-  );
-}
-
-function ShieldIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="1.8">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z" />
-    </svg>
-  );
-}
-
-function ExclamationIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-4 w-4 shrink-0" stroke="currentColor" strokeWidth="1.8">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-    </svg>
-  );
-}
+} from "../../assets/icons";
 
 export default function LoginSuperAdmin() {
   const navigate = useNavigate();
@@ -148,7 +118,7 @@ export default function LoginSuperAdmin() {
               </div>
               {mostrarErrorUsuario && (
                 <p className="mt-1 inline-flex items-center gap-1 text-xs text-red-600">
-                  <ExclamationIcon />
+                  <ExclamationCircleIcon strokeWidth="1.8" />
                   {fieldErrors.usuario}
                 </p>
               )}
@@ -156,7 +126,7 @@ export default function LoginSuperAdmin() {
 
             <div className="animate-fade-in-up">
               <label htmlFor="sa-password" className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-gray-700">
-                <LockIcon />
+                <LockBoxIcon />
                 Contraseña
               </label>
               <div className="bg-white rounded-lg border border-gray-300 hover:border-gray-400 focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-200">
@@ -172,7 +142,7 @@ export default function LoginSuperAdmin() {
               </div>
               {mostrarErrorPassword && (
                 <p className="mt-1 inline-flex items-center gap-1 text-xs text-red-600">
-                  <ExclamationIcon />
+                  <ExclamationCircleIcon strokeWidth="1.8" />
                   {fieldErrors.password}
                 </p>
               )}

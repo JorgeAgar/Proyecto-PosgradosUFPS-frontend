@@ -1,152 +1,12 @@
 import { NavLink, useNavigate } from "react-router";
+import type { ComponentType } from "react";
 import ufpsLogoBlanco from "../../../assets/BLANCOufps.png";
 import { superadminAuthService } from "../../../services/superadmin/superadminService";
+import { CalendarIcon, CouncilDocumentsIcon, HashtagIcon as CodesIcon, HomeIcon, LogoutIcon, SuperadminCohorteIcon, UsersIcon, ValuesIcon, XMarkIcon } from "../../../assets/icons";
 
 // ── Íconos ───────────────────────────────────────────────────────────────────
 
-function HomeIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="h-5 w-5 shrink-0"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"
-      />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 21V12h6v9" />
-    </svg>
-  );
-}
 
-function UsersIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="h-5 w-5 shrink-0"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"
-      />
-      <circle cx="9" cy="7" r="4" />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"
-      />
-    </svg>
-  );
-}
-
-function CohorteIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="h-5 w-5 shrink-0"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 14l9-5-9-5-9 5 9 5z"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
-      />
-    </svg>
-  );
-}
-
-function LogoutIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="h-5 w-5 shrink-0"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M14 17l5-5-5-5" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H7" />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M10 4H5a1 1 0 00-1 1v14a1 1 0 001 1h5"
-      />
-    </svg>
-  );
-}
-
-function CalendarIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
-      className="size-6"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
-      />
-    </svg>
-  );
-}
-
-function valoresIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
-      className="size-6"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"
-      />
-    </svg>
-  );
-}
-
-function documentsIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-</svg>
-  );
-}
-
-function codesIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
-</svg>
-  );
-}
 
 // ── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -159,14 +19,21 @@ interface SuperadminSidebarProps {
 
 const BASE = "/superadmin";
 
-const NAV_ITEMS = [
+type NavItem = {
+  label: string;
+  to: string;
+  Icon: ComponentType<{ className?: string }>;
+  iconClassName?: string;
+};
+
+const NAV_ITEMS: NavItem[] = [
   { label: "Inicio", to: `${BASE}/inicio`, Icon: HomeIcon },
   { label: "Usuarios", to: `${BASE}/usuarios`, Icon: UsersIcon },
-  { label: "Programas", to: `${BASE}/programas`, Icon: CohorteIcon },
-  { label: "Semestres", to: `${BASE}/semestres`, Icon: CalendarIcon },
-  { label: "Valores globales", to: `${BASE}/valores-globales`, Icon: valoresIcon },
-  { label: "Últimos códigos", to: `${BASE}/ultimos-codigos`, Icon: codesIcon },
-  { label: "Documentos consejo", to: `${BASE}/documentos-consejo`, Icon: documentsIcon },
+  { label: "Programas", to: `${BASE}/programas`, Icon: SuperadminCohorteIcon },
+  { label: "Semestres", to: `${BASE}/semestres`, Icon: CalendarIcon, iconClassName: "size-6" },
+  { label: "Valores globales", to: `${BASE}/valores-globales`, Icon: ValuesIcon },
+  { label: "Últimos códigos", to: `${BASE}/ultimos-codigos`, Icon: CodesIcon },
+  { label: "Documentos consejo", to: `${BASE}/documentos-consejo`, Icon: CouncilDocumentsIcon },
 ];
 
 const DELAYS = ["delay-75", "delay-100", "delay-150", "delay-200", "delay-300", "delay-500", "delay-600"];
@@ -208,20 +75,7 @@ export default function SuperadminSidebar({
           aria-label="Cerrar menú"
           className="ml-auto p-1 rounded hover:bg-white/20 transition-colors md:hidden"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            className="h-5 w-5"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+          <XMarkIcon className="h-5 w-5" strokeWidth="2" />
         </button>
       </div>
 
@@ -242,7 +96,7 @@ export default function SuperadminSidebar({
 
       {/* Navegación */}
       <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
-        {NAV_ITEMS.map(({ label, to, Icon }, idx) => (
+        {NAV_ITEMS.map(({ label, to, Icon, iconClassName }, idx) => (
           <div key={to} className={`animate-slide-left ${DELAYS[idx]}`}>
             <NavLink
               to={to}
@@ -256,7 +110,7 @@ export default function SuperadminSidebar({
                 ].join(" ")
               }
             >
-              <Icon />
+              <Icon className={iconClassName} />
               <span className="truncate">{label}</span>
             </NavLink>
           </div>

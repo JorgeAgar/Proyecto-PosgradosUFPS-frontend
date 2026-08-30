@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { CheckCircleIcon, ExclamationCircleIcon, XMarkIcon } from "../assets/icons";
 
 export type TipoAlerta = "error" | "exito" | "advertencia";
 
@@ -7,30 +8,6 @@ interface AlertaProps {
   mensaje: string;
   tipo?: TipoAlerta;
   onClose: () => void;
-}
-
-function ExclamationCircleIcon({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={className ?? "w-5 h-5"}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-    </svg>
-  );
-}
-
-function CheckCircleIcon({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={className ?? "w-5 h-5"}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-    </svg>
-  );
-}
-
-function XMarkIcon({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={className ?? "w-4 h-4"}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-    </svg>
-  );
 }
 
 const ESTILOS: Record<TipoAlerta, { contenedor: string; colorIcono: string; colorBoton: string }> = {

@@ -11,7 +11,7 @@ import {
 	obtenerPagosMatricula,
 	type PagoMatriculaApi,
 } from "../../../services/programa/validacionPagosMatriculaService";
-import { SpinnerIcon } from "../../../assets/icons";
+import { ArrowLeftIcon, SpinnerIcon } from "../../../assets/icons";
 
 const POR_PAGINA = 10;
 
@@ -37,14 +37,6 @@ function EstadoBadge({ estado }: { estado: EstadoGeneral }) {
 		<span className={`inline-block text-xs font-semibold px-3 py-1 rounded-lg ${className}`}>
 			{label}
 		</span>
-	);
-}
-
-function ArrowLeftIcon() {
-	return (
-		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-[18px] w-[18px] shrink-0">
-			<path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-		</svg>
 	);
 }
 
@@ -142,7 +134,7 @@ export default function ValidacionPagosMatricula() {
 					onClick={() => navigate("/programa/pagos/matricula")}
 					className="flex items-center gap-1 text-sm text-neutral-400 hover:text-red-700 transition-colors"
 				>
-					<ArrowLeftIcon />
+					<ArrowLeftIcon className="h-[18px] w-[18px] shrink-0" />
 				</button>
 				<div>
 					<h1 className="text-xl font-bold text-gray-900">Validación de Pagos — Matrícula</h1>

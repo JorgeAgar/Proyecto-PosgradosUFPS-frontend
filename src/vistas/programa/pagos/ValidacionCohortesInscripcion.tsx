@@ -5,15 +5,7 @@ import {
   type CohortePagos,
 } from "../../../services/programa/validacionPagosCohorteService";
 import type { ProgramaOutletContext } from "../../../layouts/ProgramaLayout";
-import { SpinnerIcon } from "../../../assets/icons";
-
-function ChevronRightIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5 shrink-0 text-neutral-400">
-      <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-    </svg>
-  );
-}
+import { ChevronRightIcon, SpinnerIcon } from "../../../assets/icons";
 
 export default function ValidacionCohortesInscripcion() {
   const navigate = useNavigate();
@@ -147,7 +139,7 @@ export default function ValidacionCohortesInscripcion() {
                       )}
                     </div>
 
-                    <ChevronRightIcon />
+                    <ChevronRightIcon className="w-5 h-5 shrink-0 text-neutral-400" />
                   </div>
                 </button>
               );

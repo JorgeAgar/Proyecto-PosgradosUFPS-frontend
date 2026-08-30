@@ -1,21 +1,7 @@
 import { useState, useEffect } from 'react';
+import { XMarkIcon } from '../../../assets/icons';
 
 // ── XMarkIcon ─────────────────────────────────────────────────────────────────
-
-function XMarkIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="w-5 h-5 shrink-0"
-      stroke="currentColor"
-      strokeWidth="1.5"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-    </svg>
-  );
-}
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -79,7 +65,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
               onClick={onClose}
               className="p-1 text-gray-400 hover:text-gray-600 transition-colors rounded"
             >
-              <XMarkIcon />
+              <XMarkIcon className="w-5 h-5 shrink-0" />
             </button>
           </div>
 

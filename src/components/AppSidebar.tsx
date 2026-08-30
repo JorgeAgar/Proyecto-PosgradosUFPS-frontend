@@ -1,49 +1,9 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router";
 import ufpsLogo from "../assets/logoufps.png";
+import { ChevronIcon, LockIcon, LogoutIcon, XMarkIcon as CloseIcon } from "../assets/icons";
 
 // ── Íconos internos ───────────────────────────────────────────────────────────
-
-function ChevronIcon({ open }: { open: boolean }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      className={`h-4 w-4 shrink-0 transition-transform duration-300 ${open ? "rotate-180" : "rotate-0"}`}
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-    </svg>
-  );
-}
-
-function LogoutIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="1.8">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M14 17l5-5-5-5" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H7" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M10 4H5a1 1 0 00-1 1v14a1 1 0 001 1h5" />
-    </svg>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-    </svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-3.5 w-3.5 shrink-0 ml-auto opacity-60">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-    </svg>
-  );
-}
 
 // ── Tipos exportados ──────────────────────────────────────────────────────────
 
@@ -187,7 +147,7 @@ export default function AppSidebar({
           aria-label="Cerrar menú"
           className="ml-auto p-1 rounded hover:bg-white/20 transition-colors md:hidden"
         >
-          <CloseIcon />
+          <CloseIcon className="h-5 w-5" strokeWidth="2" />
         </button>
       </div>
 
@@ -229,7 +189,7 @@ export default function AppSidebar({
                 >
                   <item.Icon />
                   <span className="truncate flex-1">{item.label}</span>
-                  <LockIcon />
+                  <LockIcon className="h-3.5 w-3.5 shrink-0 ml-auto opacity-60" />
                 </div>
               ) : (
                 <NavLink

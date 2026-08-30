@@ -3,41 +3,9 @@ import { useOutletContext } from "react-router";
 import { fetchEstadoProceso, type PasoProceso } from "../../services/aspirante/aspiranteInicioService";
 import { getCorreoAspirante, patchCorreoAspirante, enviarConfirmacionCorreo } from "../../services/aspirante/aspiranteService";
 import type { AspiranteOutletContext } from "../../layouts/AspiranteLayout";
-import { SpinnerIcon } from "../../assets/icons";
+import { CalendarIcon, CheckCircleIcon, ClockIcon, SpinnerIcon, WarningTriangleIcon } from "../../assets/icons";
 
 // ── Íconos (Heroicons) ────────────────────────────────────────────────────────
-
-function CheckCircleIcon({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={className ?? "w-6 h-6"}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-    </svg>
-  );
-}
-
-function ClockIcon({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={className ?? "w-6 h-6"}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-    </svg>
-  );
-}
-
-function CalendarIcon({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={className ?? "w-6 h-6"}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-    </svg>
-  );
-}
-
-function ExclamationIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4 shrink-0">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-    </svg>
-  );
-}
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
@@ -206,7 +174,7 @@ export default function AspiranteInicio() {
             {necesitaValidarCorreo && (
               <>
                 <div className="flex items-start gap-3 bg-amber-100 border border-amber-200 text-amber-400 rounded-lg px-4 py-3 mb-6 animate-fade-in-up delay-200">
-                  <ExclamationIcon />
+                  <WarningTriangleIcon />
                   <p className="text-sm">
                     <span className="font-semibold text-gray-900">Acción requerida: </span>
                     Debes validar tu correo electrónico para continuar con la inscripción.
@@ -332,7 +300,7 @@ export default function AspiranteInicio() {
             {/* Alerta — solo si hay un paso en revisión (no mostrar si ya mostramos la validación de correo) */}
             {pasoEnRevision && !esAdmitido && !necesitaValidarCorreo && (
               <div className="flex items-start gap-3 bg-amber-100 border border-amber-200 text-amber-400 rounded-lg px-4 py-3 mb-6 animate-fade-in-up delay-100">
-                <ExclamationIcon />
+                <WarningTriangleIcon />
                 <p className="text-sm">
                   <span className="font-semibold text-gray-900">Acción requerida: </span>
                   {pasoEnRevision.titulo} en revisión. Te notificaremos cuando haya actualizaciones.

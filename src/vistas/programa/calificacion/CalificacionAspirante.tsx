@@ -21,57 +21,9 @@ import type { DatosAspiranteResponse } from "../../../services/programa/programa
 import type { ProgramaOutletContext } from "../../../layouts/ProgramaLayout";
 import { DatePicker } from "../../../components/DatePicker";
 import { TimePicker } from "../../../components/TimePicker";
-import { CalendarIcon, ClockIcon, MapPinIcon, SpinnerIcon } from "../../../assets/icons";
+import { ArrowLeftIcon, BroomIcon, CalendarIcon, ChevronDownIcon, ClockIcon, MapPinIcon, PlusIcon, RefreshIcon, SpinnerIcon } from "../../../assets/icons";
 
 // ── Íconos (Heroicons) ────────────────────────────────────────────────────────
-
-function ArrowLeftIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4.5 w-4.5 shrink-0">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-    </svg>
-  );
-}
-
-function PlusIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4 shrink-0">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-    </svg>
-  );
-}
-
-function RefreshIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4 shrink-0">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-    </svg>
-  );
-}
-
-function BroomIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4 shrink-0">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21 3 9 15" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 15c0 0-3 1-4 3-1 1.5-.5 3.5 1.5 3.5s4-1 4-3.5V15Z" />
-    </svg>
-  );
-}
-
-function ChevronDownIcon({ open }: { open: boolean }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth="2"
-      stroke="currentColor"
-      className={`h-4 w-4 shrink-0 text-neutral-400 transition-transform duration-300 ease-in-out ${open ? "rotate-180" : "rotate-0"}`}
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-    </svg>
-  );
-}
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
@@ -749,7 +701,7 @@ export default function CalificacionAspirante() {
           )}
           className="flex items-center gap-2 text-red-700 hover:text-red-800 mb-6 transition-colors animate-fade-in group"
         >
-          <ArrowLeftIcon />
+          <ArrowLeftIcon className="h-4.5 w-4.5 shrink-0" />
           <div className="flex flex-col items-start">
             <span className="font-medium text-sm leading-tight">Volver</span>
             {nombreCohorte && (
