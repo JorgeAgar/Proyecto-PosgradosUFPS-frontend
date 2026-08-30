@@ -2,29 +2,9 @@ import { NavLink, useNavigate } from "react-router";
 import type { ComponentType } from "react";
 import ufpsLogoBlanco from "../../../assets/BLANCOufps.png";
 import { superadminAuthService } from "../../../services/superadmin/superadminService";
-import { CalendarIcon, LogoutIcon, XMarkIcon } from "../../../assets/icons";
+import { CalendarIcon, HomeIcon, LogoutIcon, XMarkIcon } from "../../../assets/icons";
 
 // ── Íconos ───────────────────────────────────────────────────────────────────
-
-function HomeIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="h-5 w-5 shrink-0"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"
-      />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 21V12h6v9" />
-    </svg>
-  );
-}
 
 function UsersIcon() {
   return (

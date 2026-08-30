@@ -64,6 +64,27 @@ export function XMarkIcon({
   );
 }
 
+export function HomeIcon({
+  className = "h-5 w-5 shrink-0",
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      stroke="currentColor"
+      strokeWidth="1.8"
+      aria-hidden="true"
+      {...props}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 21V12h6v9" />
+    </svg>
+  );
+}
+
 export function CalendarIcon({
   className = "h-4 w-4 shrink-0 text-neutral-400",
   ...props
