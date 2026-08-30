@@ -2,17 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { useOutletContext } from "react-router";
 import { fetchEstadoProceso, type PasoProceso } from "../../services/aspirante/aspiranteEstadoService";
 import type { AspiranteOutletContext } from "../../layouts/AspiranteLayout";
-import { ClockIcon, SpinnerIcon, StatusCheckIcon as CheckIcon } from "../../assets/icons";
+import { ClockIcon, DotIcon, SpinnerIcon, StatusCheckIcon as CheckIcon } from "../../assets/icons";
 
 // ── Íconos (Heroicons) ────────────────────────────────────────────────────────
-
-function DotIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-      <circle cx="12" cy="12" r="4" />
-    </svg>
-  );
-}
 
 // ── Helper: mensaje dinámico ─────────────────────────────────────────────────
 
