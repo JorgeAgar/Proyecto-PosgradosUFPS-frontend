@@ -10,17 +10,6 @@ import {
 import type { AspiranteOutletContext } from "../../layouts/AspiranteLayout";
 import { CalendarIcon, ChevronDownIcon, ClockIcon, LockIcon, MapPinIcon, SpinnerIcon } from "../../assets/icons";
 
-// ── Íconos (Heroicons) ────────────────────────────────────────────────────────
-
-function ButtonSpinner() {
-  return (
-    <svg className="animate-spin h-4 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
-
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 const MESES = [
@@ -447,7 +436,7 @@ export default function AspirantePrueba() {
                 disabled={cargandoAceptar}
                 className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {cargandoAceptar ? <><ButtonSpinner />Confirmando...</> : "Sí, aceptar"}
+                {cargandoAceptar ? <><SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />Confirmando...</> : "Sí, aceptar"}
               </button>
             </div>
           </div>
@@ -499,7 +488,7 @@ export default function AspirantePrueba() {
                 disabled={!motivoCambio.trim() || cargandoCambio}
                 className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {cargandoCambio ? <><ButtonSpinner />Enviando...</> : "Enviar solicitud"}
+                {cargandoCambio ? <><SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />Enviando...</> : "Enviar solicitud"}
               </button>
             </div>
           </div>
@@ -548,7 +537,7 @@ export default function AspirantePrueba() {
                 disabled={!motivoCancelacion.trim() || cargandoCancelar}
                 className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {cargandoCancelar ? <><ButtonSpinner />Cancelando...</> : "Confirmar cancelación"}
+                {cargandoCancelar ? <><SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />Cancelando...</> : "Confirmar cancelación"}
               </button>
             </div>
           </div>
