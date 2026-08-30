@@ -22,17 +22,9 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import ufpsLogo from "../assets/logoufps.png";
 import flujoabs from "../assets/flujoabs.jpg";
-import { ArrowLeftIcon, CheckCircleIcon, SpinnerIcon } from "../assets/icons";
+import { ArrowLeftIcon, CheckCircleIcon, EnvelopeIcon, SpinnerIcon } from "../assets/icons";
 
 // ── Íconos inline (misma convención que los otros logins) ──────────────────────
-
-function EnvelopeIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="1.8">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25H4.5a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5H4.5a2.25 2.25 0 00-2.25 2.25m19.5 0l-9.75 6.75L2.25 6.75" />
-    </svg>
-  );
-}
 
 function KeyIcon() {
   return (
