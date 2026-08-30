@@ -1,24 +1,9 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router";
 import ufpsLogo from "../assets/logoufps.png";
-import { LockIcon, LogoutIcon, XMarkIcon as CloseIcon } from "../assets/icons";
+import { ChevronIcon, LockIcon, LogoutIcon, XMarkIcon as CloseIcon } from "../assets/icons";
 
 // ── Íconos internos ───────────────────────────────────────────────────────────
-
-function ChevronIcon({ open }: { open: boolean }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      className={`h-4 w-4 shrink-0 transition-transform duration-300 ${open ? "rotate-180" : "rotate-0"}`}
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-    </svg>
-  );
-}
 
 // ── Tipos exportados ──────────────────────────────────────────────────────────
 

@@ -15,6 +15,23 @@ type CustomIconProps = {
 };
 
 type ChevronDownIconProps = IconProps & { open: boolean };
+type ChevronIconProps = { open: boolean };
+
+export function ChevronIcon({ open }: ChevronIconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      className={`h-4 w-4 shrink-0 transition-transform duration-300 ${open ? "rotate-180" : "rotate-0"}`}
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+    </svg>
+  );
+}
 
 export function MenuIcon({
   className = "h-5 w-5",
