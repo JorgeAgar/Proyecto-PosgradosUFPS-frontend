@@ -1,6 +1,8 @@
 import { NavLink, useNavigate } from "react-router";
+import type { ComponentType } from "react";
 import ufpsLogoBlanco from "../../../assets/BLANCOufps.png";
 import { superadminAuthService } from "../../../services/superadmin/superadminService";
+import { CalendarIcon } from "../../../assets/icons";
 
 // ── Íconos ───────────────────────────────────────────────────────────────────
 
@@ -94,25 +96,6 @@ function LogoutIcon() {
   );
 }
 
-function CalendarIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
-      className="size-6"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
-      />
-    </svg>
-  );
-}
-
 function valoresIcon() {
   return (
     <svg
@@ -159,11 +142,18 @@ interface SuperadminSidebarProps {
 
 const BASE = "/superadmin";
 
-const NAV_ITEMS = [
+type NavItem = {
+  label: string;
+  to: string;
+  Icon: ComponentType<{ className?: string }>;
+  iconClassName?: string;
+};
+
+const NAV_ITEMS: NavItem[] = [
   { label: "Inicio", to: `${BASE}/inicio`, Icon: HomeIcon },
   { label: "Usuarios", to: `${BASE}/usuarios`, Icon: UsersIcon },
   { label: "Programas", to: `${BASE}/programas`, Icon: CohorteIcon },
-  { label: "Semestres", to: `${BASE}/semestres`, Icon: CalendarIcon },
+  { label: "Semestres", to: `${BASE}/semestres`, Icon: CalendarIcon, iconClassName: "size-6" },
   { label: "Valores globales", to: `${BASE}/valores-globales`, Icon: valoresIcon },
   { label: "Últimos códigos", to: `${BASE}/ultimos-codigos`, Icon: codesIcon },
   { label: "Documentos consejo", to: `${BASE}/documentos-consejo`, Icon: documentsIcon },
@@ -242,7 +232,7 @@ export default function SuperadminSidebar({
 
       {/* Navegación */}
       <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
-        {NAV_ITEMS.map(({ label, to, Icon }, idx) => (
+        {NAV_ITEMS.map(({ label, to, Icon, iconClassName }, idx) => (
           <div key={to} className={`animate-slide-left ${DELAYS[idx]}`}>
             <NavLink
               to={to}
@@ -256,7 +246,7 @@ export default function SuperadminSidebar({
                 ].join(" ")
               }
             >
-              <Icon />
+              <Icon className={iconClassName} />
               <span className="truncate">{label}</span>
             </NavLink>
           </div>
