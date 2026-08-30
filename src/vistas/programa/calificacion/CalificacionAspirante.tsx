@@ -21,7 +21,7 @@ import type { DatosAspiranteResponse } from "../../../services/programa/programa
 import type { ProgramaOutletContext } from "../../../layouts/ProgramaLayout";
 import { DatePicker } from "../../../components/DatePicker";
 import { TimePicker } from "../../../components/TimePicker";
-import { ArrowLeftIcon, CalendarIcon, ClockIcon, MapPinIcon, RefreshIcon, SpinnerIcon } from "../../../assets/icons";
+import { ArrowLeftIcon, CalendarIcon, ChevronDownIcon, ClockIcon, MapPinIcon, RefreshIcon, SpinnerIcon } from "../../../assets/icons";
 
 // ── Íconos (Heroicons) ────────────────────────────────────────────────────────
 
@@ -38,21 +38,6 @@ function BroomIcon() {
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4 shrink-0">
       <path strokeLinecap="round" strokeLinejoin="round" d="M21 3 9 15" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 15c0 0-3 1-4 3-1 1.5-.5 3.5 1.5 3.5s4-1 4-3.5V15Z" />
-    </svg>
-  );
-}
-
-function ChevronDownIcon({ open }: { open: boolean }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth="2"
-      stroke="currentColor"
-      className={`h-4 w-4 shrink-0 text-neutral-400 transition-transform duration-300 ease-in-out ${open ? "rotate-180" : "rotate-0"}`}
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
     </svg>
   );
 }
