@@ -1,33 +1,9 @@
 import { useNavigate } from "react-router";
 import AppSidebar, { type AppNavItem } from "../../../components/AppSidebar";
 import { fetchCohortes } from '../../../services/programa/programaCohorteService';
-import { DocumentsIcon, HomeIcon as InicioIcon, ProgramCohorteIcon } from "../../../assets/icons";
+import { CriteriaListIcon, DocumentsIcon, HomeIcon as InicioIcon, ProgramCohorteIcon } from "../../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
-
-function CriteriosIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="h-5 w-5 shrink-0"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M8.5 6h11M8.5 12h11M8.5 18h11"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"
-      />
-    </svg>
-  );
-}
 
 function AdmisionIcon() {
   return (
@@ -90,7 +66,7 @@ const NAV_ITEMS: AppNavItem[] = [
   { label: "Inicio", to: "/programa/inicio", Icon: InicioIcon },
   { label: "Cohortes", to: "/programa/cohortes", Icon: ProgramCohorteIcon },
   { label: "Documentos requeridos", to: "/programa/documentos", Icon: DocumentsIcon },
-  { label: "Criterios", to: "/programa/criterios", Icon: CriteriosIcon },
+  { label: "Criterios", to: "/programa/criterios", Icon: CriteriaListIcon },
   {
     label: "Validación de pagos",
     Icon: PagoIcon,
