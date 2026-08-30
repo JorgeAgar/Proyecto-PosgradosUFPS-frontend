@@ -7,17 +7,9 @@ import {
   type AspiranteCalificacion,
 } from "../../../services/programa/programaCalificacionCohorteService";
 import type { ProgramaOutletContext } from "../../../layouts/ProgramaLayout";
-import { ArrowLeftIcon, ChevronRightIcon, FunnelIcon, SearchIcon, SpinnerIcon } from "../../../assets/icons";
+import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, FunnelIcon, SearchIcon, SpinnerIcon } from "../../../assets/icons";
 
 // ── Íconos (Heroicons) ────────────────────────────────────────────────────────
-
-function ChevronLeftIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-    </svg>
-  );
-}
 
 const POR_PAGINA = 10;
 

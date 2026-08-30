@@ -227,6 +227,26 @@ export function RefreshIcon({
   );
 }
 
+export function ChevronLeftIcon({
+  className = "h-4 w-4 shrink-0",
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden="true"
+      {...props}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+    </svg>
+  );
+}
+
 export function CalendarIcon({
   className = "h-4 w-4 shrink-0 text-neutral-400",
   ...props
