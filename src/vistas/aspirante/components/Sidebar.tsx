@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import AppSidebar, { type AppNavItem } from "../../../components/AppSidebar";
 import { aspiranteAuthService } from "../../../services/aspirante/aspiranteService";
-import { CheckCircleIcon as StatusIcon, HomeIcon } from "../../../assets/icons";
+import { CheckCircleIcon as StatusIcon, HomeIcon, UsersIcon as InterviewIcon } from "../../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
 
@@ -20,17 +20,6 @@ function DocumentsIcon() {
       <path strokeLinecap="round" strokeLinejoin="round" d="M7 3h7l5 5v13H7z" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M14 3v6h5" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M10 13h6M10 17h6" />
-    </svg>
-  );
-}
-
-function InterviewIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="1.8">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M23 21v-2a4 4 0 00-3-3.87" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M16 3.13a4 4 0 010 7.75" />
     </svg>
   );
 }
