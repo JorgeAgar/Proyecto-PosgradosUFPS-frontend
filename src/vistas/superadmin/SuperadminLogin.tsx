@@ -6,10 +6,13 @@ import flujoabs from "../../assets/flujoabs.jpg";
 import { superadminAuthService } from "../../services/superadmin/superadminService";
 import {
   UserCheckIcon as FacultyUserCheckIcon,
-  UserIcon as FacultyUserIcon,
   UserShieldIcon as FacultyUserShieldIcon,
 } from "../posgrados/PosgradosLogin";
-import { ExclamationCircleIcon, SpinnerIcon } from "../../assets/icons";
+import {
+  ExclamationCircleIcon,
+  SpinnerIcon,
+  UserIcon as FacultyUserIcon,
+} from "../../assets/icons";
 
 function UserIconLabel({ className = "h-4 w-4" }: { className?: string }) {
   return (

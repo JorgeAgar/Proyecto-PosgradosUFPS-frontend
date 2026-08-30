@@ -6,10 +6,9 @@ import ufpsLogo from "../../assets/logoufps.png";
 import { programaAuthService } from "../../services/programa/programaService";
 import {
   UserCheckIcon,
-  UserIcon,
   UserShieldIcon,
 } from "../posgrados/PosgradosLogin";
-import { SpinnerIcon } from "../../assets/icons";
+import { SpinnerIcon, UserIcon } from "../../assets/icons";
 
 export default function ProgramaLogin() {
   const navigate = useNavigate();
