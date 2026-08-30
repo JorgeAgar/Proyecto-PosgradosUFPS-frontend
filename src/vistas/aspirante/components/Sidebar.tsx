@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import AppSidebar, { type AppNavItem } from "../../../components/AppSidebar";
 import { aspiranteAuthService } from "../../../services/aspirante/aspiranteService";
-import { CheckCircleIcon as StatusIcon, HomeIcon, UsersIcon as InterviewIcon } from "../../../assets/icons";
+import { CheckCircleIcon as StatusIcon, DocumentsIcon, HomeIcon, UsersIcon as InterviewIcon } from "../../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
 
@@ -10,16 +10,6 @@ function PagosIcon() {
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="1.8">
       <rect x="2" y="5" width="20" height="14" rx="2" strokeLinejoin="round" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M2 10h20" />
-    </svg>
-  );
-}
-
-function DocumentsIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="1.8">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M7 3h7l5 5v13H7z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M14 3v6h5" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M10 13h6M10 17h6" />
     </svg>
   );
 }

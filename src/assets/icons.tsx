@@ -223,6 +223,28 @@ export function TrashIcon({
   );
 }
 
+export function DocumentsIcon({
+  className = "h-5 w-5 shrink-0",
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      stroke="currentColor"
+      strokeWidth="1.8"
+      aria-hidden="true"
+      {...props}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M7 3h7l5 5v13H7z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M14 3v6h5" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10 13h6M10 17h6" />
+    </svg>
+  );
+}
+
 export function SearchIcon({
   className = "h-4 w-4 shrink-0",
   ...props
