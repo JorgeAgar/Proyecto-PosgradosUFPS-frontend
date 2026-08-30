@@ -8,7 +8,7 @@ import {
   type Entrevista,
 } from "../../services/aspirante/aspiranteEntrevistaService";
 import type { AspiranteOutletContext } from "../../layouts/AspiranteLayout";
-import { CalendarIcon, ClockIcon, MapPinIcon, SpinnerIcon } from "../../assets/icons";
+import { CalendarIcon, ClockIcon, LockIcon, MapPinIcon, SpinnerIcon } from "../../assets/icons";
 
 // ── Íconos (Heroicons) ────────────────────────────────────────────────────────
 
@@ -17,14 +17,6 @@ function ButtonSpinner() {
     <svg className="animate-spin h-4 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-8 h-8 text-neutral-400">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
     </svg>
   );
 }
@@ -267,7 +259,7 @@ export default function AspiranteEntrevista() {
         <div className="bg-white border border-gray-200 rounded-lg p-8 max-w-sm w-full text-center">
           <div className="flex justify-center mb-4">
             <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center">
-              <LockIcon />
+              <LockIcon className="w-8 h-8 text-neutral-400" />
             </div>
           </div>
           <h2 className="text-base font-semibold text-gray-900 mb-2">Sección no disponible</h2>

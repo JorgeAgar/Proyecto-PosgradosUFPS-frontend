@@ -16,25 +16,9 @@ import { useState } from "react";
 import { /*useNavigate,*/ useSearchParams } from "react-router";
 import ufpsLogo from "../assets/logoufps.png";
 import flujoabs from "../assets/flujoabs.jpg";
-import { SpinnerIcon } from "../assets/icons";
+import { LockIcon, SpinnerIcon } from "../assets/icons";
 
 // ── Íconos ─────────────────────────────────────────────────────────────────────
-
-function LockIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-    </svg>
-  );
-}
-
-function LockIconSm() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="1.8">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-    </svg>
-  );
-}
 
 function EyeIcon() {
   return (
@@ -204,7 +188,7 @@ export default function CambioContrasena() {
             {/* Encabezado */}
             <div className="text-center animate-fade-in-up rounded-md bg-red-700 text-white p-4">
               <div className="flex items-center justify-center gap-2 mb-1">
-                <LockIcon />
+                <LockIcon className="h-5 w-5" strokeWidth="1.8" />
                 <h1 className="text-2xl font-bold tracking-wide">
                   Cambiar contraseña
                 </h1>
@@ -255,7 +239,7 @@ export default function CambioContrasena() {
                     className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-gray-700"
                   >
                     <span className="text-red-700">
-                      <LockIconSm />
+                      <LockIcon className="h-4 w-4" strokeWidth="1.8" />
                     </span>
                     Nueva contraseña
                   </label>
@@ -296,7 +280,7 @@ export default function CambioContrasena() {
                     className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-gray-700"
                   >
                     <span className="text-red-700">
-                      <LockIconSm />
+                      <LockIcon className="h-4 w-4" strokeWidth="1.8" />
                     </span>
                     Confirmar contraseña
                   </label>
