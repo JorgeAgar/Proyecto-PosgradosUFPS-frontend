@@ -6,6 +6,7 @@ import flujoabs from "../../assets/flujoabs.jpg";
 import { superadminAuthService } from "../../services/superadmin/superadminService";
 import {
   ExclamationCircleIcon,
+  LockBoxIcon,
   SpinnerIcon,
   ShieldIcon,
   UserCheckIcon as FacultyUserCheckIcon,
@@ -13,15 +14,6 @@ import {
   UserIconLabel,
   UserShieldIcon as FacultyUserShieldIcon,
 } from "../../assets/icons";
-
-function LockIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="1.8">
-      <rect x="4" y="11" width="16" height="9" rx="2" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8 11V8a4 4 0 118 0v3" />
-    </svg>
-  );
-}
 
 export default function LoginSuperAdmin() {
   const navigate = useNavigate();
@@ -134,7 +126,7 @@ export default function LoginSuperAdmin() {
 
             <div className="animate-fade-in-up">
               <label htmlFor="sa-password" className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-gray-700">
-                <LockIcon />
+                <LockBoxIcon />
                 Contraseña
               </label>
               <div className="bg-white rounded-lg border border-gray-300 hover:border-gray-400 focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-200">

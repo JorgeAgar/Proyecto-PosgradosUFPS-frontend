@@ -217,6 +217,27 @@ export function ShieldIcon({
   );
 }
 
+export function LockBoxIcon({
+  className = "h-4 w-4",
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      stroke="currentColor"
+      strokeWidth="1.8"
+      aria-hidden="true"
+      {...props}
+    >
+      <rect x="4" y="11" width="16" height="9" rx="2" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8 11V8a4 4 0 118 0v3" />
+    </svg>
+  );
+}
+
 export function HomeIcon({
   className = "h-5 w-5 shrink-0",
   ...props
