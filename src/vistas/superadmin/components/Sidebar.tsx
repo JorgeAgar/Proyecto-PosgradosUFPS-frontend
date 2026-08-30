@@ -2,33 +2,9 @@ import { NavLink, useNavigate } from "react-router";
 import type { ComponentType } from "react";
 import ufpsLogoBlanco from "../../../assets/BLANCOufps.png";
 import { superadminAuthService } from "../../../services/superadmin/superadminService";
-import { CalendarIcon, HashtagIcon as CodesIcon, HomeIcon, LogoutIcon, UsersIcon, XMarkIcon } from "../../../assets/icons";
+import { CalendarIcon, HashtagIcon as CodesIcon, HomeIcon, LogoutIcon, SuperadminCohorteIcon, UsersIcon, XMarkIcon } from "../../../assets/icons";
 
 // ── Íconos ───────────────────────────────────────────────────────────────────
-
-function CohorteIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="h-5 w-5 shrink-0"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 14l9-5-9-5-9 5 9 5z"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
-      />
-    </svg>
-  );
-}
 
 function valoresIcon() {
   return (
@@ -78,7 +54,7 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { label: "Inicio", to: `${BASE}/inicio`, Icon: HomeIcon },
   { label: "Usuarios", to: `${BASE}/usuarios`, Icon: UsersIcon },
-  { label: "Programas", to: `${BASE}/programas`, Icon: CohorteIcon },
+  { label: "Programas", to: `${BASE}/programas`, Icon: SuperadminCohorteIcon },
   { label: "Semestres", to: `${BASE}/semestres`, Icon: CalendarIcon, iconClassName: "size-6" },
   { label: "Valores globales", to: `${BASE}/valores-globales`, Icon: valoresIcon },
   { label: "Últimos códigos", to: `${BASE}/ultimos-codigos`, Icon: CodesIcon },
