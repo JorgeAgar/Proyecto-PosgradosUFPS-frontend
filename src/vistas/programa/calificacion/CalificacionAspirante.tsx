@@ -21,17 +21,9 @@ import type { DatosAspiranteResponse } from "../../../services/programa/programa
 import type { ProgramaOutletContext } from "../../../layouts/ProgramaLayout";
 import { DatePicker } from "../../../components/DatePicker";
 import { TimePicker } from "../../../components/TimePicker";
-import { ArrowLeftIcon, CalendarIcon, ChevronDownIcon, ClockIcon, MapPinIcon, RefreshIcon, SpinnerIcon } from "../../../assets/icons";
+import { ArrowLeftIcon, CalendarIcon, ChevronDownIcon, ClockIcon, MapPinIcon, PlusIcon, RefreshIcon, SpinnerIcon } from "../../../assets/icons";
 
 // ── Íconos (Heroicons) ────────────────────────────────────────────────────────
-
-function PlusIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4 shrink-0">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-    </svg>
-  );
-}
 
 function BroomIcon() {
   return (

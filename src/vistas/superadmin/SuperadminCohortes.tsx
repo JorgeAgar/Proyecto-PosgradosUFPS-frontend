@@ -24,7 +24,7 @@ import {
   type OtrosValoresOutput,
 } from '../../services/superadmin/superadminCohortesService';
 import { superadminDocumentosService } from '../../services/superadmin/superadminDocumentosService';
-import { AcademicCapIcon, BuildingLibraryIcon, ChevronRightIcon, PencilIcon, SpinnerIcon, TrashIcon } from "../../assets/icons";
+import { AcademicCapIcon, BuildingLibraryIcon, ChevronRightIcon, PencilIcon, PlusIcon, SpinnerIcon, TrashIcon } from "../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
 
@@ -40,14 +40,6 @@ function FolderPlusIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="w-5 h-5 shrink-0" stroke="currentColor" strokeWidth="1.5">
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
-    </svg>
-  );
-}
-
-function PlusIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="w-4 h-4 shrink-0" stroke="currentColor" strokeWidth="2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
     </svg>
   );
 }
@@ -229,7 +221,7 @@ function ProgramaItem({
               onClick={(e) => onAddCohorte(programa.id, e)}
               className="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors text-sm font-medium"
             >
-              <PlusIcon />Nueva Cohorte
+              <PlusIcon strokeWidth="2" />Nueva Cohorte
             </button>
 
             {cohortes.length === 0 && (
@@ -328,7 +320,7 @@ function FacultadItem({
               onClick={(e) => onAddPrograma(facultad.id, e)}
               className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors text-sm font-medium"
             >
-              <PlusIcon />Nuevo Programa
+              <PlusIcon strokeWidth="2" />Nuevo Programa
             </button>
 
             {programas.length === 0 && (

@@ -317,6 +317,26 @@ export function EyeSlashIcon({
   );
 }
 
+export function PlusIcon({
+  className = "h-4 w-4 shrink-0",
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden="true"
+      {...props}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+  );
+}
+
 export function SearchIcon({
   className = "h-4 w-4 shrink-0",
   ...props
