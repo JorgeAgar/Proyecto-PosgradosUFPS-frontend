@@ -22,6 +22,28 @@ export function MenuIcon({
   );
 }
 
+export function LogoutIcon({
+  className = "h-5 w-5 shrink-0",
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      stroke="currentColor"
+      strokeWidth="1.8"
+      aria-hidden="true"
+      {...props}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M14 17l5-5-5-5" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H7" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10 4H5a1 1 0 00-1 1v14a1 1 0 001 1h5" />
+    </svg>
+  );
+}
+
 export function CalendarIcon({
   className = "h-4 w-4 shrink-0 text-neutral-400",
   ...props

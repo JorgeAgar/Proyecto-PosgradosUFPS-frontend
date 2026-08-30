@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router";
 import ufpsLogo from "../assets/logoufps.png";
-import { LockIcon } from "../assets/icons";
+import { LockIcon, LogoutIcon } from "../assets/icons";
 
 // ── Íconos internos ───────────────────────────────────────────────────────────
 
@@ -16,16 +16,6 @@ function ChevronIcon({ open }: { open: boolean }) {
       strokeWidth="2"
     >
       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-    </svg>
-  );
-}
-
-function LogoutIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="1.8">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M14 17l5-5-5-5" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H7" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M10 4H5a1 1 0 00-1 1v14a1 1 0 001 1h5" />
     </svg>
   );
 }
