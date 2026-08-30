@@ -197,6 +197,26 @@ export function UserIconLabel({
   );
 }
 
+export function ShieldIcon({
+  className = "h-4 w-4",
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      stroke="currentColor"
+      strokeWidth="1.8"
+      aria-hidden="true"
+      {...props}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z" />
+    </svg>
+  );
+}
+
 export function HomeIcon({
   className = "h-5 w-5 shrink-0",
   ...props

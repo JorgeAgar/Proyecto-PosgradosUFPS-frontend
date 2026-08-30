@@ -7,6 +7,7 @@ import { superadminAuthService } from "../../services/superadmin/superadminServi
 import {
   ExclamationCircleIcon,
   SpinnerIcon,
+  ShieldIcon,
   UserCheckIcon as FacultyUserCheckIcon,
   UserIcon as FacultyUserIcon,
   UserIconLabel,
@@ -18,14 +19,6 @@ function LockIcon() {
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="1.8">
       <rect x="4" y="11" width="16" height="9" rx="2" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M8 11V8a4 4 0 118 0v3" />
-    </svg>
-  );
-}
-
-function ShieldIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="1.8">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z" />
     </svg>
   );
 }
