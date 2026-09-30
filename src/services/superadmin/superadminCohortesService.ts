@@ -142,10 +142,16 @@ export const superadminProgramasService = {
     valormatricula: number; idSede: number; idTiporegistro: number; idModalidad: number;
     idFacultad: number; idOtros: number;
   }): Promise<{ advertencia?: string }> => {
-    const programa = await superadminApiClient.fetch<{ id: number }>('/api/dev/endpoint/programa/create', {
+    const programa = await superadminApiClient.fetch<{ id?: number } | undefined>('/api/dev/endpoint/programa/create', {
       method: 'POST',
       body: JSON.stringify(data),
     });
+
+    // El programa ya existe en este punto: los fallos del cargo se informan como advertencia
+    // (no como error) para no inducir a crear el programa de nuevo.
+    if (typeof programa?.id !== 'number') {
+      return { advertencia: 'El programa se creó, pero el servidor no devolvió su id, así que no se pudo crear su cargo de director.' };
+    }
 
     try {
       await superadminApiClient.fetch<unknown>('/api/dev/endpoint/cargo/create', {
@@ -157,7 +163,6 @@ export const superadminProgramasService = {
         }),
       });
     } catch (err) {
-      // El programa ya existe: se informa sin tratarlo como fallo para no inducir a crearlo de nuevo.
       const detalle = err instanceof Error ? err.message : String(err);
       return { advertencia: `El programa se creó, pero no se pudo crear su cargo de director: ${detalle}` };
     }
