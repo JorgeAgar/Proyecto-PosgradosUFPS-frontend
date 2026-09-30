@@ -15,8 +15,8 @@ import {
 	type EstadoOutput,
 	type SemestreOutput,
 } from '../../services/superadmin/superadminSemestresService';
-import { SelectSA } from './components/SelectSA';
-import { DatePickerSA } from './components/DatePickerSA';
+import { Select } from '../../components/Select';
+import { DatePicker } from '../../components/DatePicker';
 import { SpinnerIcon } from "../../assets/icons";
 
 type SemestreForm = {
@@ -380,14 +380,14 @@ export default function SuperadminSemestres() {
 					</div>
 
 					<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-						<DatePickerSA
+						<DatePicker tema="oscuro"
 							id="fechaInicio"
 							label="Fecha de inicio"
 							value={formData.fechaInicio}
 							onChange={(v) => setFormData((c) => ({ ...c, fechaInicio: v }))}
 							disabled={submitting}
 						/>
-						<DatePickerSA
+						<DatePicker tema="oscuro"
 							id="fechaFin"
 							label="Fecha de fin"
 							value={formData.fechaFin}
@@ -396,7 +396,7 @@ export default function SuperadminSemestres() {
 						/>
 					</div>
 
-					<SelectSA
+					<Select tema="oscuro"
 						id="estadoSemestre"
 						label="Estado"
 						value={String(formData.idEstado)}
