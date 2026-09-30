@@ -1,17 +1,13 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import {
-  superadminFacultadesService,
-  superadminProgramasService,
-  superadminCohortesService,
+  posgradosProgramasService,
   type FacultadOutput,
   type ProgramaOutput,
   type CohorteOutput,
 } from '../../services/posgrados/posgradosProgramasService';
 import { seleccionarPrograma } from '../../services/programa/programaService';
 import { AcademicCapIcon, BuildingLibraryIcon, ChevronRightIcon, SpinnerIcon } from "../../assets/icons";
-
-// ── Íconos ────────────────────────────────────────────────────────────────────
 
 // ── ProgramaItem ──────────────────────────────────────────────────────────────
 
@@ -97,13 +93,7 @@ function FacultadItem({
 }: FacultadItemProps) {
   const [open, setOpen] = useState(false);
 
-  const toggle = () => {
-    if (!open) {
-      setOpen(true);
-    } else {
-      setOpen(false);
-    }
-  };
+  const toggle = () => setOpen((o) => !o);
 
   return (
     <div className={`animate-fade-in-up ${delay} bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-gray-300 hover:shadow-sm transition-all`}>
@@ -181,9 +171,9 @@ export default function Posgrados() {
     setPageError(null);
     try {
       const [facs, progs, cohs] = await Promise.all([
-        superadminFacultadesService.listar(),
-        superadminProgramasService.listar(),
-        superadminCohortesService.listar(),
+        posgradosProgramasService.listarFacultades(),
+        posgradosProgramasService.listarProgramas(),
+        posgradosProgramasService.listarCohortes(),
       ]);
       setFacultades(facs);
       setProgramas(progs);
