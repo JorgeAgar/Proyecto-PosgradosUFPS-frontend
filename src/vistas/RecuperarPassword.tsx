@@ -21,6 +21,7 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import PaginaAuth from "../components/auth/PaginaAuth";
+import { API_BASE_URL } from "../services/authService";
 import { ArrowLeftIcon, CheckCircleIcon, EnvelopeIcon, KeyIcon, SpinnerIcon } from "../assets/icons";
 
 // ── Íconos inline (misma convención que los otros logins) ──────────────────────
@@ -48,7 +49,7 @@ function validarCorreo(valor: string): string | null {
 }
 
 async function enviarCorreoRecuperacion(correo: string): Promise<void> {
-  const url = `${import.meta.env.VITE_API_URL}/api/application/case/recuperarContrasena/solicitar`;
+  const url = `${API_BASE_URL}/api/application/case/recuperarContrasena/solicitar`;
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

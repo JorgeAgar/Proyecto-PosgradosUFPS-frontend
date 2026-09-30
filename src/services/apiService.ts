@@ -1,6 +1,4 @@
-import { extractErrorMessage, type AuthService } from "./authService";
-
-const BASE_URL = (import.meta.env.VITE_API_URL as string ?? "").replace(/\/$/, "");
+import { API_BASE_URL, extractErrorMessage, type AuthService } from "./authService";
 
 export interface ApiClient {
   /** Petición autenticada; la respuesta se interpreta como JSON (o texto si no lo es). */
@@ -25,7 +23,7 @@ export function createApiClient(authService: AuthService): ApiClient {
       headers.set("Authorization", `Bearer ${token}`);
     }
 
-    const response = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+    const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
 
     if ((response.status === 401 || response.status === 403) && !isRetry) {
       const refreshed = await authService.refreshSession();

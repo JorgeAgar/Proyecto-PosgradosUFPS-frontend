@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "./authService";
+
 export type RegistroSelectOption = {
 	value: string;
 	label: string;
@@ -79,7 +81,6 @@ type RegistrarNuevoUsuarioResponse = {
 	nombreusuario?: string;
 };
 
-const BASE_URL = import.meta.env.VITE_API_URL;
 const REGISTRO_BASE = "/api/application/case/inscripciones";
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
@@ -88,7 +89,7 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
 		...init?.headers,
 	};
 
-	const response = await fetch(`${BASE_URL}${path}`, {
+	const response = await fetch(`${API_BASE_URL}${path}`, {
 		...init,
 		method: init?.method ?? "GET",
 		headers,

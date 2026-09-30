@@ -15,6 +15,7 @@
 import { useState } from "react";
 import { /*useNavigate,*/ useSearchParams } from "react-router";
 import PaginaAuth from "../components/auth/PaginaAuth";
+import { API_BASE_URL } from "../services/authService";
 import { CheckCircleIcon, EyeIcon, EyeSlashIcon, LockIcon, SpinnerIcon } from "../assets/icons";
 
 // ── Íconos ─────────────────────────────────────────────────────────────────────
@@ -36,7 +37,7 @@ function validarConfirmacion(contrasena: string, confirmacion: string): string |
 // ── Petición API ──────────────────────────────────────────────────────────────
 
 async function cambiarContrasenaApi(token: string, contrasena: string): Promise<void> {
-  const url = `${import.meta.env.VITE_API_URL}/api/application/case/recuperarContrasena/cambiar`;
+  const url = `${API_BASE_URL}/api/application/case/recuperarContrasena/cambiar`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
