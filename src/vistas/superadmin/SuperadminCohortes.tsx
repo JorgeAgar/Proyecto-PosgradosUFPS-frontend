@@ -627,14 +627,16 @@ export default function SuperadminCohortes() {
         idFacultad: progForm.idFacultad as number,
         idOtros: (progForm.idOtros as number) || 0,
       };
+      let advertencia: string | undefined;
       if (editingProg) {
         await superadminProgramasService.actualizar({ id: editingProg.id, ...payload });
       } else {
-        await superadminProgramasService.crear(payload);
+        ({ advertencia } = await superadminProgramasService.crear(payload));
       }
       setShowProgModal(false);
       await cargar();
-      mostrarConfirm(editingProg ? 'Programa actualizado con éxito.' : 'Programa creado con éxito.');
+      if (advertencia) mostrarAlerta(advertencia, 'advertencia');
+      else mostrarConfirm(editingProg ? 'Programa actualizado con éxito.' : 'Programa creado con éxito.');
     } catch (err) {
       mostrarAlerta(err instanceof Error ? err.message : 'Error al guardar el programa.');
     } finally {

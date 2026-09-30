@@ -1,4 +1,4 @@
-import { superadminApiClient, superadminAuthService } from './superadminService';
+import { superadminApiClient } from './superadminService';
 
 export interface PersonaBasica {
   id: number;
@@ -193,36 +193,17 @@ export const superadminUsuariosService = {
   listarPersonas: () =>
     superadminApiClient.fetch<PersonaBasica[]>(`/api/dev/endpoint/persona/listall`, { method: 'GET' }),
 
-  listarProgramasDirigibles: async (): Promise<ProgramaDirigibleOutput[]> => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/dev/endpoint/superadmin/cargos-director-programa/listall`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${superadminAuthService.getAccessToken()}`,
-      }
-    });
-    if(!response.ok) {
-      throw new Error(`Error al obtener programas dirigibles: ${response.status} ${response.statusText}`);
-    }
-    const data = await response.json();
-    return data;
-  },
+  listarProgramasDirigibles: () =>
+    superadminApiClient.fetch<ProgramaDirigibleOutput[]>(`/api/dev/endpoint/superadmin/cargos-director-programa/listall`, { method: 'GET' }),
 
-  asignarProgramaDirector: async (_data: { idPersona: number; idCargo: number }): Promise<void> => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/dev/endpoint/superadmin/administrativo/crear-director`, {
+  asignarProgramaDirector: async (data: { idPersona: number; idCargo: number }): Promise<void> => {
+    await superadminApiClient.fetch<unknown>(`/api/dev/endpoint/superadmin/administrativo/crear-director`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${superadminAuthService.getAccessToken()}`,
-      },
       body: JSON.stringify({
-        id_persona: _data.idPersona,
-        id_cargo: _data.idCargo,
+        id_persona: data.idPersona,
+        id_cargo: data.idCargo,
       }),
     });
-    if(!response.ok) {
-      throw new Error(`Error al asignar programa director: ${response.status} ${response.statusText}`);
-    }
   },
 
   desasignarProgramaDirector: async (idPersona: number): Promise<void> => {
@@ -231,20 +212,13 @@ export const superadminUsuariosService = {
 
     if (!administrativo) return;
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/dev/endpoint/superadmin/administrativo/asignar-programa`, {
+    await superadminApiClient.fetch<unknown>(`/api/dev/endpoint/superadmin/administrativo/asignar-programa`, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${superadminAuthService.getAccessToken()}`,
-      },
       body: JSON.stringify({
         id: administrativo.id,
         id_cargo: null,
       }),
     });
-    if(!response.ok) {
-      throw new Error(`Error al desasignar programa director: ${response.status} ${response.statusText}`);
-    }
   },
 
   obtenerCargoDirectorActual: async (idPersona: number): Promise<number | ''> => {

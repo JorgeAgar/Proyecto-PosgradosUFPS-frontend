@@ -1,4 +1,4 @@
-import { superadminApiClient, superadminAuthService } from './superadminService';
+import { superadminApiClient } from './superadminService';
 import type { EstadoOutput } from './superadminSemestresService';
 export { superadminSemestresService } from './superadminSemestresService';
 export type { EstadoOutput, SemestreOutput } from './superadminSemestresService';
@@ -141,27 +141,27 @@ export const superadminProgramasService = {
     rcmineducacion: string; creditos: number; periodicidad: string;
     valormatricula: number; idSede: number; idTiporegistro: number; idModalidad: number;
     idFacultad: number; idOtros: number;
-  }) => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/dev/endpoint/programa/create`, {
+  }): Promise<{ advertencia?: string }> => {
+    const programa = await superadminApiClient.fetch<{ id: number }>('/api/dev/endpoint/programa/create', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${superadminAuthService.getAccessToken()}`,
-      },
       body: JSON.stringify(data),
     });
-    if(!response .ok) {
-      throw new Error(`Error al crear programa: ${response.status} ${response.statusText}`);
-    }
 
-    superadminApiClient.fetch<unknown>('/api/dev/endpoint/cargo/create', {
-      method: 'POST',
-      body: JSON.stringify({
-        'nombre': `Director ${data.nombre}`,
-        'descripcion': `Cargo de director para el programa ${data.nombre}`,
-        'idPrograma': await response.json().then((res: { id: number }) => res.id),
-      })
-    });
+    try {
+      await superadminApiClient.fetch<unknown>('/api/dev/endpoint/cargo/create', {
+        method: 'POST',
+        body: JSON.stringify({
+          nombre: `Director ${data.nombre}`,
+          descripcion: `Cargo de director para el programa ${data.nombre}`,
+          idPrograma: programa.id,
+        }),
+      });
+    } catch (err) {
+      // El programa ya existe: se informa sin tratarlo como fallo para no inducir a crearlo de nuevo.
+      const detalle = err instanceof Error ? err.message : String(err);
+      return { advertencia: `El programa se creó, pero no se pudo crear su cargo de director: ${detalle}` };
+    }
+    return {};
   },
 
   actualizar: (data: {
@@ -224,20 +224,8 @@ export const superadminCohortesService = {
     }),
 
   listarEstados: async () => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/dev/endpoint/estado/listall`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${superadminAuthService.getAccessToken()}`,
-      },
-    });
-    
-    if(!response.ok) {
-      throw new Error(`Error al listar estados: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.filter((e: { entidad: string }) => e.entidad === 'cohorte');
-
+    const estados = await superadminApiClient.fetch<EstadoOutput[]>('/api/dev/endpoint/estado/listall', { method: 'GET' });
+    return estados.filter((e) => e.entidad === 'cohorte');
   }
 };
 

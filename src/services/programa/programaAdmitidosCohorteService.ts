@@ -49,19 +49,7 @@ export async function estaFinalizadoProcesoAdmision(cohorteId: string): Promise<
 }
 
 export async function downloadAdmittedListPdf(cohorteId: string): Promise<Blob> {
-  const token = localStorage.getItem("ufps_programa_access_token");
-  const url = `${import.meta.env.VITE_API_URL}/api/application/case/director-programa/${cohorteId}/generateAdmittedList`;
-
-  const res = await fetch(url, {
-    method: 'GET',
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-
-  if (!res.ok) {
-    throw new Error(`Error al generar el PDF de admitidos (${res.status})`);
-  }
-
-  return res.blob();
+  return programaApiClient.blob(`/api/application/case/director-programa/${cohorteId}/generateAdmittedList`, { method: 'GET' });
 }
 
 export default {
