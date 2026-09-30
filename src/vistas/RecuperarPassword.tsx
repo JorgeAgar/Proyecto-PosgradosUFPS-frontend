@@ -20,8 +20,7 @@
 
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
-import ufpsLogo from "../assets/logoufps.png";
-import flujoabs from "../assets/flujoabs.jpg";
+import PaginaAuth from "../components/auth/PaginaAuth";
 import { ArrowLeftIcon, CheckCircleIcon, EnvelopeIcon, KeyIcon, SpinnerIcon } from "../assets/icons";
 
 // ── Íconos inline (misma convención que los otros logins) ──────────────────────
@@ -129,140 +128,121 @@ export default function RecuperarPassword() {
   // ── Render ───────────────────────────────────────────────────────────────────
 
   return (
-    <div
-      className="animate-fade-in min-h-screen w-full relative overflow-hidden bg-no-repeat bg-cover bg-center"
-      style={{ backgroundImage: `url(${flujoabs})` }}
-    >
-      {/* ── Logos institucionales (idénticos al resto de logins) ── */}
-      <div className="relative flex flex-col w-full min-h-30">
-        <div className="animate-slide-left delay-200 flex items-center gap-5 px-8 py-5">
-          <img
-            src={ufpsLogo}
-            alt="Universidad Francisco de Paula Santander"
-            className="h-14 w-auto"
-          />
+    <PaginaAuth fondo="imagen">
+      <form onSubmit={handleSubmit} noValidate className="w-full flex flex-col gap-4">
+
+        {/* Encabezado del formulario */}
+        <div className="text-center animate-fade-in-up rounded-md bg-red-700 text-white p-4">
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <KeyIcon />
+            <h1 className="text-2xl font-bold tracking-wide">
+              Recuperación de contraseña
+            </h1>
+          </div>
+          {rol && (
+            <p className="text-xs mt-1 text-red-100">
+              {rol}
+            </p>
+          )}
         </div>
-      </div>
 
-      {/* ── Tarjeta flotante (misma estructura que los logins) ── */}
-      <div className="flex items-center justify-center px-4 pb-10">
-        <div className="bg-white rounded-xl shadow-[0_8px_40px_rgba(0,0,0,0.15)] p-8 w-full max-w-90 animate-fade-in-up delay-200">
-          <form onSubmit={handleSubmit} noValidate className="w-full flex flex-col gap-4">
+        {/* Mensaje de error general (ej: correo no registrado) */}
+        {errorGeneral && (
+          <div className="px-4 py-3 rounded-md text-sm border animate-fade-in bg-red-50 border-red-200 text-red-900">
+            {errorGeneral}
+          </div>
+        )}
 
-            {/* Encabezado del formulario */}
-            <div className="text-center animate-fade-in-up rounded-md bg-red-700 text-white p-4">
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <KeyIcon />
-                <h1 className="text-2xl font-bold tracking-wide">
-                  Recuperación de contraseña
-                </h1>
+        {/* ── Flujo exitoso: mensaje + botón volver ── */}
+        {enviado ? (
+          <div className="flex flex-col gap-4 animate-fade-in">
+            {/* Mensaje de éxito */}
+            <div className="flex items-start gap-3 px-4 py-3 rounded-md border bg-emerald-50 border-emerald-200 text-emerald-900 text-sm">
+              <span className="mt-0.5 text-emerald-600 shrink-0">
+                <CheckCircleIcon className="h-5 w-5" strokeWidth="1.8" />
+              </span>
+              <p>
+                Se envió un correo electrónico con el enlace de recuperación a la dirección:{" "}
+                <span className="font-semibold break-all">{correo.trim()}</span>
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleVolverLogin}
+              className="flex items-center justify-center gap-2 w-full text-white font-bold bg-red-700 rounded-md p-3 hover:bg-red-800 transition-colors cursor-pointer"
+            >
+              <ArrowLeftIcon className="h-4 w-4" />
+              Volver al login
+            </button>
+          </div>
+        ) : (
+          /* ── Flujo normal: campo de correo + botón enviar ── */
+          <>
+            {/* Descripción breve */}
+            <p className="text-sm text-gray-600 animate-fade-in-up">
+              Ingresa tu correo electrónico y te enviaremos una nueva contraseña generada.
+            </p>
+
+            {/* Campo correo */}
+            <div className="animate-fade-in-up">
+              <label
+                htmlFor="rp-email"
+                className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-gray-700"
+              >
+                <span className="text-red-700">
+                  <EnvelopeIcon />
+                </span>
+                Correo electrónico
+              </label>
+              <div
+                className={`rounded-md border bg-gray-50 focus-within:ring-2 focus-within:ring-red-200 ${
+                  errorCorreo ? "border-red-400" : "border-gray-200"
+                }`}
+              >
+                <input
+                  id="rp-email"
+                  type="email"
+                  placeholder="correo@ejemplo.com"
+                  value={correo}
+                  onChange={handleCorreoChange}
+                  autoComplete="email"
+                  disabled={loading}
+                  className="w-full bg-transparent px-3 py-2 text-sm outline-none text-gray-800 placeholder-gray-400 disabled:cursor-not-allowed disabled:opacity-60"
+                />
               </div>
-              {rol && (
-                <p className="text-xs mt-1 text-red-100">
-                  {rol}
-                </p>
+              {/* Mensaje de error de validación */}
+              {errorCorreo && (
+                <p className="mt-1 text-xs text-red-600">{errorCorreo}</p>
               )}
             </div>
 
-            {/* Mensaje de error general (ej: correo no registrado) */}
-            {errorGeneral && (
-              <div className="px-4 py-3 rounded-md text-sm border animate-fade-in bg-red-50 border-red-200 text-red-900">
-                {errorGeneral}
-              </div>
-            )}
+            {/* Botón enviar */}
+            <div className="mt-1 animate-fade-in-up">
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex items-center justify-center gap-2 w-full text-white font-bold bg-red-700 rounded-md p-3 hover:bg-red-800 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:bg-red-400"
+              >
+                {loading && <SpinnerIcon className="animate-spin h-4 w-4 text-white" />}
+                {loading ? "Enviando..." : "Enviar nueva contraseña"}
+              </button>
+            </div>
 
-            {/* ── Flujo exitoso: mensaje + botón volver ── */}
-            {enviado ? (
-              <div className="flex flex-col gap-4 animate-fade-in">
-                {/* Mensaje de éxito */}
-                <div className="flex items-start gap-3 px-4 py-3 rounded-md border bg-emerald-50 border-emerald-200 text-emerald-900 text-sm">
-                  <span className="mt-0.5 text-emerald-600 shrink-0">
-                    <CheckCircleIcon className="h-5 w-5" strokeWidth="1.8" />
-                  </span>
-                  <p>
-                    Se envió un correo electrónico con el enlace de recuperación a la dirección:{" "}
-                    <span className="font-semibold break-all">{correo.trim()}</span>
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleVolverLogin}
-                  className="flex items-center justify-center gap-2 w-full text-white font-bold bg-red-700 rounded-md p-3 hover:bg-red-800 transition-colors cursor-pointer"
-                >
-                  <ArrowLeftIcon className="h-4 w-4" />
-                  Volver al login
-                </button>
-              </div>
-            ) : (
-              /* ── Flujo normal: campo de correo + botón enviar ── */
-              <>
-                {/* Descripción breve */}
-                <p className="text-sm text-gray-600 animate-fade-in-up">
-                  Ingresa tu correo electrónico y te enviaremos una nueva contraseña generada.
-                </p>
-
-                {/* Campo correo */}
-                <div className="animate-fade-in-up">
-                  <label
-                    htmlFor="rp-email"
-                    className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-gray-700"
-                  >
-                    <span className="text-red-700">
-                      <EnvelopeIcon />
-                    </span>
-                    Correo electrónico
-                  </label>
-                  <div
-                    className={`rounded-md border bg-gray-50 focus-within:ring-2 focus-within:ring-red-200 ${
-                      errorCorreo ? "border-red-400" : "border-gray-200"
-                    }`}
-                  >
-                    <input
-                      id="rp-email"
-                      type="email"
-                      placeholder="correo@ejemplo.com"
-                      value={correo}
-                      onChange={handleCorreoChange}
-                      autoComplete="email"
-                      disabled={loading}
-                      className="w-full bg-transparent px-3 py-2 text-sm outline-none text-gray-800 placeholder-gray-400 disabled:cursor-not-allowed disabled:opacity-60"
-                    />
-                  </div>
-                  {/* Mensaje de error de validación */}
-                  {errorCorreo && (
-                    <p className="mt-1 text-xs text-red-600">{errorCorreo}</p>
-                  )}
-                </div>
-
-                {/* Botón enviar */}
-                <div className="mt-1 animate-fade-in-up">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="flex items-center justify-center gap-2 w-full text-white font-bold bg-red-700 rounded-md p-3 hover:bg-red-800 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:bg-red-400"
-                  >
-                    {loading && <SpinnerIcon className="animate-spin h-4 w-4 text-white" />}
-                    {loading ? "Enviando..." : "Enviar nueva contraseña"}
-                  </button>
-                </div>
-
-                {/* Enlace volver al login */}
-                <div className="text-center">
-                  <button
-                    type="button"
-                    onClick={handleVolverLogin}
-                    className="inline-flex items-center gap-1 text-xs text-red-700 hover:text-red-900 hover:underline transition-colors"
-                  >
-                    <ArrowLeftIcon className="h-4 w-4" />
-                    Volver al login
-                  </button>
-                </div>
-              </>
-            )}
-          </form>
-        </div>
-      </div>
-    </div>
+            {/* Enlace volver al login */}
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={handleVolverLogin}
+                className="inline-flex items-center gap-1 text-xs text-red-700 hover:text-red-900 hover:underline transition-colors"
+              >
+                <ArrowLeftIcon className="h-4 w-4" />
+                Volver al login
+              </button>
+            </div>
+          </>
+        )}
+      </form>
+    </PaginaAuth>
   );
 }

@@ -14,8 +14,7 @@
 
 import { useState } from "react";
 import { /*useNavigate,*/ useSearchParams } from "react-router";
-import ufpsLogo from "../assets/logoufps.png";
-import flujoabs from "../assets/flujoabs.jpg";
+import PaginaAuth from "../components/auth/PaginaAuth";
 import { CheckCircleIcon, EyeIcon, EyeSlashIcon, LockIcon, SpinnerIcon } from "../assets/icons";
 
 // ── Íconos ─────────────────────────────────────────────────────────────────────
@@ -132,190 +131,171 @@ export default function CambioContrasena() {
   // ── Render ───────────────────────────────────────────────────────────────────
 
   return (
-    <div
-      className="animate-fade-in min-h-screen w-full relative overflow-hidden bg-no-repeat bg-cover bg-center"
-      style={{ backgroundImage: `url(${flujoabs})` }}
-    >
-      {/* ── Logos institucionales ── */}
-      <div className="relative flex flex-col w-full min-h-30">
-        <div className="animate-slide-left delay-200 flex items-center gap-5 px-8 py-5">
-          <img
-            src={ufpsLogo}
-            alt="Universidad Francisco de Paula Santander"
-            className="h-14 w-auto"
-          />
+    <PaginaAuth fondo="imagen">
+      <form onSubmit={handleSubmit} noValidate className="w-full flex flex-col gap-4">
+
+        {/* Encabezado */}
+        <div className="text-center animate-fade-in-up rounded-md bg-red-700 text-white p-4">
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <LockIcon className="h-5 w-5" strokeWidth="1.8" />
+            <h1 className="text-2xl font-bold tracking-wide">
+              Cambiar contraseña
+            </h1>
+          </div>
+          {rol && (
+            <p className="text-xs mt-1 text-red-100">{rol}</p>
+          )}
         </div>
-      </div>
 
-      {/* ── Tarjeta flotante ── */}
-      <div className="flex items-center justify-center px-4 pb-10">
-        <div className="bg-white rounded-xl shadow-[0_8px_40px_rgba(0,0,0,0.15)] p-8 w-full max-w-90 animate-fade-in-up delay-200">
-          <form onSubmit={handleSubmit} noValidate className="w-full flex flex-col gap-4">
+        {/* Error general (respuesta del API) */}
+        {errorGeneral && (
+          <div className="px-4 py-3 rounded-md text-sm border animate-fade-in bg-red-100 border-red-200 text-red-700">
+            {errorGeneral}
+          </div>
+        )}
 
-            {/* Encabezado */}
-            <div className="text-center animate-fade-in-up rounded-md bg-red-700 text-white p-4">
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <LockIcon className="h-5 w-5" strokeWidth="1.8" />
-                <h1 className="text-2xl font-bold tracking-wide">
-                  Cambiar contraseña
-                </h1>
+        {/* ── Flujo exitoso ── */}
+        {cambiado ? (
+          <div className="flex flex-col gap-4 animate-fade-in">
+            <div className="flex items-start gap-3 px-4 py-3 rounded-md border bg-green-100 border-green-200 text-green-700 text-sm">
+              <span className="mt-0.5 shrink-0">
+                <CheckCircleIcon className="h-5 w-5" strokeWidth="1.8" />
+              </span>
+              <p>
+                Tu contraseña fue actualizada correctamente. Ya puedes iniciar sesión con tu nueva contraseña.
+              </p>
+            </div>
+            {/* <button
+              type="button"
+              onClick={handleVolverLogin}
+              className="flex items-center justify-center gap-2 w-full text-white font-bold bg-red-700 rounded-md p-3 hover:bg-red-800 transition-colors cursor-pointer"
+            >
+              <ArrowLeftIcon />
+              Volver al login
+            </button> */}
+          </div>
+        ) : (
+          /* ── Flujo normal: dos campos de contraseña ── */
+          <>
+            <p className="text-sm text-gray-600 animate-fade-in-up">
+              Ingresa y confirma tu nueva contraseña. Debe tener al menos 8 caracteres.
+            </p>
+
+            {/* Campo: nueva contraseña */}
+            <div className="animate-fade-in-up">
+              <label
+                htmlFor="cc-password"
+                className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-gray-700"
+              >
+                <span className="text-red-700">
+                  <LockIcon className="h-4 w-4" strokeWidth="1.8" />
+                </span>
+                Nueva contraseña
+              </label>
+              <div
+                className={`rounded-md border bg-gray-50 focus-within:ring-2 focus-within:ring-red-200 flex items-center ${
+                  errorContrasena ? "border-red-400" : "border-gray-200"
+                }`}
+              >
+                <input
+                  id="cc-password"
+                  type={mostrarContrasena ? "text" : "password"}
+                  placeholder="Mínimo 8 caracteres"
+                  value={contrasena}
+                  onChange={handleContrasenaChange}
+                  autoComplete="new-password"
+                  disabled={loading}
+                  className="flex-1 bg-transparent px-3 py-2 text-sm outline-none text-gray-800 placeholder-gray-400 disabled:cursor-not-allowed disabled:opacity-60"
+                />
+                <button
+                  type="button"
+                  onClick={() => setMostrarContrasena((v) => !v)}
+                  className="px-3 py-2 text-neutral-400 hover:text-gray-600 transition-colors"
+                  tabIndex={-1}
+                  aria-label={mostrarContrasena ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  {mostrarContrasena ? <EyeSlashIcon strokeWidth="1.8" /> : <EyeIcon strokeWidth="1.8" />}
+                </button>
               </div>
-              {rol && (
-                <p className="text-xs mt-1 text-red-100">{rol}</p>
+              {errorContrasena && (
+                <p className="mt-1 text-xs text-red-600">{errorContrasena}</p>
               )}
             </div>
 
-            {/* Error general (respuesta del API) */}
-            {errorGeneral && (
-              <div className="px-4 py-3 rounded-md text-sm border animate-fade-in bg-red-100 border-red-200 text-red-700">
-                {errorGeneral}
-              </div>
-            )}
-
-            {/* ── Flujo exitoso ── */}
-            {cambiado ? (
-              <div className="flex flex-col gap-4 animate-fade-in">
-                <div className="flex items-start gap-3 px-4 py-3 rounded-md border bg-green-100 border-green-200 text-green-700 text-sm">
-                  <span className="mt-0.5 shrink-0">
-                    <CheckCircleIcon className="h-5 w-5" strokeWidth="1.8" />
-                  </span>
-                  <p>
-                    Tu contraseña fue actualizada correctamente. Ya puedes iniciar sesión con tu nueva contraseña.
-                  </p>
-                </div>
-                {/* <button
+            {/* Campo: confirmar contraseña */}
+            <div className="animate-fade-in-up">
+              <label
+                htmlFor="cc-confirm"
+                className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-gray-700"
+              >
+                <span className="text-red-700">
+                  <LockIcon className="h-4 w-4" strokeWidth="1.8" />
+                </span>
+                Confirmar contraseña
+              </label>
+              <div
+                className={`rounded-md border bg-gray-50 focus-within:ring-2 focus-within:ring-red-200 flex items-center ${
+                  errorConfirmacion
+                    ? "border-red-400"
+                    : contrasenasConcuerdan
+                      ? "border-green-400"
+                      : "border-gray-200"
+                }`}
+              >
+                <input
+                  id="cc-confirm"
+                  type={mostrarConfirmacion ? "text" : "password"}
+                  placeholder="Repite tu nueva contraseña"
+                  value={confirmacion}
+                  onChange={handleConfirmacionChange}
+                  autoComplete="new-password"
+                  disabled={loading}
+                  className="flex-1 bg-transparent px-3 py-2 text-sm outline-none text-gray-800 placeholder-gray-400 disabled:cursor-not-allowed disabled:opacity-60"
+                />
+                <button
                   type="button"
-                  onClick={handleVolverLogin}
-                  className="flex items-center justify-center gap-2 w-full text-white font-bold bg-red-700 rounded-md p-3 hover:bg-red-800 transition-colors cursor-pointer"
+                  onClick={() => setMostrarConfirmacion((v) => !v)}
+                  className="px-3 py-2 text-neutral-400 hover:text-gray-600 transition-colors"
+                  tabIndex={-1}
+                  aria-label={mostrarConfirmacion ? "Ocultar contraseña" : "Mostrar contraseña"}
                 >
-                  <ArrowLeftIcon />
-                  Volver al login
-                </button> */}
+                  {mostrarConfirmacion ? <EyeSlashIcon strokeWidth="1.8" /> : <EyeIcon strokeWidth="1.8" />}
+                </button>
               </div>
-            ) : (
-              /* ── Flujo normal: dos campos de contraseña ── */
-              <>
-                <p className="text-sm text-gray-600 animate-fade-in-up">
-                  Ingresa y confirma tu nueva contraseña. Debe tener al menos 8 caracteres.
-                </p>
+              {errorConfirmacion && (
+                <p className="mt-1 text-xs text-red-600">{errorConfirmacion}</p>
+              )}
+              {!errorConfirmacion && contrasenasConcuerdan && (
+                <p className="mt-1 text-xs text-green-700">Las contraseñas coinciden</p>
+              )}
+            </div>
 
-                {/* Campo: nueva contraseña */}
-                <div className="animate-fade-in-up">
-                  <label
-                    htmlFor="cc-password"
-                    className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-gray-700"
-                  >
-                    <span className="text-red-700">
-                      <LockIcon className="h-4 w-4" strokeWidth="1.8" />
-                    </span>
-                    Nueva contraseña
-                  </label>
-                  <div
-                    className={`rounded-md border bg-gray-50 focus-within:ring-2 focus-within:ring-red-200 flex items-center ${
-                      errorContrasena ? "border-red-400" : "border-gray-200"
-                    }`}
-                  >
-                    <input
-                      id="cc-password"
-                      type={mostrarContrasena ? "text" : "password"}
-                      placeholder="Mínimo 8 caracteres"
-                      value={contrasena}
-                      onChange={handleContrasenaChange}
-                      autoComplete="new-password"
-                      disabled={loading}
-                      className="flex-1 bg-transparent px-3 py-2 text-sm outline-none text-gray-800 placeholder-gray-400 disabled:cursor-not-allowed disabled:opacity-60"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setMostrarContrasena((v) => !v)}
-                      className="px-3 py-2 text-neutral-400 hover:text-gray-600 transition-colors"
-                      tabIndex={-1}
-                      aria-label={mostrarContrasena ? "Ocultar contraseña" : "Mostrar contraseña"}
-                    >
-                      {mostrarContrasena ? <EyeSlashIcon strokeWidth="1.8" /> : <EyeIcon strokeWidth="1.8" />}
-                    </button>
-                  </div>
-                  {errorContrasena && (
-                    <p className="mt-1 text-xs text-red-600">{errorContrasena}</p>
-                  )}
-                </div>
+            {/* Botón confirmar */}
+            <div className="mt-1 animate-fade-in-up">
+              <button
+                type="submit"
+                disabled={botonDeshabilitado}
+                className="flex items-center justify-center gap-2 w-full text-white font-bold bg-red-700 rounded-md p-3 hover:bg-red-800 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:bg-red-400"
+              >
+                {loading && <SpinnerIcon className="animate-spin h-4 w-4 text-white" />}
+                {loading ? "Guardando..." : "Confirmar nueva contraseña"}
+              </button>
+            </div>
 
-                {/* Campo: confirmar contraseña */}
-                <div className="animate-fade-in-up">
-                  <label
-                    htmlFor="cc-confirm"
-                    className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-gray-700"
-                  >
-                    <span className="text-red-700">
-                      <LockIcon className="h-4 w-4" strokeWidth="1.8" />
-                    </span>
-                    Confirmar contraseña
-                  </label>
-                  <div
-                    className={`rounded-md border bg-gray-50 focus-within:ring-2 focus-within:ring-red-200 flex items-center ${
-                      errorConfirmacion
-                        ? "border-red-400"
-                        : contrasenasConcuerdan
-                          ? "border-green-400"
-                          : "border-gray-200"
-                    }`}
-                  >
-                    <input
-                      id="cc-confirm"
-                      type={mostrarConfirmacion ? "text" : "password"}
-                      placeholder="Repite tu nueva contraseña"
-                      value={confirmacion}
-                      onChange={handleConfirmacionChange}
-                      autoComplete="new-password"
-                      disabled={loading}
-                      className="flex-1 bg-transparent px-3 py-2 text-sm outline-none text-gray-800 placeholder-gray-400 disabled:cursor-not-allowed disabled:opacity-60"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setMostrarConfirmacion((v) => !v)}
-                      className="px-3 py-2 text-neutral-400 hover:text-gray-600 transition-colors"
-                      tabIndex={-1}
-                      aria-label={mostrarConfirmacion ? "Ocultar contraseña" : "Mostrar contraseña"}
-                    >
-                      {mostrarConfirmacion ? <EyeSlashIcon strokeWidth="1.8" /> : <EyeIcon strokeWidth="1.8" />}
-                    </button>
-                  </div>
-                  {errorConfirmacion && (
-                    <p className="mt-1 text-xs text-red-600">{errorConfirmacion}</p>
-                  )}
-                  {!errorConfirmacion && contrasenasConcuerdan && (
-                    <p className="mt-1 text-xs text-green-700">Las contraseñas coinciden</p>
-                  )}
-                </div>
-
-                {/* Botón confirmar */}
-                <div className="mt-1 animate-fade-in-up">
-                  <button
-                    type="submit"
-                    disabled={botonDeshabilitado}
-                    className="flex items-center justify-center gap-2 w-full text-white font-bold bg-red-700 rounded-md p-3 hover:bg-red-800 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:bg-red-400"
-                  >
-                    {loading && <SpinnerIcon className="animate-spin h-4 w-4 text-white" />}
-                    {loading ? "Guardando..." : "Confirmar nueva contraseña"}
-                  </button>
-                </div>
-
-                {/* Enlace volver al login */}
-                {/* <div className="text-center">
-                  <button
-                    type="button"
-                    onClick={handleVolverLogin}
-                    className="inline-flex items-center gap-1 text-xs text-red-700 hover:text-red-900 hover:underline transition-colors"
-                  >
-                    <ArrowLeftIcon />
-                    Volver al login
-                  </button>
-                </div> */}
-              </>
-            )}
-          </form>
-        </div>
-      </div>
-    </div>
+            {/* Enlace volver al login */}
+            {/* <div className="text-center">
+              <button
+                type="button"
+                onClick={handleVolverLogin}
+                className="inline-flex items-center gap-1 text-xs text-red-700 hover:text-red-900 hover:underline transition-colors"
+              >
+                <ArrowLeftIcon />
+                Volver al login
+              </button>
+            </div> */}
+          </>
+        )}
+      </form>
+    </PaginaAuth>
   );
 }

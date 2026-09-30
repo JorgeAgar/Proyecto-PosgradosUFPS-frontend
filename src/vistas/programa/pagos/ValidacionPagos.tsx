@@ -15,10 +15,10 @@ const POR_PAGINA = 10;
 type EstadoGeneral = "COMPLETADO" | "RECHAZADO" | "EN_REVISION" | "PENDIENTE";
 
 const ESTADOS: Record<EstadoGeneral, { label: string; color: BadgeColor }> = {
+	PENDIENTE:   { label: "Pendiente",   color: "gris" },
+	EN_REVISION: { label: "En revisión", color: "amarillo" },
 	COMPLETADO:  { label: "Completado",  color: "verde" },
 	RECHAZADO:   { label: "Rechazado",   color: "rojo" },
-	EN_REVISION: { label: "En revisión", color: "amarillo" },
-	PENDIENTE:   { label: "Pendiente",   color: "gris" },
 };
 
 function resolverEstadoGeneral(pagos: PagoApi[]): EstadoGeneral {
