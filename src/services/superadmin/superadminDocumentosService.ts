@@ -1,4 +1,4 @@
-import { superadminApiClient, superadminApiUploadFile } from './superadminService';
+import { superadminApiClient } from './superadminService';
 
 export interface DocumentoConsejoOutput {
 	id: number;
@@ -149,7 +149,7 @@ export const superadminDocumentosService = {
 		form.append('body', new Blob([JSON.stringify({ nombre: data.nombre.trim(), tamanomaximo: data.tamanomaximo })], { type: 'application/json' }));
 		if (file) form.append('file', file);
 
-		const created = await superadminApiUploadFile<unknown>('/api/dev/endpoint/documentosrequisitoconsejo/superadmin/create', form, false, 'POST');
+		const created = await superadminApiClient.upload<unknown>('/api/dev/endpoint/documentosrequisitoconsejo/superadmin/create', form);
 
 		const payload = getPayloadItems(created);
 		if (payload.isCollection) {
@@ -168,7 +168,7 @@ export const superadminDocumentosService = {
 			const form = new FormData();
 			form.append('body', new Blob([JSON.stringify({ id: data.id, nombre: data.nombre.trim(), tamanomaximo: data.tamanomaximo })], { type: 'application/json' }));
 			form.append('file', file);
-			updated = await superadminApiUploadFile<unknown>(`/api/dev/endpoint/documentosrequisitoconsejo/superadmin/${data.id}`, form, false, 'PUT');
+			updated = await superadminApiClient.upload<unknown>(`/api/dev/endpoint/documentosrequisitoconsejo/superadmin/${data.id}`, form, 'PUT');
 		} else {
 			updated = await superadminApiClient.fetch<unknown>('/api/dev/endpoint/documentosrequisitoconsejo/update', {
 				method: 'PUT',
