@@ -11,8 +11,7 @@ import AspiranteLogin from "./vistas/aspirante/AspiranteLogin.tsx";
 import AspiranteInicio from "./vistas/aspirante/AspiranteInicio.tsx";
 import AspiranteEstado from "./vistas/aspirante/AspiranteEstado.tsx";
 import AspiranteDocumentos from "./vistas/aspirante/AspiranteDocumentos.tsx";
-import AspiranteEntrevista from "./vistas/aspirante/AspiranteEntrevista.tsx";
-import AspirantePrueba from "./vistas/aspirante/AspirantePrueba.tsx";
+import AspiranteActividades from "./vistas/aspirante/AspiranteActividades.tsx";
 import AspiranteCriterios from "./vistas/aspirante/AspiranteCriterios.tsx";
 // import Registro from "./vistas/Registro"; agregar cuando este listo el registro
 
@@ -57,8 +56,7 @@ import PosgradosLogin from "./vistas/posgrados/PosgradosLogin.tsx";
 import PosgradosLayout from "./layouts/PosgradosLayout.tsx";
 import Registro from "./vistas/Registro.tsx";
 import AspirantePagos from "./vistas/aspirante/pagos/AspirantePagos.tsx";
-import AspirantePagosInscripcion from "./vistas/aspirante/pagos/AspirantePagosInscripcion.tsx";
-import AspirantePagosMatricula from "./vistas/aspirante/pagos/AspirantePagosMatricula.tsx";
+import AspirantePagoDetalle from "./vistas/aspirante/pagos/AspirantePagoDetalle.tsx";
 
 /**
  * Punto de entrada de la aplicación.
@@ -138,11 +136,11 @@ createRoot(document.getElementById("root")!).render(
           <Route path="inicio" element={<AspiranteInicio />} />
           <Route path="estado" element={<AspiranteEstado />} />
           <Route path="documentos" element={<AspiranteDocumentos />} />
-          <Route path="entrevista" element={<AspiranteEntrevista />} />
+          <Route path="entrevista" element={<AspiranteActividades key="entrevista" tipo="entrevista" />} />
           <Route path="pagos" element={<AspirantePagos />} />
-          <Route path="pagos/inscripcion" element={<AspirantePagosInscripcion />} />
-          <Route path="pagos/matricula" element={<AspirantePagosMatricula />} />
-          <Route path="prueba" element={<AspirantePrueba />} />
+          <Route path="pagos/inscripcion" element={<AspirantePagoDetalle key="inscripcion" tipo="inscripcion" />} />
+          <Route path="pagos/matricula" element={<AspirantePagoDetalle key="matricula" tipo="matricula" />} />
+          <Route path="prueba" element={<AspiranteActividades key="prueba" tipo="prueba" />} />
           <Route path="criterios" element={<AspiranteCriterios />} />
           {/* <Route path="/registro" element={<Registro />} />
           descomentar y conectar cuando estén listas:
