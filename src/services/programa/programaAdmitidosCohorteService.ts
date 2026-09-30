@@ -51,12 +51,3 @@ export async function estaFinalizadoProcesoAdmision(cohorteId: string): Promise<
 export async function downloadAdmittedListPdf(cohorteId: string): Promise<Blob> {
   return programaApiClient.blob(`/api/application/case/director-programa/${cohorteId}/generateAdmittedList`, { method: 'GET' });
 }
-
-export default {
-  fetchRankingAdmitidosByCohorte,
-  admitirAspirante,
-  revertirAdmision,
-  finalizarProcesoAdmision,
-  estaFinalizadoProcesoAdmision,
-  downloadAdmittedListPdf,
-};

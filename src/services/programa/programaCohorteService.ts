@@ -237,10 +237,3 @@ export async function fetchModalidadesDisponibles(): Promise<ModalidadItem[]> {
     } as ModalidadItem;
   });
 }
-
-export default {
-  fetchCohortes,
-  createCohorte,
-  fetchSemestresDisponibles,
-  fetchModalidadesDisponibles,
-};

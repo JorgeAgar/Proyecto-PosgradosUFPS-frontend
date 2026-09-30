@@ -86,10 +86,3 @@ export async function cerrarCohorte(cohorteId: string): Promise<CohorteItem> {
   const path = `/api/application/case/director-programa/cohorte/${cohorteId}/cerrar`;
   return programaApiClient.fetch<CohorteItem>(path, { method: 'POST' });
 }
-
-export default {
-  fetchCohorteDetalle,
-  updateCohorte,
-  abrirCohorte,
-  cerrarCohorte,
-};

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, type ComponentType } from "react";
 import { useOutletContext } from "react-router";
-import { fetchEstadoProceso, type PasoProceso } from "../../services/aspirante/aspiranteInicioService";
+import { fetchEstadoProceso, type PasoProceso } from "../../services/aspirante/aspiranteEstadoService";
 import { getCorreoAspirante, patchCorreoAspirante, enviarConfirmacionCorreo } from "../../services/aspirante/aspiranteService";
 import type { AspiranteOutletContext } from "../../layouts/AspiranteLayout";
 import { CalendarIcon, CheckCircleIcon, ClockIcon, SpinnerIcon, WarningTriangleIcon } from "../../assets/icons";

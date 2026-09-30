@@ -13,7 +13,9 @@ import AspiranteEstado from "./vistas/aspirante/AspiranteEstado.tsx";
 import AspiranteDocumentos from "./vistas/aspirante/AspiranteDocumentos.tsx";
 import AspiranteActividades from "./vistas/aspirante/AspiranteActividades.tsx";
 import AspiranteCriterios from "./vistas/aspirante/AspiranteCriterios.tsx";
-// import Registro from "./vistas/Registro"; agregar cuando este listo el registro
+import AspirantePagos from "./vistas/aspirante/pagos/AspirantePagos.tsx";
+import AspirantePagoDetalle from "./vistas/aspirante/pagos/AspirantePagoDetalle.tsx";
+import Registro from "./vistas/Registro.tsx";
 
 // Vistas del superadmin
 import LoginSuperAdmin from "./vistas/superadmin/SuperadminLogin.tsx";
@@ -54,33 +56,27 @@ import AdmitidosCohorte from "./vistas/programa/admitidos/AdmitidosCohorte.tsx";
 import Posgrados from "./vistas/posgrados/Posgrados.tsx";
 import PosgradosLogin from "./vistas/posgrados/PosgradosLogin.tsx";
 import PosgradosLayout from "./layouts/PosgradosLayout.tsx";
-import Registro from "./vistas/Registro.tsx";
-import AspirantePagos from "./vistas/aspirante/pagos/AspirantePagos.tsx";
-import AspirantePagoDetalle from "./vistas/aspirante/pagos/AspirantePagoDetalle.tsx";
 
 /**
  * Punto de entrada de la aplicación.
  *
- * Rutas definidas:
- *   /                        → Vista de login (autenticación)
- *   /funcionario/home        → Home del funcionario
- *   /funcionario/dashboard   → Dashboard del funcionario
+ * Rutas:
+ *   /                     → redirige a /programa/login
+ *   /registro             → formulario de inscripción (público)
+ *   /recuperar-password, /cambiar-password → recuperación de contraseña (todos los roles)
  *
- *   /aspirante/*             → Rutas anidadas bajo AspiranteLayout (con Sidebar)
- *     /aspirante/inicio      → Home del aspirante
- *     /aspirante/estado      → Estado del proceso del aspirante
- *     /aspirante/documentos  → Gestión de documentos
- *     /aspirante/entrevista  → Información de entrevista
- *     /aspirante/prueba      → Prueba de admisión
+ *   /aspirante/login, /aspirante/*       → panel del aspirante (AspiranteLayout)
+ *   /programa/login, /programa/*         → panel del director de programa (ProgramaLayout)
+ *   /superadmin/login, /superadmin/*     → panel del superadministrador (SuperadminLayout)
+ *   /posgrados/login, /posgrados         → consulta de programas del usuario de Posgrados
  *
- *    /registro                   → Formulario de inscripción (público)
- * TODO: agregar /recuperar-clave cuando estén listos.
+ * Cada layout redirige a su login si no hay sesión del rol correspondiente.
  */
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        {/* ── Raíz: redirige al login del aspirante ── */}
+        {/* ── Raíz: redirige al login del director de programa ── */}
         <Route path="/" element={<Navigate to="/programa/login" replace />} />
         {/* ── Rutas públicas ── */}
         <Route path="aspirante/login" element={<AspiranteLogin />} />
@@ -142,10 +138,6 @@ createRoot(document.getElementById("root")!).render(
           <Route path="pagos/matricula" element={<AspirantePagoDetalle key="matricula" tipo="matricula" />} />
           <Route path="prueba" element={<AspiranteActividades key="prueba" tipo="prueba" />} />
           <Route path="criterios" element={<AspiranteCriterios />} />
-          {/* <Route path="/registro" element={<Registro />} />
-          descomentar y conectar cuando estén listas:
-          <Route path="/recuperar-clave" element={<RecuperarClave />} />
-          <Route path="/dashboard" element={<Dashboard />} /> */}
         </Route>
 
         {/* Rutas del usuario posgrados */}

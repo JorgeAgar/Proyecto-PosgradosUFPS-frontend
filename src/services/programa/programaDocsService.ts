@@ -51,38 +51,6 @@ const programaDocsService = {
       { method: 'DELETE' }
     );
   },
-
-  async uploadFormat(docId: string, file: File) {
-    const form = new FormData();
-    form.append('file', file);
-    return programaApiClient.upload<unknown>(`/api/application/case/director-programa/documentos/${docId}/formato`, form);
-  },
 };
 
 export default programaDocsService;
-
-/* Suggested backend endpoints (example)
-
-GET  /api/application/case/director-programa/programa/:programaId/documentos/requeridos
-  Response:
-  {
-    "documentosConsejo": [ { "id", "nombre", "tamanomaximo", "urlformato", "id_programa" } ],
-    "documentosPrograma": [ { "id", "nombre", "tamanomaximo", "urlformato", "id_programa" } ]
-  }
-
-POST /api/application/case/director-programa/programa/:programaId/documentos/requeridos
-  Body: { nombre, tamanomaximo?, formato? }
-  Response: { id, nombre, tamanomaximo, urlformato }
-
-PUT  /api/application/case/director-programa/documentos/:documentoId
-  Body: { nombre, tamanomaximo?, formato? }
-  Response: { id, nombre, tamanomaximo, urlformato }
-
-DELETE /api/application/case/director-programa/documentos/:documentoId
-  Response: { success: true }
-
-POST /api/application/case/director-programa/documentos/:documentoId/formato
-  multipart/form-data: file
-  Response: { success: true, urlformato: 'https://...' }
-
-*/

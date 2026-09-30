@@ -41,5 +41,3 @@ export async function fetchEstadoProceso(): Promise<PasoProceso[]> {
     estado: mapEstado(p.status),
   }));
 }
-
-export default { fetchEstadoProceso };

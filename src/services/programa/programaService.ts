@@ -1,9 +1,8 @@
 /**
  * programaService.ts
  *
- * Servicio de autenticación para el módulo Programa (Director de Programa).
- * Implementa `login`, `logout`, `refreshSession` y helpers similares al patrón
- * usado en `superadminService.ts`.
+ * Servicio de autenticación para el módulo Programa (Director de Programa)
+ * y resolución del id del programa con el que se trabaja.
  */
 
 import { createApiClient } from "../apiService";
@@ -50,18 +49,6 @@ export async function getProgramaRealId(): Promise<number> {
 export function seleccionarPrograma(id: number) {
   _programaIdCache = id;
   localStorage.setItem(PROGRAMA_KEY, String(id));
-}
-
-// ── Helpers específicos de Programa ──────────────────────────────────────────
-export interface ProgramaBackend {
-  id: number;
-  codigo?: number;
-  nombre: string;
-  semestres?: number;
-  correo?: string;
-  sede?: { id?: number; nombre?: string };
-  facultad?: { id?: number; nombre?: string };
-  ofertaacademicaList?: Array<{ id?: number; encuentros?: string }>;
 }
 
 export const programaAuthService = createAuthService({

@@ -1,10 +1,10 @@
 import { createApiClient } from "../apiService";
 import { createAuthService } from "../authService";
 
-export const ACCESS_TOKEN_KEY = "ufps_aspirante_access_token";
-export const REFRESH_TOKEN_KEY = "ufps_aspirante_refresh_token";
-export const SESSION_KEY = "ufps_aspirante_session";
-export const ASPIRANTE_ID_KEY = "ufps_aspirante_id";
+const ACCESS_TOKEN_KEY = "ufps_aspirante_access_token";
+const REFRESH_TOKEN_KEY = "ufps_aspirante_refresh_token";
+const SESSION_KEY = "ufps_aspirante_session";
+const ASPIRANTE_ID_KEY = "ufps_aspirante_id";
 
 let _aspiranteIdCache: number | null = null;
 
