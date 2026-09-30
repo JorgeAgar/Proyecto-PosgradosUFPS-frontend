@@ -9,36 +9,7 @@ import { DatePicker } from '../../../components/DatePicker';
 import { Select, type SelectOption } from '../../../components/Select';
 import { SpinnerIcon } from "../../../assets/icons";
 import { DialogoConfirmacion } from '../../../components/Dialogo';
-
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) {
-    const brandedError = error as Error & { body?: unknown; status?: number };
-    const body = brandedError.body;
-    const status = brandedError.status;
-    if (body && typeof body === 'object') {
-      const bodyRecord = body as Record<string, unknown>;
-      if (status === 409) {
-        if (typeof bodyRecord.message === 'string' && bodyRecord.message.trim()) return bodyRecord.message.trim();
-        if (typeof bodyRecord.mensaje === 'string' && bodyRecord.mensaje.trim()) return bodyRecord.mensaje.trim();
-        if (typeof bodyRecord.error === 'string' && bodyRecord.error.trim()) return bodyRecord.error.trim();
-      }
-      if (typeof bodyRecord.message === 'string' && bodyRecord.message.trim()) return bodyRecord.message.trim();
-      if (typeof bodyRecord.mensaje === 'string' && bodyRecord.mensaje.trim()) return bodyRecord.mensaje.trim();
-    }
-
-    return error.message.trim() || 'No se pudo crear la cohorte.';
-  }
-
-  if (typeof error === 'string' && error.trim()) return error.trim();
-
-  if (error && typeof error === 'object') {
-    const record = error as Record<string, unknown>;
-    if (typeof record.message === 'string' && record.message.trim()) return record.message.trim();
-    if (typeof record.mensaje === 'string' && record.mensaje.trim()) return record.mensaje.trim();
-  }
-
-  return 'No se pudo crear la cohorte.';
-}
+import { mensajeErrorCohorte } from './mensajeErrorCohorte';
 
 export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void; onBack?: () => void | Promise<void> }) {
   const navigate = useNavigate();
@@ -212,7 +183,7 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
       else navigate('/programa/cohortes');
     } catch (err) {
       console.error(err);
-      mostrarAlerta(getErrorMessage(err), 'error');
+      mostrarAlerta(mensajeErrorCohorte(err, 'No se pudo crear la cohorte.'), 'error');
     } finally {
       setSaving(false);
     }

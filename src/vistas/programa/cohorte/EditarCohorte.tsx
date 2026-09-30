@@ -11,6 +11,7 @@ import { DatePicker } from '../../../components/DatePicker';
 import { Select, type SelectOption } from '../../../components/Select';
 import { SpinnerIcon } from "../../../assets/icons";
 import { DialogoConfirmacion } from '../../../components/Dialogo';
+import { mensajeErrorCohorte } from './mensajeErrorCohorte';
 
 function genLocalId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -54,36 +55,6 @@ type SavePayload = Partial<{
   documentosPrograma: { idDocrequisito?: string | number; idCohorte?: string | number; nombre?: string }[];
   criteriosCohorte: { id?: string | number; idCriterio?: string | number; pesoSnapshot?: number }[];
 }>;
-
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) {
-    const brandedError = error as Error & { body?: unknown; status?: number };
-    const body = brandedError.body;
-    const status = brandedError.status;
-    if (body && typeof body === 'object') {
-      const bodyRecord = body as Record<string, unknown>;
-      if (status === 415 || bodyRecord.status === 415 || bodyRecord.statusCode === 415) {
-        return 'El criterio no se puede editar ni borrar porque ya tiene calificaciones registradas.';
-      }
-      if (typeof bodyRecord.message === 'string' && bodyRecord.message.trim()) return bodyRecord.message.trim();
-      if (typeof bodyRecord.mensaje === 'string' && bodyRecord.mensaje.trim()) return bodyRecord.mensaje.trim();
-    }
-    if (status === 415) {
-      return 'El criterio no se puede editar ni borrar porque ya tiene calificaciones registradas.';
-    }
-    return error.message.trim() || 'No se pudo guardar la cohorte.';
-  }
-
-  if (typeof error === 'string' && error.trim()) return error.trim();
-
-  if (error && typeof error === 'object') {
-    const record = error as Record<string, unknown>;
-    if (typeof record.message === 'string' && record.message.trim()) return record.message.trim();
-    if (typeof record.mensaje === 'string' && record.mensaje.trim()) return record.mensaje.trim();
-  }
-
-  return 'No se pudo guardar la cohorte.';
-}
 
 export default function EditarCohorte({
   cohorte,
@@ -442,7 +413,9 @@ export default function EditarCohorte({
       setEditClosing(true);
       setTimeout(() => onCancel(), 170);
     } catch (error) {
-      const message = getErrorMessage(error);
+      const message = mensajeErrorCohorte(error, 'No se pudo guardar la cohorte.', {
+        415: 'El criterio no se puede editar ni borrar porque ya tiene calificaciones registradas.',
+      });
       mostrarAlerta(message, 'error');
     } finally {
       setIsSaving(false);
