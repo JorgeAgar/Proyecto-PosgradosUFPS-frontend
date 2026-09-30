@@ -42,6 +42,16 @@ export async function getProgramaRealId(): Promise<number> {
   return _programaIdCache;
 }
 
+/**
+ * Fija el programa con el que se trabajará (lo usa el usuario de Posgrados al
+ * entrar a un programa). Actualiza también la caché en memoria para que no se
+ * sigan mostrando los datos del programa visitado antes.
+ */
+export function seleccionarPrograma(id: number) {
+  _programaIdCache = id;
+  localStorage.setItem(PROGRAMA_KEY, String(id));
+}
+
 // ── Helpers específicos de Programa ──────────────────────────────────────────
 export interface ProgramaBackend {
   id: number;
@@ -54,25 +64,19 @@ export interface ProgramaBackend {
   ofertaacademicaList?: Array<{ id?: number; encuentros?: string }>;
 }
 
-export const programaAuthService = {
-  ...createAuthService({
-    accessTokenKey: ACCESS_TOKEN_KEY,
-    refreshTokenKey: REFRESH_TOKEN_KEY,
-    sessionKey: SESSION_KEY,
-    requestedRole: "Director de programa",
-    extraKeys: [PROGRAMA_KEY],
-    onLogin: () => {
-      // Se limpia el programaId cacheado para que se resuelva de nuevo en la sesión nueva
-      _programaIdCache = null;
-    },
-    onLogout: () => {
-      _programaIdCache = null;
-    },
-  }),
-
-  async setProgramaId() {
-    await getProgramaRealId();
+export const programaAuthService = createAuthService({
+  accessTokenKey: ACCESS_TOKEN_KEY,
+  refreshTokenKey: REFRESH_TOKEN_KEY,
+  sessionKey: SESSION_KEY,
+  requestedRole: "Director de programa",
+  extraKeys: [PROGRAMA_KEY],
+  onLogin: () => {
+    // Se limpia el programaId cacheado para que se resuelva de nuevo en la sesión nueva
+    _programaIdCache = null;
   },
-};
+  onLogout: () => {
+    _programaIdCache = null;
+  },
+});
 
 export const programaApiClient = createApiClient(programaAuthService);

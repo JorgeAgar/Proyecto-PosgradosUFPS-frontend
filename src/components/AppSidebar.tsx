@@ -140,7 +140,6 @@ interface AppSidebarProps {
   onLogout: () => void;
   mobileOpen: boolean;
   onClose: () => void;
-  onNavItemClick?: (item: AppNavItem) => void;
   /** Paleta de colores. Por defecto "rojo" (aspirante / programa). */
   tema?: AppSidebarTema;
 }
@@ -155,7 +154,6 @@ export default function AppSidebar({
   onLogout,
   mobileOpen,
   onClose,
-  onNavItemClick,
   tema = "rojo",
 }: AppSidebarProps) {
   const t = TEMAS[tema];
@@ -229,10 +227,7 @@ export default function AppSidebar({
               ) : (
                 <NavLink
                   to={item.to!}
-                  onClick={() => {
-                    onNavItemClick?.(item);
-                    onClose();
-                  }}
+                  onClick={onClose}
                   className={({ isActive }) =>
                     [
                       "flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",

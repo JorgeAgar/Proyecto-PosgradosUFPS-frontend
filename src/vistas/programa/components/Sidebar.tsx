@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import AppSidebar, { type AppNavItem } from "../../../components/AppSidebar";
-import { fetchCohortes } from '../../../services/programa/programaCohorteService';
+import { programaAuthService } from "../../../services/programa/programaService";
 import { AdmissionIcon, CriteriaListIcon, DocumentsIcon, HomeIcon as InicioIcon, PaymentCardDetailsIcon, ProgramCohorteIcon, ValidationDocumentIcon } from "../../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
@@ -51,25 +51,11 @@ export default function SidebarDirectorPrograma({
   onClose,
 }: SidebarDirectorProgramaProps) {
   const navigate = useNavigate();
-  const sessionRaw = localStorage.getItem("ufps_programa_session");
-  const session = sessionRaw ? JSON.parse(sessionRaw) : null;
+  const session = programaAuthService.getSession();
 
   const handleLogout = () => {
-    localStorage.removeItem("ufps_programa_session");
-    localStorage.removeItem("ufps_programa_access_token");
-    localStorage.removeItem("ufps_programa_refresh_token");
-    localStorage.removeItem("ufps_programa_id");
-    navigate("/");
-  };
-
-  const handleNavItemClick = (item: AppNavItem) => {
-    if (item.to === '/programa/cohortes') {
-      try {
-        fetchCohortes().catch((err) => console.error('Error cargando cohortes desde sidebar:', err));
-      } catch (err) {
-        console.error('Error preparando fetchCohortes desde sidebar:', err);
-      }
-    }
+    programaAuthService.logout();
+    navigate("/programa/login");
   };
 
   return (
@@ -78,7 +64,6 @@ export default function SidebarDirectorPrograma({
       roleLabel="Director"
       session={session}
       navItems={NAV_ITEMS}
-      onNavItemClick={handleNavItemClick}
       onLogout={handleLogout}
       mobileOpen={mobileOpen}
       onClose={onClose}

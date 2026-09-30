@@ -8,6 +8,7 @@ import {
   type ProgramaOutput,
   type CohorteOutput,
 } from '../../services/posgrados/posgradosProgramasService';
+import { seleccionarPrograma } from '../../services/programa/programaService';
 import { AcademicCapIcon, BuildingLibraryIcon, ChevronRightIcon, SpinnerIcon } from "../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
@@ -54,7 +55,7 @@ function ProgramaItem({
 
   const irAlPrograma = () => {
     copiarAutenticacionPosgradosAPrograma();
-    localStorage.setItem('ufps_programa_id', String(programa.id));
+    seleccionarPrograma(programa.id);
     navigate('/programa/inicio');
   };
 
