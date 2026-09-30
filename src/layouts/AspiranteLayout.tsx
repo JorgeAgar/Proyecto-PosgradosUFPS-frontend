@@ -26,8 +26,12 @@ export default function AspiranteLayout() {
   const [soloInscrito, setSoloInscrito] = useState<boolean | null>(null);
   const [admitido, setAdmitido]         = useState<boolean | null>(null);
   const [inscripcionCompletada, setInscripcionCompletada] = useState<boolean | null>(null);
+  const session = aspiranteAuthService.getSession();
+  const haySesion = session !== null;
 
   useEffect(() => {
+    // Sin sesión se redirige al login; no tiene sentido consultar el estado.
+    if (!haySesion) return;
     fetchEstadoProceso()
       .then((pasos) => {
         const pagoCompletado = pasos.some(
@@ -51,9 +55,8 @@ export default function AspiranteLayout() {
         setAdmitido(false);
         setInscripcionCompletada(false);
       });
-  }, []);
+  }, [haySesion]);
 
-  const session = aspiranteAuthService.getSession();
   if (!session) {
     return <Navigate to="/aspirante/login" replace />;
   }
