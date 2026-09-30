@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { CalendarIcon, ChevronDownIcon, ClockIcon, MapPinIcon, PlusIcon, RefreshIcon, SpinnerIcon } from "../../../assets/icons";
+import { EstadoAgendaBadge, Motivo } from "../../../components/Agenda";
+import { formatFecha, formatHora } from "../../../utils/fechas";
 
 export type EstadoAgenda = "pendiente" | "confirmada" | "solicitud de cambio" | "cancelada" | "completada";
 
@@ -17,30 +19,6 @@ export interface ItemAgenda {
   motivo?: string;
 }
 
-// ── Helper: badge de estado entrevista ────────────────────────────────────────
-
-function EntrevistaBadge({ estado }: { estado: string }) {
-  const map: Record<string, string> = {
-    confirmada:            "bg-blue-100 text-blue-700 border border-blue-200",
-    "solicitud de cambio": "bg-amber-100 text-amber-600 border border-amber-200",
-    pendiente:             "bg-yellow-100 text-yellow-600 border border-yellow-200",
-    cancelada:             "bg-red-100 text-red-700 border border-red-200",
-    completada:            "bg-green-100 text-green-700 border border-green-200",
-  };
-  const labels: Record<string, string> = {
-    confirmada:            "Confirmada",
-    "solicitud de cambio": "Solicitud de cambio",
-    pendiente:             "Pendiente de confirmación",
-    cancelada:             "Cancelada",
-    completada:            "Completada",
-  };
-  return (
-    <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-lg ${map[estado] ?? "bg-gray-100 text-gray-700"}`}>
-      {labels[estado] ?? estado}
-    </span>
-  );
-}
-
 function ModalidadBadge({ modalidad }: { modalidad: string }) {
   return (
     <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-lg ${
@@ -51,36 +29,9 @@ function ModalidadBadge({ modalidad }: { modalidad: string }) {
   );
 }
 
-// ── Helpers de formato ────────────────────────────────────────────────────────
-
-const MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-
-function formatFecha(iso: string): string {
-  if (!iso) return "";
-  const [year, month, day] = iso.split("-");
-  return `${parseInt(day)} de ${MESES[parseInt(month) - 1]} de ${year}`;
-}
-
-function formatHora(time: string): string {
-  if (!time) return "";
-  const [h, m] = time.split(":").map(Number);
-  const ampm = h >= 12 ? "PM" : "AM";
-  const hour = h % 12 || 12;
-  return `${hour}:${String(m).padStart(2, "0")} ${ampm}`;
-}
-
 // ── Tarjeta ───────────────────────────────────────────────────────────────────
 
 const BOTON_ROJO_PEQUENO = "px-3 py-1.5 bg-red-700 text-white text-xs rounded-lg hover:bg-red-800 transition-colors font-medium";
-
-function Motivo({ titulo, texto }: { titulo: string; texto: string }) {
-  return (
-    <div className="mt-3 pt-3 border-t border-gray-200">
-      <div className="text-xs font-semibold text-neutral-400 mb-1">{titulo}</div>
-      <div className="text-sm text-gray-700 italic">"{texto}"</div>
-    </div>
-  );
-}
 
 function TarjetaAgenda({ item, className, children }: { item: ItemAgenda; className: string; children?: React.ReactNode }) {
   return (
@@ -92,7 +43,7 @@ function TarjetaAgenda({ item, className, children }: { item: ItemAgenda; classN
         </div>
       )}
       <div className="flex flex-wrap items-center gap-2 mb-3">
-        <EntrevistaBadge estado={item.estado} />
+        <EstadoAgendaBadge estado={item.estado} />
         <ModalidadBadge modalidad={item.modalidad} />
       </div>
       <div className="space-y-1.5">
