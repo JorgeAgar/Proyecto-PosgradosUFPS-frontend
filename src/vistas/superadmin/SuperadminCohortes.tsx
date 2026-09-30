@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useOutletContext } from 'react-router';
-import { Modal } from './components/Modal';
+import { Modal } from '../../components/Modal';
 import { SelectSA } from './components/SelectSA';
 import { DatePickerSA } from './components/DatePickerSA';
 import type { SuperadminOutletContext } from '../../layouts/SuperadminLayout';

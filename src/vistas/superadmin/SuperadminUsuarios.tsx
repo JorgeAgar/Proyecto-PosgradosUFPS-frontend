@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router';
-import { Modal } from './components/Modal';
+import { Modal } from '../../components/Modal';
 import type { SuperadminOutletContext } from '../../layouts/SuperadminLayout';
 import {
   superadminUsuariosService,

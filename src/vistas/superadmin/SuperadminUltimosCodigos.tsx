@@ -6,7 +6,7 @@ import {
 	MagnifyingGlassIcon,
 	PencilSquareIcon,
 } from '@heroicons/react/24/outline';
-import { Modal } from './components/Modal';
+import { Modal } from '../../components/Modal';
 import type { SuperadminOutletContext } from '../../layouts/SuperadminLayout';
 import {
 	superadminUltimosCodigosService,

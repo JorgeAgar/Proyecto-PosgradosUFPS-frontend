@@ -1,8 +1,5 @@
 import { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { XMarkIcon } from '../../../assets/icons';
-
-// ── XMarkIcon ─────────────────────────────────────────────────────────────────
+import { XMarkIcon } from '../assets/icons';
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -44,11 +41,11 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
 
   if (!visible) return null;
 
-  const content = (
+  return (
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px] ${closing ? 'animate-overlay-out' : 'animate-overlay-in'}`}
+        className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm ${closing ? 'animate-overlay-out' : 'animate-overlay-in'}`}
         onClick={onClose}
         aria-hidden="true"
       />
@@ -56,11 +53,11 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
       {/* Centrado */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div
-          className={`${closing ? 'animate-modal-out' : 'animate-modal-in'} bg-white rounded-lg shadow-xl w-full ${sizeClass[size]} p-6`}
+          className={`${closing ? 'animate-modal-out' : 'animate-modal-in'} bg-white rounded-lg border border-slate-200 shadow-xl w-full ${sizeClass[size]} flex flex-col max-h-[90vh]`}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Cabecera */}
-          <div className="flex items-center justify-between mb-5">
+          {/* Cabecera fija */}
+          <div className="flex items-center justify-between px-6 pt-6 pb-4 shrink-0">
             <h3 className="text-base font-semibold text-gray-900">{title}</h3>
             <button
               onClick={onClose}
@@ -70,11 +67,12 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
             </button>
           </div>
 
-          {children}
+          {/* Contenido scrollable */}
+          <div className="overflow-y-auto flex-1 px-6 pb-6">
+            {children}
+          </div>
         </div>
       </div>
     </>
   );
-
-  return createPortal(content, document.body);
 }
