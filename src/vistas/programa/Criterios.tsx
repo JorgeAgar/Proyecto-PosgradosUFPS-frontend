@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router';
 import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
   InformationCircleIcon,
   PencilSquareIcon,
   PlusIcon,
@@ -20,6 +18,7 @@ import {
 import type { ProgramaOutletContext } from '../../layouts/ProgramaLayout';
 import { SpinnerIcon } from "../../assets/icons";
 import { DialogoConfirmacion } from '../../components/Dialogo';
+import Paginacion from '../../components/Paginacion';
 
 const CAMPO = 'mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 disabled:opacity-60 disabled:cursor-not-allowed';
 
@@ -191,7 +190,6 @@ export default function Criterios() {
     }
   };
 
-  const totalPaginas = Math.ceil(criterios.length / POR_PAGINA);
   const criteriosPagina = criterios.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA);
 
   return (
@@ -270,32 +268,7 @@ export default function Criterios() {
             </tbody>
           </table>
           </div>
-          {totalPaginas > 1 && (
-            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-              <span className="text-xs text-neutral-400">
-                {(pagina - 1) * POR_PAGINA + 1}–{Math.min(pagina * POR_PAGINA, criterios.length)} de {criterios.length} criterios
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPagina((p) => p - 1)}
-                  disabled={pagina === 1}
-                  className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-gray-700"
-                >
-                  <ChevronLeftIcon className="w-4 h-4" />
-                  Anterior
-                </button>
-                <span className="text-sm font-medium text-gray-600 px-1">{pagina} / {totalPaginas}</span>
-                <button
-                  onClick={() => setPagina((p) => p + 1)}
-                  disabled={pagina === totalPaginas}
-                  className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-gray-700"
-                >
-                  Siguiente
-                  <ChevronRightIcon className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
+          <Paginacion pagina={pagina} porPagina={POR_PAGINA} totalElementos={criterios.length} onCambiar={setPagina} etiqueta="criterios" />
         </div>
         )}
       </div>

@@ -3,8 +3,6 @@ import { useNavigate, useOutletContext } from 'react-router';
 import {
   ArrowLeftIcon,
   ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   DocumentTextIcon,
   PencilSquareIcon,
   SparklesIcon,
@@ -15,6 +13,7 @@ import type { ProgramaOutletContext } from '../../../layouts/ProgramaLayout';
 import EditarCohorte from './EditarCohorte';
 import { SpinnerIcon } from "../../../assets/icons";
 import { DialogoConfirmacion } from '../../../components/Dialogo';
+import Paginacion from '../../../components/Paginacion';
 
 export default function CohorteDetalleView({
   cohorte,
@@ -364,7 +363,6 @@ export default function CohorteDetalleView({
 
             {isInscritosExpanded && editedData.id !== 'new' && (() => {
               const inscritos = editedData.inscritosData ?? [];
-              const totalPaginasInscritos = Math.ceil(inscritos.length / POR_PAGINA);
               const inscritosPagina = inscritos.slice((paginaInscritos - 1) * POR_PAGINA, paginaInscritos * POR_PAGINA);
               return (
                 <div className="border-t border-gray-200 animate-accordion-open">
@@ -399,32 +397,7 @@ export default function CohorteDetalleView({
                       </tbody>
                     </table>
                   </div>
-                  {totalPaginasInscritos > 1 && (
-                    <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-                      <span className="text-xs text-neutral-400">
-                        {(paginaInscritos - 1) * POR_PAGINA + 1}–{Math.min(paginaInscritos * POR_PAGINA, inscritos.length)} de {inscritos.length} inscritos
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setPaginaInscritos((p) => p - 1)}
-                          disabled={paginaInscritos === 1}
-                          className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-gray-700"
-                        >
-                          <ChevronLeftIcon className="w-4 h-4" />
-                          Anterior
-                        </button>
-                        <span className="text-sm font-medium text-gray-600 px-1">{paginaInscritos} / {totalPaginasInscritos}</span>
-                        <button
-                          onClick={() => setPaginaInscritos((p) => p + 1)}
-                          disabled={paginaInscritos === totalPaginasInscritos}
-                          className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-gray-700"
-                        >
-                          Siguiente
-                          <ChevronRightIcon className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                  <Paginacion pagina={paginaInscritos} porPagina={POR_PAGINA} totalElementos={inscritos.length} onCambiar={setPaginaInscritos} etiqueta="inscritos" />
                 </div>
               );
             })()}
@@ -443,7 +416,6 @@ export default function CohorteDetalleView({
 
               {isAdmitidosExpanded && (() => {
                 const admitidos = editedData.admitidosData ?? [];
-                const totalPaginasAdmitidos = Math.ceil(admitidos.length / POR_PAGINA);
                 const admitidosPagina = admitidos.slice((paginaAdmitidos - 1) * POR_PAGINA, paginaAdmitidos * POR_PAGINA);
                 return (
                   <div className="border-t border-gray-200 animate-accordion-open">
@@ -478,32 +450,7 @@ export default function CohorteDetalleView({
                         </tbody>
                       </table>
                     </div>
-                    {totalPaginasAdmitidos > 1 && (
-                      <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-                        <span className="text-xs text-neutral-400">
-                          {(paginaAdmitidos - 1) * POR_PAGINA + 1}–{Math.min(paginaAdmitidos * POR_PAGINA, admitidos.length)} de {admitidos.length} admitidos
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => setPaginaAdmitidos((p) => p - 1)}
-                            disabled={paginaAdmitidos === 1}
-                            className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-gray-700"
-                          >
-                            <ChevronLeftIcon className="w-4 h-4" />
-                            Anterior
-                          </button>
-                          <span className="text-sm font-medium text-gray-600 px-1">{paginaAdmitidos} / {totalPaginasAdmitidos}</span>
-                          <button
-                            onClick={() => setPaginaAdmitidos((p) => p + 1)}
-                            disabled={paginaAdmitidos === totalPaginasAdmitidos}
-                            className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-gray-700"
-                          >
-                            Siguiente
-                            <ChevronRightIcon className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                    <Paginacion pagina={paginaAdmitidos} porPagina={POR_PAGINA} totalElementos={admitidos.length} onCambiar={setPaginaAdmitidos} etiqueta="admitidos" />
                   </div>
                 );
               })()}
