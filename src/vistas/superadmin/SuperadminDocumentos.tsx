@@ -15,6 +15,7 @@ import {
 } from '../../services/superadmin/superadminDocumentosService';
 import { SpinnerIcon } from "../../assets/icons";
 import { CampoBusqueda, CatalogoVacio, EncabezadoCatalogo } from '../../components/Catalogo';
+import { soloDigitos } from '../../utils/numeros';
 
 type DocumentoForm = {
 	id: number;
@@ -40,10 +41,6 @@ function sortDocumentos(items: DocumentoConsejoOutput[]) {
 
 function formatSizeLabel(value: number) {
 	return `${new Intl.NumberFormat('es-CO').format(value)} MB`;
-}
-
-function sanitizeIntegerValue(value: string) {
-	return value.replace(/\D+/g, '');
 }
 
 function abrirFormato(url: string) {
@@ -151,7 +148,7 @@ export default function SuperadminDocumentos() {
 			return;
 		}
 
-		const tamanomaximo = Number(sanitizeIntegerValue(formData.tamanomaximo));
+		const tamanomaximo = Number(soloDigitos(formData.tamanomaximo));
 		if (!Number.isFinite(tamanomaximo) || tamanomaximo < 0) {
 			setFormError('El tamaño máximo debe ser un número válido.');
 			return;
@@ -352,7 +349,7 @@ export default function SuperadminDocumentos() {
 							inputMode="numeric"
 							pattern="[0-9]*"
 							value={formData.tamanomaximo}
-							onChange={(e) => setFormData((current) => ({ ...current, tamanomaximo: sanitizeIntegerValue(e.target.value) }))}
+							onChange={(e) => setFormData((current) => ({ ...current, tamanomaximo: soloDigitos(e.target.value) }))}
 							disabled={submitting}
 							className="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 hover:border-gray-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
 							placeholder="Ej. 5"

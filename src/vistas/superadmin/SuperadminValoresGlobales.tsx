@@ -13,6 +13,7 @@ import {
 } from '../../services/superadmin/superadminGlobalesService';
 import { SpinnerIcon } from "../../assets/icons";
 import { CampoBusqueda, CatalogoVacio, EncabezadoCatalogo } from '../../components/Catalogo';
+import { soloDecimal } from '../../utils/numeros';
 
 type ValorGlobalForm = {
 	id: number;
@@ -35,26 +36,6 @@ function formatValuePreview(value: string) {
 	if (!trimmed) return 'Sin valor';
 	if (trimmed.length <= 160) return trimmed;
 	return `${trimmed.slice(0, 157)}...`;
-}
-
-function sanitizeDecimalValue(value: string) {
-	const trimmed = value.trim().replace(',', '.');
-	let resultado = '';
-	let yaTienePuntoDecimal = false;
-
-	for (const caracter of trimmed) {
-		if (/\d/.test(caracter)) {
-			resultado += caracter;
-			continue;
-		}
-
-		if (caracter === '.' && !yaTienePuntoDecimal) {
-			resultado += caracter;
-			yaTienePuntoDecimal = true;
-		}
-	}
-
-	return resultado;
 }
 
 function getUnidadValorGlobal(clave: string) {
@@ -143,7 +124,7 @@ export default function SuperadminValoresGlobales() {
 		setSubmitting(true);
 		try {
 			const clave = formData.clave.trim();
-			const valor = sanitizeDecimalValue(formData.valor);
+			const valor = soloDecimal(formData.valor);
 
 			if (!valor) {
 				setFormError('El valor debe contener solo números decimales.');
@@ -280,7 +261,7 @@ export default function SuperadminValoresGlobales() {
 								inputMode="decimal"
 								pattern="[0-9]*[.,]?[0-9]*"
 								value={formData.valor}
-								onChange={(e) => setFormData((current) => ({ ...current, valor: sanitizeDecimalValue(e.target.value) }))}
+								onChange={(e) => setFormData((current) => ({ ...current, valor: soloDecimal(e.target.value) }))}
 								disabled={submitting}
 								className="block min-w-0 flex-1 border-0 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
 								placeholder="Ej. 2000.50"

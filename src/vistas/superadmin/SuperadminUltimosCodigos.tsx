@@ -13,6 +13,7 @@ import {
 } from '../../services/superadmin/superadminUltimosCodigosService';
 import { SpinnerIcon } from "../../assets/icons";
 import { CampoBusqueda, CatalogoVacio, EncabezadoCatalogo } from '../../components/Catalogo';
+import { soloDigitos } from '../../utils/numeros';
 
 type UltimoCodigoForm = {
 	idPrograma: number;
@@ -28,10 +29,6 @@ const EMPTY_FORM: UltimoCodigoForm = {
 
 function sortUltimosCodigos(items: UltimoCodigoProgramaOutput[]) {
 	return [...items].sort((a, b) => a.nombrePrograma.localeCompare(b.nombrePrograma, 'es', { sensitivity: 'base' }));
-}
-
-function sanitizeIntegerValue(value: string) {
-	return value.replace(/\D/g, '');
 }
 
 export default function SuperadminUltimosCodigos() {
@@ -231,7 +228,7 @@ export default function SuperadminUltimosCodigos() {
 							inputMode="numeric"
 							pattern="[0-9]*"
 							value={formData.codigo}
-							onChange={(e) => setFormData((current) => ({ ...current, codigo: sanitizeIntegerValue(e.target.value) }))}
+							onChange={(e) => setFormData((current) => ({ ...current, codigo: soloDigitos(e.target.value) }))}
 							disabled={submitting}
 							className="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
 							placeholder="Ej. 120"
