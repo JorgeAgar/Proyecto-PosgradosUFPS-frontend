@@ -68,8 +68,6 @@ export default function ValidacionPagos({ tipo }: { tipo: TipoPago }) {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [idCohorte, tipo]);
 
-	useEffect(() => { setPagina(1); }, [searchTerm, filtroEstado]);
-
 	// Agrupar por idAspirante
 	const grupos = pagos.reduce<Record<number, PagoApi[]>>((acc, pago) => {
 		(acc[pago.idAspirante] ??= []).push(pago);
@@ -127,10 +125,10 @@ export default function ValidacionPagos({ tipo }: { tipo: TipoPago }) {
 
 					<BuscadorConFiltro
 						busqueda={searchTerm}
-						onBusqueda={setSearchTerm}
+						onBusqueda={(v) => { setSearchTerm(v); setPagina(1); }}
 						tituloFiltro="Estado"
 						filtro={filtroEstado}
-						onFiltro={setFiltroEstado}
+						onFiltro={(v) => { setFiltroEstado(v); setPagina(1); }}
 						opciones={[
 							{ value: "todos", label: "Todos" },
 							...(Object.keys(ESTADOS) as EstadoGeneral[]).map((e) => ({ value: e, label: ESTADOS[e].label })),
