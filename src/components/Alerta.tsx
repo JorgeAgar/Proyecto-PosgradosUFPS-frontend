@@ -8,6 +8,8 @@ interface AlertaProps {
   mensaje: string;
   tipo?: TipoAlerta;
   onClose: () => void;
+  /** Milisegundos antes de cerrarse sola. */
+  duracion?: number;
 }
 
 const ESTILOS: Record<TipoAlerta, { contenedor: string; colorIcono: string; colorBoton: string }> = {
@@ -28,7 +30,7 @@ const ESTILOS: Record<TipoAlerta, { contenedor: string; colorIcono: string; colo
   },
 };
 
-export default function Alerta({ isOpen, mensaje, tipo = "error", onClose }: AlertaProps) {
+export default function Alerta({ isOpen, mensaje, tipo = "error", onClose, duracion = 5000 }: AlertaProps) {
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
 
@@ -49,7 +51,7 @@ export default function Alerta({ isOpen, mensaje, tipo = "error", onClose }: Ale
 
   useEffect(() => {
     if (!isOpen) return;
-    const id = setTimeout(onClose, 5000);
+    const id = setTimeout(onClose, duracion);
     return () => clearTimeout(id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);

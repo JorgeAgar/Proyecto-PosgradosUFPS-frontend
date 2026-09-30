@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router";
 import ufpsLogo from "../assets/logoufps.png";
+import ufpsLogoBlanco from "../assets/BLANCOufps.png";
 import { ChevronIcon, LockIcon, LogoutIcon, XMarkIcon as CloseIcon } from "../assets/icons";
-
-// ── Íconos internos ───────────────────────────────────────────────────────────
 
 // ── Tipos exportados ──────────────────────────────────────────────────────────
 
@@ -14,7 +13,9 @@ export type SubNavItem = {
 
 export type AppNavItem = {
   label: string;
-  Icon: React.ComponentType;
+  Icon: React.ComponentType<{ className?: string }>;
+  /** Clase opcional para el ícono (p. ej. para ajustar su tamaño). */
+  iconClassName?: string;
   /** Ruta destino para ítems simples */
   to?: string;
   /** Sub-ítems para grupo colapsable */
@@ -97,6 +98,36 @@ function CollapsibleGroup({
   );
 }
 
+// ── Temas ────────────────────────────────────────────────────────────────────
+
+export type AppSidebarTema = "rojo" | "oscuro";
+
+const TEMAS: Record<AppSidebarTema, {
+  logo: string;
+  encabezado: string;
+  subtitulo: string;
+  badge: string;
+  activo: string;
+  logout: string;
+}> = {
+  rojo: {
+    logo: ufpsLogo,
+    encabezado: "py-5 bg-red-700",
+    subtitulo: "text-red-200",
+    badge: "bg-red-700",
+    activo: "bg-red-700 text-white shadow-sm",
+    logout: "hover:bg-red-50 hover:text-red-700",
+  },
+  oscuro: {
+    logo: ufpsLogoBlanco,
+    encabezado: "py-4 bg-slate-900",
+    subtitulo: "text-slate-300",
+    badge: "bg-slate-900",
+    activo: "bg-slate-900 text-white shadow-sm",
+    logout: "hover:bg-slate-100 hover:text-slate-900",
+  },
+};
+
 // ── Componente principal ──────────────────────────────────────────────────────
 
 interface AppSidebarProps {
@@ -110,6 +141,8 @@ interface AppSidebarProps {
   mobileOpen: boolean;
   onClose: () => void;
   onNavItemClick?: (item: AppNavItem) => void;
+  /** Paleta de colores. Por defecto "rojo" (aspirante / programa). */
+  tema?: AppSidebarTema;
 }
 
 const DELAYS = ["delay-100", "delay-200", "delay-300", "delay-400", "delay-500", "delay-600"];
@@ -123,18 +156,20 @@ export default function AppSidebar({
   mobileOpen,
   onClose,
   onNavItemClick,
+  tema = "rojo",
 }: AppSidebarProps) {
+  const t = TEMAS[tema];
   const sidebarContent = (
     <aside className="flex flex-col h-full w-64 bg-white border-r border-gray-200 shadow-sm">
       {/* Encabezado */}
-      <div className="flex items-center gap-3 px-5 py-5 bg-red-700 text-white">
+      <div className={`flex items-center gap-3 px-5 text-white ${t.encabezado}`}>
         <img
-          src={ufpsLogo}
+          src={t.logo}
           alt="UFPS"
           className="animate-fade-in h-9 w-auto shrink-0 drop-shadow-sm"
         />
         <div className="min-w-0 flex-1">
-          <p className="animate-fade-in text-[11px] font-bold tracking-widest uppercase text-red-200 leading-none">
+          <p className={`animate-fade-in text-[11px] font-bold tracking-widest uppercase leading-none ${t.subtitulo}`}>
             UFPS
           </p>
           <p className="animate-fade-in text-[13px] font-semibold leading-tight mt-0.5 truncate">
@@ -160,7 +195,7 @@ export default function AppSidebar({
           <p className="text-sm font-bold text-gray-800 mt-0.5 truncate">
             {session.displayName ?? session.username}
           </p>
-          <span className="inline-block mt-1 text-[10px] font-bold uppercase tracking-wider bg-red-700 text-white rounded px-2 py-0.5">
+          <span className={`inline-block mt-1 text-[10px] font-bold uppercase tracking-wider text-white rounded px-2 py-0.5 ${t.badge}`}>
             {roleLabel}
           </span>
         </div>
@@ -187,7 +222,7 @@ export default function AppSidebar({
                   title="Disponible a partir del estado Paz y salvo"
                   className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 cursor-not-allowed select-none"
                 >
-                  <item.Icon />
+                  <item.Icon className={item.iconClassName} />
                   <span className="truncate flex-1">{item.label}</span>
                   <LockIcon className="h-3.5 w-3.5 shrink-0 ml-auto opacity-60" />
                 </div>
@@ -202,12 +237,12 @@ export default function AppSidebar({
                     [
                       "flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                       isActive
-                        ? "bg-red-700 text-white shadow-sm"
+                        ? t.activo
                         : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
                     ].join(" ")
                   }
                 >
-                  <item.Icon />
+                  <item.Icon className={item.iconClassName} />
                   <span className="truncate">{item.label}</span>
                 </NavLink>
               )}
@@ -221,7 +256,7 @@ export default function AppSidebar({
         <button
           type="button"
           onClick={onLogout}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-red-700 transition-colors"
+          className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 transition-colors ${t.logout}`}
         >
           <LogoutIcon />
           <span>Cerrar sesión</span>
