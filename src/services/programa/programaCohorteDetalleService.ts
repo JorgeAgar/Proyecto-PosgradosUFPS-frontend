@@ -6,7 +6,7 @@
 */
 
 import { programaApiClient } from './programaService';
-import type { CohorteItem, CohorteDetalle, NuevaCohortePayload, DocumentoCohorte, DocumentAssignItem, CriterioItem } from './programaCohorteService';
+import { normalizeCohorte, type AspiranteItem, type CohorteItem, type CohorteDetalle, type NuevaCohortePayload, type DocumentoCohorte, type DocumentAssignItem, type CriterioItem } from './programaCohorteService';
 
 export type { CohorteItem, CohorteDetalle, NuevaCohortePayload, DocumentoCohorte, DocumentAssignItem, CriterioItem };
 
@@ -14,68 +14,42 @@ function isObject(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null;
 }
 
+function mapAspirantes(value: unknown): AspiranteItem[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((raw) => {
+    const item = raw as Record<string, unknown>;
+    return {
+      id: String(item.id ?? ''),
+      nombre: String(item.nombre ?? ''),
+      cedula: String(item.cedula ?? ''),
+      correo: String(item.correo ?? ''),
+    };
+  });
+}
+
+function mapDocumentosAsignados(value: unknown): DocumentAssignItem[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((raw) => {
+    const item = raw as Record<string, unknown>;
+    return {
+      id: Number(item.id ?? 0),
+      idDocrequisito: Number(item.idDocrequisito ?? 0),
+      idCohorte: Number(item.idCohorte ?? 0),
+      nombre: typeof item.nombre === 'string' ? item.nombre : undefined,
+    };
+  });
+}
+
 export async function fetchCohorteDetalle(cohorteId: string): Promise<CohorteDetalle> {
   const path = `/api/application/case/director-programa/cohorte/${cohorteId}`;
-  const data = await programaApiClient.fetch<unknown>(path, { method: 'GET' });
-  const cohorte = data as Record<string, unknown>;
-  const nombreSemestre = String(
-    cohorte.nombreSemestre ??
-      (isObject(cohorte.semestre)
-        ? (cohorte.semestre as Record<string, unknown>).nombreSemestre ??
-          (cohorte.semestre as Record<string, unknown>).nombre ??
-          ''
-        : cohorte.semestre ?? '')
-  );
-  const nombreModalidad = String(
-    cohorte.nombreModalidad ??
-      (isObject(cohorte.modalidad)
-        ? (cohorte.modalidad as Record<string, unknown>).nombreModalidad ??
-          (cohorte.modalidad as Record<string, unknown>).nombre ??
-          ''
-        : cohorte.modalidad ?? '')
-  );
+  const cohorte = await programaApiClient.fetch<Record<string, unknown>>(path, { method: 'GET' });
+  const base = normalizeCohorte(cohorte);
   return {
-    id: String(cohorte.id ?? cohorte._id ?? cohorte.cohorteId ?? cohorteId),
-    nombre: String(cohorte.nombre ?? ''),
-    activa: Boolean(cohorte.activa),
-    idSemestre: cohorte.idSemestre !== undefined
-      ? (cohorte.idSemestre as string | number)
-      : (isObject(cohorte.semestre) && (cohorte.semestre as Record<string, unknown>).id !== undefined
-        ? ((cohorte.semestre as Record<string, unknown>).id as string | number)
-        : undefined),
-    nombreSemestre,
-    semestre: nombreSemestre,
-    idModalidad: cohorte.idModalidad !== undefined
-      ? (cohorte.idModalidad as string | number)
-      : (isObject(cohorte.modalidad) && (cohorte.modalidad as Record<string, unknown>).id !== undefined
-        ? ((cohorte.modalidad as Record<string, unknown>).id as string | number)
-        : undefined),
-    nombreModalidad,
-    modalidad: nombreModalidad,
-    cupos: Number(cohorte.cupos ?? 0),
-    fechaLimiteDocs: String(cohorte.fechaLimiteDocs ?? cohorte.fechaLimiteDocumentos ?? ''),
-    fechaLimiteInscripcion: String(cohorte.fechaLimiteInscripcion ?? cohorte.fechaLimitePago ?? ''),
-    totalInscritos: Number(cohorte.totalInscritos ?? cohorte.inscritos ?? 0),
-    totalValidados: Number(cohorte.totalValidados ?? 0),
-    totalCalificados: cohorte.totalCalificados !== undefined ? Number(cohorte.totalCalificados) : Number(cohorte.totalValidados ?? 0),
-    totalAdmitidos: Number(cohorte.totalAdmitidos ?? cohorte.admitidos ?? 0),
-    inscritos: cohorte.inscritos !== undefined ? Number(cohorte.inscritos) : undefined,
-    admitidos: cohorte.admitidos !== undefined ? Number(cohorte.admitidos) : undefined,
-    fechaInicioDocumentacion: cohorte.fechaInicioDocumentacion !== undefined ? String(cohorte.fechaInicioDocumentacion) : undefined,
-    fechaFinDocumentacion: cohorte.fechaFinDocumentacion !== undefined ? String(cohorte.fechaFinDocumentacion) : undefined,
-    fechaInicioInscripcion: cohorte.fechaInicioInscripcion !== undefined ? String(cohorte.fechaInicioInscripcion) : undefined,
-    fechaFinInscripcion: cohorte.fechaFinInscripcion !== undefined ? String(cohorte.fechaFinInscripcion) : undefined,
-    fechaInicioPago: cohorte.fechaInicioPago !== undefined ? String(cohorte.fechaInicioPago) : undefined,
-    fechaFinPago: cohorte.fechaFinPago !== undefined ? String(cohorte.fechaFinPago) : undefined,
-    documentos: Array.isArray(cohorte.documentos)
-      ? cohorte.documentos.map((doc) => {
-          const documento = doc as Record<string, unknown>;
-          return {
-            nombre: String(documento.nombre ?? ''),
-            obligatorio: Boolean(documento.obligatorio),
-          };
-        })
-      : [],
+    ...base,
+    id: base.id || cohorteId,
+    // En el detalle, si el backend no envía calificados se usa el total de validados.
+    totalCalificados: Number(cohorte.totalCalificados ?? cohorte.totalValidados ?? 0),
+    documentos: base.documentos ?? [],
     criterios: Array.isArray(cohorte.criterios)
       ? cohorte.criterios.map((crit) => {
           const criterio = crit as Record<string, unknown>;
@@ -87,56 +61,14 @@ export async function fetchCohorteDetalle(cohorteId: string): Promise<CohorteDet
           };
         })
       : [],
-    inscritosData: Array.isArray(cohorte.inscritosData)
-      ? cohorte.inscritosData.map((inscrito) => {
-          const item = inscrito as Record<string, unknown>;
-          return {
-            id: String(item.id ?? ''),
-            nombre: String(item.nombre ?? ''),
-            cedula: String(item.cedula ?? ''),
-            correo: String(item.correo ?? ''),
-          };
-        })
-      : [],
-    admitidosData: Array.isArray(cohorte.admitidosData)
-      ? cohorte.admitidosData.map((admitido) => {
-          const item = admitido as Record<string, unknown>;
-          return {
-            id: String(item.id ?? ''),
-            nombre: String(item.nombre ?? ''),
-            cedula: String(item.cedula ?? ''),
-            correo: String(item.correo ?? ''),
-          };
-        })
-      : [],
-    documentosAsignados: (() => {
-      const da = cohorte.documentosAsignados;
-      if (!isObject(da)) return undefined;
-      const ra = da as Record<string, unknown>;
-      const documentosConsejo: DocumentAssignItem[] = Array.isArray(ra.documentosConsejo)
-        ? (ra.documentosConsejo as unknown[]).map((d) => {
-            const item = d as Record<string, unknown>;
-            return {
-              id: Number(item.id ?? 0),
-              idDocrequisito: Number(item.idDocrequisito ?? 0),
-              idCohorte: Number(item.idCohorte ?? 0),
-              nombre: typeof item.nombre === 'string' ? String(item.nombre) : undefined,
-            } as DocumentAssignItem;
-          })
-        : [];
-      const documentosPrograma: DocumentAssignItem[] = Array.isArray(ra.documentosPrograma)
-        ? (ra.documentosPrograma as unknown[]).map((d) => {
-            const item = d as Record<string, unknown>;
-            return {
-              id: Number(item.id ?? 0),
-              idDocrequisito: Number(item.idDocrequisito ?? 0),
-              idCohorte: Number(item.idCohorte ?? 0),
-              nombre: typeof item.nombre === 'string' ? String(item.nombre) : undefined,
-            } as DocumentAssignItem;
-          })
-        : [];
-      return { documentosConsejo, documentosPrograma };
-    })(),
+    inscritosData: mapAspirantes(cohorte.inscritosData),
+    admitidosData: mapAspirantes(cohorte.admitidosData),
+    documentosAsignados: isObject(cohorte.documentosAsignados)
+      ? {
+          documentosConsejo: mapDocumentosAsignados(cohorte.documentosAsignados.documentosConsejo),
+          documentosPrograma: mapDocumentosAsignados(cohorte.documentosAsignados.documentosPrograma),
+        }
+      : undefined,
   };
 }
 
