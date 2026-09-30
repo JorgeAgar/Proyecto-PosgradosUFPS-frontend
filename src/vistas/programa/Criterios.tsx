@@ -5,7 +5,6 @@ import {
   PencilSquareIcon,
   PlusIcon,
   TrashIcon,
-  XMarkIcon,
 } from '@heroicons/react/24/outline';
 import {
   createCriterioPrograma,
@@ -17,7 +16,7 @@ import {
 } from '../../services/programa/programaCriteriosService';
 import type { ProgramaOutletContext } from '../../layouts/ProgramaLayout';
 import { SpinnerIcon } from "../../assets/icons";
-import { DialogoConfirmacion } from '../../components/Dialogo';
+import { BOTON_SECUNDARIO, Dialogo, DialogoConfirmacion } from '../../components/Dialogo';
 import Paginacion from '../../components/Paginacion';
 
 const CAMPO = 'mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 disabled:opacity-60 disabled:cursor-not-allowed';
@@ -273,82 +272,41 @@ export default function Criterios() {
         )}
       </div>
 
-      {deleteConfirm && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${deleteConfirmClosing ? 'animate-overlay-out' : 'animate-overlay-in'}`}>
-          <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${deleteConfirmClosing ? 'animate-modal-out' : 'animate-modal-in'}`}>
-            <div className="p-6 flex items-start gap-3">
-              <div className="mt-0.5 rounded-full bg-red-100 p-2 text-red-700">
-                <TrashIcon className="h-5 w-5" />
-              </div>
-              <div className="flex-1">
-                <div className="text-sm font-semibold text-gray-900">Confirmar eliminación</div>
-                <div className="mt-1 text-sm text-gray-600">¿Estás seguro de eliminar el criterio <span className="font-semibold text-gray-900">"{deleteConfirm?.criterioNombre}"</span>?</div>
-              </div>
-              <button
-                type="button"
-                onClick={closeDeleteConfirm}
-                disabled={deleting}
-                className="rounded-full p-1 transition hover:bg-black/5 text-gray-500 disabled:opacity-60"
-                aria-label="Cerrar confirmación"
-              >
-                <XMarkIcon className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="px-4 pb-4 flex items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={closeDeleteConfirm}
-                disabled={deleting}
-                className="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-neutral-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={confirmDelete}
-                disabled={deleting}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-700 text-white text-sm font-medium hover:bg-red-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {deleting && <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />}
-                Eliminar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DialogoConfirmacion
+        abierto={deleteConfirm !== null}
+        cerrando={deleteConfirmClosing}
+        titulo="Confirmar eliminación"
+        onCerrar={closeDeleteConfirm}
+        cerrarDeshabilitado={deleting}
+        onCancelar={closeDeleteConfirm}
+        onConfirmar={confirmDelete}
+        textoConfirmar="Eliminar"
+        textoProcesando="Eliminando..."
+        procesando={deleting}
+      >
+        <p className="text-sm text-gray-700">
+          ¿Estás seguro de eliminar el criterio <span className="font-semibold text-gray-900">"{deleteConfirm?.criterioNombre}"</span>?
+        </p>
+      </DialogoConfirmacion>
 
-      {warningModal && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${warningModalClosing ? 'animate-overlay-out' : 'animate-overlay-in'}`}>
-          <div className={`bg-white rounded-lg border border-sky-200 shadow-xl max-w-md w-full mx-4 ${warningModalClosing ? 'animate-modal-out' : 'animate-modal-in'}`}>
-            <div className="p-6 flex items-start gap-3">
-              <div className="mt-0.5 rounded-full bg-sky-100 p-2 text-sky-700">
-                <InformationCircleIcon className="h-5 w-5" />
-              </div>
-              <div className="flex-1">
-                <div className="text-sm font-semibold text-gray-900">{warningModal.title}</div>
-                <div className="mt-1 text-sm text-gray-600">{warningModal.message}</div>
-              </div>
-              <button
-                type="button"
-                onClick={closeWarningModal}
-                className="rounded-full p-1 transition hover:bg-black/5 text-gray-500"
-                aria-label="Cerrar advertencia"
-              >
-                <XMarkIcon className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="px-4 pb-4 flex items-center justify-end">
-              <button
-                type="button"
-                onClick={closeWarningModal}
-                className="px-4 py-2 rounded-lg bg-white text-gray-700 border border-gray-200 text-sm font-medium hover:bg-neutral-100 transition-colors"
-              >
-                Cerrar
-              </button>
-            </div>
+      <Dialogo
+        abierto={warningModal !== null}
+        cerrando={warningModalClosing}
+        titulo={warningModal?.title}
+        onCerrar={closeWarningModal}
+        pie={
+          <button type="button" onClick={closeWarningModal} className={BOTON_SECUNDARIO}>
+            Cerrar
+          </button>
+        }
+      >
+        <div className="flex items-start gap-3">
+          <div className="rounded-full bg-sky-100 p-2 text-sky-700 shrink-0">
+            <InformationCircleIcon className="h-5 w-5" />
           </div>
+          <p className="text-sm text-gray-700">{warningModal?.message}</p>
         </div>
-      )}
+      </Dialogo>
 
       <DialogoConfirmacion
         abierto={modalOpen}
