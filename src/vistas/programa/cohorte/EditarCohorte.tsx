@@ -39,7 +39,8 @@ function criterionMatchesProgramId(
 
 type LocalDocumento = DocumentoCohorte & { __localId?: string };
 
-type SavePayload = Partial<{
+/** Cambios de una cohorte que se envían al guardar. */
+export type SavePayload = Partial<{
   cupos: number;
   idSemestre: number | string;
   idModalidad: number | string;
