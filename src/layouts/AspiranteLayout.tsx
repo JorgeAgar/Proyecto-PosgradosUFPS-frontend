@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Outlet, Navigate } from "react-router";
 import SidebarAspirante from "../vistas/aspirante/components/Sidebar";
 import ufpsLogo from "../assets/logoufps.png";
-import PanelLayout, { useNotificaciones, type NotificacionesContext } from "./PanelLayout";
+import PanelLayout from "./PanelLayout";
+import { useNotificaciones, type NotificacionesContext } from "./useNotificaciones";
 import { aspiranteAuthService } from "../services/aspirante/aspiranteService";
 import { fetchEstadoProceso } from "../services/aspirante/aspiranteEstadoService";
 

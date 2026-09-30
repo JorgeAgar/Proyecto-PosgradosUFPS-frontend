@@ -11,6 +11,7 @@ import {
 import type { AspiranteOutletContext } from "../../layouts/AspiranteLayout";
 import { ArrowDownTrayIcon, ArrowTopRightOnSquareIcon, CheckCircleIcon, DocumentTextIcon, InformationCircleIcon, SpinnerIcon } from "../../assets/icons";
 import SeccionBloqueada from "./components/SeccionBloqueada";
+import { DialogoConfirmacion } from "../../components/Dialogo";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
 
@@ -522,45 +523,18 @@ export default function AspiranteDocumentos() {
       </div>
 
       {/* ── Modal: Confirmar envío ──────────────────────────────────────────── */}
-      {mostrarConfirmar && (
-        <div
-          className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${
-            cerrandoConfirmar ? "animate-overlay-out" : "animate-overlay-in"
-          }`}
-          onClick={cerrarConfirmar}
-        >
-          <div
-            className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-sm w-full mx-4 ${
-              cerrandoConfirmar ? "animate-modal-out" : "animate-modal-in"
-            }`}
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-base font-semibold text-gray-900">Enviar documentos</h3>
-            </div>
-            <div className="p-6">
-              <p className="text-sm text-gray-700">
-                ¿Estás seguro de que deseas enviar los archivos seleccionados para revisión?
-                Asegúrate de que todos los documentos estén correctos antes de continuar.
-              </p>
-            </div>
-            <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={cerrarConfirmar}
-                className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleEnviarConfirmado}
-                className="px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium"
-              >
-                Sí, enviar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DialogoConfirmacion
+        abierto={mostrarConfirmar}
+        cerrando={cerrandoConfirmar}
+        tamano="sm"
+        titulo="Enviar documentos"
+        onClickFondo={cerrarConfirmar}
+        onCancelar={cerrarConfirmar}
+        onConfirmar={handleEnviarConfirmado}
+        textoConfirmar="Sí, enviar"
+      >
+        ¿Estás seguro de que deseas enviar los archivos seleccionados para revisión? Asegúrate de que todos los documentos estén correctos antes de continuar.
+      </DialogoConfirmacion>
     </div>
   );
 }

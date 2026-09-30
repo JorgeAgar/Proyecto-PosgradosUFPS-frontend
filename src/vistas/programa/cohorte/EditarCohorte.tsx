@@ -10,6 +10,7 @@ import type { ProgramaOutletContext } from '../../../layouts/ProgramaLayout';
 import { DatePicker } from '../../../components/DatePicker';
 import { Select, type SelectOption } from '../../../components/Select';
 import { SpinnerIcon } from "../../../assets/icons";
+import { DialogoConfirmacion } from '../../../components/Dialogo';
 
 function genLocalId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -723,35 +724,18 @@ export default function EditarCohorte({
       </div>
     </div>
 
-    {mostrarConfirmarGuardar && (
-      <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoConfirmarGuardar ? 'animate-overlay-out' : 'animate-overlay-in'}`}>
-        <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${cerrandoConfirmarGuardar ? 'animate-modal-out' : 'animate-modal-in'}`}>
-          <div className="p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Confirmar cambios</h3>
-          </div>
-          <div className="p-6">
-            <p className="text-sm text-gray-700">¿Está seguro de guardar los cambios realizados en la cohorte <strong>"{cohorte.nombre}"</strong>?</p>
-          </div>
-          <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-            <button
-              onClick={cerrarModalGuardar}
-              disabled={isSaving}
-              className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={confirmarGuardar}
-              disabled={isSaving}
-              className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg text-sm font-medium transition-colors hover:bg-red-800 disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {isSaving ? <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" /> : null}
-              {isSaving ? 'Guardando...' : 'Sí, guardar'}
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
+    <DialogoConfirmacion
+      abierto={mostrarConfirmarGuardar}
+      cerrando={cerrandoConfirmarGuardar}
+      titulo="Confirmar cambios"
+      onCancelar={cerrarModalGuardar}
+      onConfirmar={confirmarGuardar}
+      textoConfirmar="Sí, guardar"
+      textoProcesando="Guardando..."
+      procesando={isSaving}
+    >
+      <p className="text-sm text-gray-700">¿Está seguro de guardar los cambios realizados en la cohorte <strong>"{cohorte.nombre}"</strong>?</p>
+    </DialogoConfirmacion>
     </>
   );
 }

@@ -14,6 +14,7 @@ import type { CriterioEvaluacion } from '../../../services/programa/programaCrit
 import type { ProgramaOutletContext } from '../../../layouts/ProgramaLayout';
 import EditarCohorte from './EditarCohorte';
 import { SpinnerIcon } from "../../../assets/icons";
+import { DialogoConfirmacion } from '../../../components/Dialogo';
 
 export default function CohorteDetalleView({
   cohorte,
@@ -512,49 +513,27 @@ export default function CohorteDetalleView({
       </div>
 
       {/* Modal: Confirmar abrir / cerrar cohorte */}
-      {mostrarConfirmarEstado && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoConfirmarEstado ? 'animate-overlay-out' : 'animate-overlay-in'}`}>
-          <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${cerrandoConfirmarEstado ? 'animate-modal-out' : 'animate-modal-in'}`}>
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {nextEstadoPendiente ? 'Abrir cohorte' : 'Cerrar cohorte'}
-              </h3>
-            </div>
-            <div className="p-6">
-              {nextEstadoPendiente ? (
-                <p className="text-sm text-gray-700">
-                  ¿Estás seguro de <span className="font-semibold text-green-700">abrir</span> la cohorte <span className="font-semibold">"{editedData.nombre}"</span>? Los aspirantes podrán inscribirse una vez esté activa.
-                </p>
-              ) : (
-                <p className="text-sm text-gray-700">
-                  ¿Estás seguro de <span className="font-semibold text-gray-800">cerrar</span> la cohorte <span className="font-semibold">"{editedData.nombre}"</span>? No se aceptarán nuevas inscripciones mientras esté cerrada.
-                </p>
-              )}
-            </div>
-            <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={cerrarConfirmarEstado}
-                disabled={isTogglingEstado}
-                className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleConfirmarEstado}
-                disabled={isTogglingEstado}
-                className={`flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
-                  nextEstadoPendiente
-                    ? 'bg-green-700 text-white hover:bg-green-800'
-                    : 'bg-neutral-700 text-white hover:bg-neutral-800'
-                }`}
-              >
-                {isTogglingEstado ? <SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-white" /> : null}
-                {nextEstadoPendiente ? 'Sí, abrir cohorte' : 'Sí, cerrar cohorte'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DialogoConfirmacion
+        abierto={mostrarConfirmarEstado}
+        cerrando={cerrandoConfirmarEstado}
+        titulo={nextEstadoPendiente ? 'Abrir cohorte' : 'Cerrar cohorte'}
+        onCancelar={cerrarConfirmarEstado}
+        onConfirmar={handleConfirmarEstado}
+        textoConfirmar={nextEstadoPendiente ? 'Sí, abrir cohorte' : 'Sí, cerrar cohorte'}
+        textoProcesando={nextEstadoPendiente ? 'Abriendo...' : 'Cerrando...'}
+        procesando={isTogglingEstado}
+        colorConfirmar={nextEstadoPendiente ? 'verde' : 'neutro'}
+      >
+        {nextEstadoPendiente ? (
+          <p className="text-sm text-gray-700">
+            ¿Estás seguro de <span className="font-semibold text-green-700">abrir</span> la cohorte <span className="font-semibold">"{editedData.nombre}"</span>? Los aspirantes podrán inscribirse una vez esté activa.
+          </p>
+        ) : (
+          <p className="text-sm text-gray-700">
+            ¿Estás seguro de <span className="font-semibold text-gray-800">cerrar</span> la cohorte <span className="font-semibold">"{editedData.nombre}"</span>? No se aceptarán nuevas inscripciones mientras esté cerrada.
+          </p>
+        )}
+      </DialogoConfirmacion>
     </div>
   );
 }

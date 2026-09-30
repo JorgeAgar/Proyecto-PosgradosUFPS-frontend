@@ -19,6 +19,9 @@ import {
 } from '../../services/programa/programaCriteriosService';
 import type { ProgramaOutletContext } from '../../layouts/ProgramaLayout';
 import { SpinnerIcon } from "../../assets/icons";
+import { DialogoConfirmacion } from '../../components/Dialogo';
+
+const CAMPO = 'mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 disabled:opacity-60 disabled:cursor-not-allowed';
 
 type ModalMode = 'create' | 'edit';
 
@@ -374,77 +377,58 @@ export default function Criterios() {
         </div>
       )}
 
-      {modalOpen && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${modalClosing ? 'animate-overlay-out' : 'animate-overlay-in'}`}>
-          <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-lg w-full mx-4 ${modalClosing ? 'animate-modal-out' : 'animate-modal-in'}`}>
-            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">{modalMode === 'create' ? 'Nuevo criterio' : 'Editar criterio'}</h3>
-              <button onClick={closeModal} disabled={modalSubmitting} className="p-1 rounded-lg hover:bg-neutral-200 text-neutral-400 disabled:opacity-60">
-                <XMarkIcon className="w-5 h-5" />
-              </button>
-            </div>
+      <DialogoConfirmacion
+        abierto={modalOpen}
+        cerrando={modalClosing}
+        tamano="lg"
+        titulo={modalMode === 'create' ? 'Nuevo criterio' : 'Editar criterio'}
+        onCerrar={closeModal}
+        cerrarDeshabilitado={modalSubmitting}
+        onCancelar={closeModal}
+        onConfirmar={handleSubmitModal}
+        textoConfirmar={modalMode === 'create' ? 'Agregar criterio' : 'Guardar cambios'}
+        textoProcesando={modalMode === 'create' ? 'Agregando...' : 'Guardando...'}
+        procesando={modalSubmitting}
+      >
+        {modalError && <div className="mb-4 text-sm text-red-700 bg-red-100 border border-red-200 rounded-lg px-3 py-2">{modalError}</div>}
 
-            <div className="p-6">
-              {modalError && <div className="mb-4 text-sm text-red-700 bg-red-100 border border-red-200 rounded-lg px-3 py-2">{modalError}</div>}
-
-              <div className="mb-4">
-                <label className="text-sm font-semibold text-gray-700 mb-1 block">Nombre del criterio</label>
-                <input
-                  type="text"
-                  value={form.nombre}
-                  onChange={(e) => setForm((prev) => ({ ...prev, nombre: e.target.value }))}
-                  disabled={modalSubmitting}
-                  placeholder="Ej: Experiencia profesional"
-                  className="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 disabled:opacity-60 disabled:cursor-not-allowed"
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="text-sm font-semibold text-gray-700 mb-1 block">Descripción</label>
-                <textarea
-                  value={form.descripcion}
-                  onChange={(e) => setForm((prev) => ({ ...prev, descripcion: e.target.value }))}
-                  disabled={modalSubmitting}
-                  placeholder="Describe qué se evalúa en este criterio..."
-                  rows={3}
-                  className="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition resize-none hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 disabled:opacity-60 disabled:cursor-not-allowed"
-                />
-              </div>
-
-              <div className="mb-1">
-                <label className="text-sm font-semibold text-gray-700 mb-1 block">Puntaje máximo</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={form.peso || ''}
-                  onChange={(e) => setForm((prev) => ({ ...prev, peso: Number(e.target.value) || 0 }))}
-                  disabled={modalSubmitting}
-                  placeholder="0"
-                  className="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 disabled:opacity-60 disabled:cursor-not-allowed"
-                />
-              </div>
-            </div>
-
-            <div className="p-6 border-t border-gray-200 flex gap-3 justify-end">
-              <button
-                onClick={closeModal}
-                disabled={modalSubmitting}
-                className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-neutral-200 transition-colors text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleSubmitModal}
-                disabled={modalSubmitting}
-                className="flex items-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {modalSubmitting && <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />}
-                {modalMode === 'create' ? (modalSubmitting ? 'Agregando...' : 'Agregar criterio') : (modalSubmitting ? 'Guardando...' : 'Guardar cambios')}
-              </button>
-            </div>
-          </div>
+        <div className="mb-4">
+          <label className="text-sm font-semibold text-gray-700 mb-1 block">Nombre del criterio</label>
+          <input
+            type="text"
+            value={form.nombre}
+            onChange={(e) => setForm((prev) => ({ ...prev, nombre: e.target.value }))}
+            disabled={modalSubmitting}
+            placeholder="Ej: Experiencia profesional"
+            className={CAMPO}
+          />
         </div>
-      )}
+
+        <div className="mb-4">
+          <label className="text-sm font-semibold text-gray-700 mb-1 block">Descripción</label>
+          <textarea
+            value={form.descripcion}
+            onChange={(e) => setForm((prev) => ({ ...prev, descripcion: e.target.value }))}
+            disabled={modalSubmitting}
+            placeholder="Describe qué se evalúa en este criterio..."
+            rows={3}
+            className={`${CAMPO} resize-none`}
+          />
+        </div>
+
+        <div className="mb-1">
+          <label className="text-sm font-semibold text-gray-700 mb-1 block">Puntaje máximo</label>
+          <input
+            type="number"
+            min="0"
+            value={form.peso || ''}
+            onChange={(e) => setForm((prev) => ({ ...prev, peso: Number(e.target.value) || 0 }))}
+            disabled={modalSubmitting}
+            placeholder="0"
+            className={CAMPO}
+          />
+        </div>
+      </DialogoConfirmacion>
     </div>
   );
 }

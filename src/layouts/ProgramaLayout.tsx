@@ -1,7 +1,8 @@
 import { Outlet, Navigate } from "react-router";
 import SidebarDirectorPrograma from "../vistas/programa/components/Sidebar";
 import { programaAuthService } from "../services/programa/programaService";
-import PanelLayout, { useNotificaciones, type NotificacionesContext } from "./PanelLayout";
+import PanelLayout from "./PanelLayout";
+import { useNotificaciones, type NotificacionesContext } from "./useNotificaciones";
 
 export type ProgramaOutletContext = NotificacionesContext;
 

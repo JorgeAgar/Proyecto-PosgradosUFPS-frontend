@@ -1,7 +1,13 @@
-import { SpinnerIcon } from "../assets/icons";
+import { SpinnerIcon, XMarkIcon } from "../assets/icons";
 
-export const BOTON_PRIMARIO =
-  "flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed";
+const BOTON_BASE =
+  "flex items-center justify-center gap-2 px-6 py-2 text-white rounded-lg transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed";
+const COLORES_CONFIRMAR = {
+  rojo:   "bg-red-700 hover:bg-red-800",
+  verde:  "bg-green-700 hover:bg-green-800",
+  neutro: "bg-neutral-700 hover:bg-neutral-800",
+};
+export const BOTON_PRIMARIO = `${BOTON_BASE} ${COLORES_CONFIRMAR.rojo}`;
 export const BOTON_SECUNDARIO =
   "px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60";
 
@@ -16,13 +22,17 @@ interface DialogoProps {
   tamano?: keyof typeof ANCHOS;
   /** Si se pasa, un clic en el fondo cierra el diálogo. */
   onClickFondo?: () => void;
+  /** Si se pasa, muestra una X en la cabecera que llama a esta función. */
+  onCerrar?: () => void;
+  /** Deshabilita la X de la cabecera. */
+  cerrarDeshabilitado?: boolean;
   children: React.ReactNode;
   /** Botones del pie. */
   pie?: React.ReactNode;
 }
 
 /** Diálogo modal con cabecera, cuerpo y pie separados por bordes. */
-export function Dialogo({ abierto, cerrando = false, titulo, tamano = "md", onClickFondo, children, pie }: DialogoProps) {
+export function Dialogo({ abierto, cerrando = false, titulo, tamano = "md", onClickFondo, onCerrar, cerrarDeshabilitado = false, children, pie }: DialogoProps) {
   if (!abierto) return null;
   return (
     <div
@@ -33,8 +43,19 @@ export function Dialogo({ abierto, cerrando = false, titulo, tamano = "md", onCl
         className={`bg-white rounded-lg border border-gray-200 shadow-xl ${ANCHOS[tamano]} w-full mx-4 ${cerrando ? "animate-modal-out" : "animate-modal-in"}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-gray-200 flex items-center justify-between gap-3">
           <h3 className="text-lg font-semibold text-gray-900">{titulo}</h3>
+          {onCerrar && (
+            <button
+              type="button"
+              onClick={onCerrar}
+              disabled={cerrarDeshabilitado}
+              aria-label="Cerrar"
+              className="p-1 rounded-lg hover:bg-neutral-200 text-neutral-400 disabled:opacity-60"
+            >
+              <XMarkIcon className="w-5 h-5" />
+            </button>
+          )}
         </div>
         <div className="p-6">{children}</div>
         {pie && (
@@ -55,6 +76,8 @@ interface DialogoConfirmacionProps extends Omit<DialogoProps, "pie"> {
   procesando?: boolean;
   /** Deshabilita solo el botón de confirmar (además de mientras se procesa). */
   confirmarDeshabilitado?: boolean;
+  /** Color del botón de confirmar. Por defecto "rojo". */
+  colorConfirmar?: keyof typeof COLORES_CONFIRMAR;
 }
 
 /** Diálogo "¿Está seguro…?" con botones Cancelar / Confirmar. */
@@ -66,6 +89,7 @@ export function DialogoConfirmacion({
   textoProcesando = "Procesando...",
   procesando = false,
   confirmarDeshabilitado = false,
+  colorConfirmar = "rojo",
   children,
   ...dialogo
 }: DialogoConfirmacionProps) {
@@ -81,7 +105,7 @@ export function DialogoConfirmacion({
             type="button"
             onClick={onConfirmar}
             disabled={procesando || confirmarDeshabilitado}
-            className={BOTON_PRIMARIO}
+            className={`${BOTON_BASE} ${COLORES_CONFIRMAR[colorConfirmar]}`}
           >
             {procesando ? (
               <>

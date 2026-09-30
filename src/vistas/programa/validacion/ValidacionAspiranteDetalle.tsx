@@ -19,6 +19,7 @@ import {
   type DocumentosAspiranteResponse,
 } from "../../../services/programa/validacionAspiranteService";
 import { CheckIcon, SpinnerIcon, XMarkIcon } from "../../../assets/icons";
+import { DialogoConfirmacion } from "../../../components/Dialogo";
 
 interface Documento {
   id: string;
@@ -456,114 +457,56 @@ export default function ValidacionAspiranteDetalle() {
         </div>
 
         {/* Modal: Confirmar aprobación */}
-        {mostrarConfirmacionAprobar && (
-          <div
-            className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoConfirmacionAprobar ? "animate-overlay-out" : "animate-overlay-in"}`}
-          >
-            <div
-              className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${cerrandoConfirmacionAprobar ? "animate-modal-out" : "animate-modal-in"}`}
-            >
-              <div className="p-6 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Confirmar aprobación
-                </h3>
-              </div>
-              <div className="p-6">
-                <p className="text-sm text-gray-700">
-                  ¿Está seguro de aprobar el documento{" "}
-                  <strong>"{documentoSeleccionado?.nombreTitulo}"</strong>?
-                </p>
-              </div>
-              <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-                <button
-                  type="button"
-                  onClick={cerrarModalAprobar}
-                  disabled={accionEnviando !== null}
-                  className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={confirmarAprobar}
-                  disabled={accionEnviando !== null}
-                  className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {accionEnviando === "APROBAR" ? (
-                    <>
-                      <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />
-                      Aprobando...
-                    </>
-                  ) : (
-                    "Sí, aprobar"
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <DialogoConfirmacion
+          abierto={mostrarConfirmacionAprobar}
+          cerrando={cerrandoConfirmacionAprobar}
+          titulo="Confirmar aprobación"
+          onCancelar={cerrarModalAprobar}
+          onConfirmar={confirmarAprobar}
+          textoConfirmar="Sí, aprobar"
+          textoProcesando="Aprobando..."
+          procesando={accionEnviando !== null}
+        >
+          <p className="text-sm text-gray-700">
+            ¿Está seguro de aprobar el documento{" "}
+            <strong>"{documentoSeleccionado?.nombreTitulo}"</strong>?
+          </p>
+        </DialogoConfirmacion>
 
         {/* Modal: Rechazar documento */}
-        {mostrarDialogoRechazo && (
-          <div
-            className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoDialogoRechazo ? "animate-overlay-out" : "animate-overlay-in"}`}
-          >
-            <div
-              className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-lg w-full mx-4 ${cerrandoDialogoRechazo ? "animate-modal-out" : "animate-modal-in"}`}
-            >
-              <div className="p-6 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Rechazar documento
-                </h3>
-              </div>
-              <div className="p-6 space-y-3">
-                <p className="text-sm text-gray-700">
-                  Está rechazando{" "}
-                  <strong>"{documentoSeleccionado?.nombreTitulo}"</strong>.
-                  Ingrese el motivo:
-                </p>
-                <textarea
-                  value={motivoRechazo}
-                  onChange={(e) => setMotivoRechazo(e.target.value)}
-                  placeholder="Ingrese el motivo del rechazo..."
-                  rows={4}
-                  disabled={accionEnviando !== null}
-                  className="w-full text-sm text-gray-900 border border-gray-200 rounded-lg px-3 py-2 outline-none transition hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-                {!motivoRechazo.trim() && (
-                  <p className="text-xs text-neutral-400">
-                    El motivo es obligatorio para rechazar.
-                  </p>
-                )}
-              </div>
-              <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-                <button
-                  type="button"
-                  onClick={cerrarModalRechazo}
-                  disabled={accionEnviando !== null}
-                  className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={confirmarRechazo}
-                  disabled={!motivoRechazo.trim() || accionEnviando !== null}
-                  className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {accionEnviando === "RECHAZAR" ? (
-                    <>
-                      <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />
-                      Rechazando...
-                    </>
-                  ) : (
-                    "Rechazar documento"
-                  )}
-                </button>
-              </div>
-            </div>
+        <DialogoConfirmacion
+          abierto={mostrarDialogoRechazo}
+          cerrando={cerrandoDialogoRechazo}
+          tamano="lg"
+          titulo="Rechazar documento"
+          onCancelar={cerrarModalRechazo}
+          onConfirmar={confirmarRechazo}
+          textoConfirmar="Rechazar documento"
+          textoProcesando="Rechazando..."
+          procesando={accionEnviando !== null}
+          confirmarDeshabilitado={!motivoRechazo.trim()}
+        >
+          <div className="space-y-3">
+            <p className="text-sm text-gray-700">
+              Está rechazando{" "}
+              <strong>"{documentoSeleccionado?.nombreTitulo}"</strong>.
+              Ingrese el motivo:
+            </p>
+            <textarea
+              value={motivoRechazo}
+              onChange={(e) => setMotivoRechazo(e.target.value)}
+              placeholder="Ingrese el motivo del rechazo..."
+              rows={4}
+              disabled={accionEnviando !== null}
+              className="w-full text-sm text-gray-900 border border-gray-200 rounded-lg px-3 py-2 outline-none transition hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+            {!motivoRechazo.trim() && (
+              <p className="text-xs text-neutral-400">
+                El motivo es obligatorio para rechazar.
+              </p>
+            )}
           </div>
-        )}
+        </DialogoConfirmacion>
       </div>
     </div>
   );

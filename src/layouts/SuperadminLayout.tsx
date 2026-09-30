@@ -2,7 +2,8 @@ import { Outlet, Navigate } from "react-router";
 import SuperadminSidebar from "../vistas/superadmin/components/Sidebar";
 import ufpsLogo from "../assets/NEGROufps.png";
 import { superadminAuthService } from "../services/superadmin/superadminService";
-import PanelLayout, { useNotificaciones, type NotificacionesContext } from "./PanelLayout";
+import PanelLayout from "./PanelLayout";
+import { useNotificaciones, type NotificacionesContext } from "./useNotificaciones";
 
 export type SuperadminOutletContext = NotificacionesContext;
 
