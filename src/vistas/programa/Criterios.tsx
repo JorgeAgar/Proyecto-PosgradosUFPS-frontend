@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router';
 import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
   InformationCircleIcon,
   PencilSquareIcon,
   PlusIcon,
   TrashIcon,
-  XMarkIcon,
 } from '@heroicons/react/24/outline';
 import {
   createCriterioPrograma,
@@ -19,6 +16,10 @@ import {
 } from '../../services/programa/programaCriteriosService';
 import type { ProgramaOutletContext } from '../../layouts/ProgramaLayout';
 import { SpinnerIcon } from "../../assets/icons";
+import { BOTON_SECUNDARIO, Dialogo, DialogoConfirmacion } from '../../components/Dialogo';
+import Paginacion from '../../components/Paginacion';
+
+const CAMPO = 'mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 disabled:opacity-60 disabled:cursor-not-allowed';
 
 type ModalMode = 'create' | 'edit';
 
@@ -188,7 +189,6 @@ export default function Criterios() {
     }
   };
 
-  const totalPaginas = Math.ceil(criterios.length / POR_PAGINA);
   const criteriosPagina = criterios.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA);
 
   return (
@@ -267,184 +267,99 @@ export default function Criterios() {
             </tbody>
           </table>
           </div>
-          {totalPaginas > 1 && (
-            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-              <span className="text-xs text-neutral-400">
-                {(pagina - 1) * POR_PAGINA + 1}–{Math.min(pagina * POR_PAGINA, criterios.length)} de {criterios.length} criterios
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPagina((p) => p - 1)}
-                  disabled={pagina === 1}
-                  className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-gray-700"
-                >
-                  <ChevronLeftIcon className="w-4 h-4" />
-                  Anterior
-                </button>
-                <span className="text-sm font-medium text-gray-600 px-1">{pagina} / {totalPaginas}</span>
-                <button
-                  onClick={() => setPagina((p) => p + 1)}
-                  disabled={pagina === totalPaginas}
-                  className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-gray-700"
-                >
-                  Siguiente
-                  <ChevronRightIcon className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
+          <Paginacion pagina={pagina} porPagina={POR_PAGINA} totalElementos={criterios.length} onCambiar={setPagina} etiqueta="criterios" />
         </div>
         )}
       </div>
 
-      {deleteConfirm && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${deleteConfirmClosing ? 'animate-overlay-out' : 'animate-overlay-in'}`}>
-          <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${deleteConfirmClosing ? 'animate-modal-out' : 'animate-modal-in'}`}>
-            <div className="p-6 flex items-start gap-3">
-              <div className="mt-0.5 rounded-full bg-red-100 p-2 text-red-700">
-                <TrashIcon className="h-5 w-5" />
-              </div>
-              <div className="flex-1">
-                <div className="text-sm font-semibold text-gray-900">Confirmar eliminación</div>
-                <div className="mt-1 text-sm text-gray-600">¿Estás seguro de eliminar el criterio <span className="font-semibold text-gray-900">"{deleteConfirm?.criterioNombre}"</span>?</div>
-              </div>
-              <button
-                type="button"
-                onClick={closeDeleteConfirm}
-                disabled={deleting}
-                className="rounded-full p-1 transition hover:bg-black/5 text-gray-500 disabled:opacity-60"
-                aria-label="Cerrar confirmación"
-              >
-                <XMarkIcon className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="px-4 pb-4 flex items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={closeDeleteConfirm}
-                disabled={deleting}
-                className="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-neutral-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={confirmDelete}
-                disabled={deleting}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-700 text-white text-sm font-medium hover:bg-red-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {deleting && <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />}
-                Eliminar
-              </button>
-            </div>
+      <DialogoConfirmacion
+        abierto={deleteConfirm !== null}
+        cerrando={deleteConfirmClosing}
+        titulo="Confirmar eliminación"
+        onCerrar={closeDeleteConfirm}
+        cerrarDeshabilitado={deleting}
+        onCancelar={closeDeleteConfirm}
+        onConfirmar={confirmDelete}
+        textoConfirmar="Eliminar"
+        textoProcesando="Eliminando..."
+        procesando={deleting}
+      >
+        <p className="text-sm text-gray-700">
+          ¿Estás seguro de eliminar el criterio <span className="font-semibold text-gray-900">"{deleteConfirm?.criterioNombre}"</span>?
+        </p>
+      </DialogoConfirmacion>
+
+      <Dialogo
+        abierto={warningModal !== null}
+        cerrando={warningModalClosing}
+        titulo={warningModal?.title}
+        onCerrar={closeWarningModal}
+        pie={
+          <button type="button" onClick={closeWarningModal} className={BOTON_SECUNDARIO}>
+            Cerrar
+          </button>
+        }
+      >
+        <div className="flex items-start gap-3">
+          <div className="rounded-full bg-sky-100 p-2 text-sky-700 shrink-0">
+            <InformationCircleIcon className="h-5 w-5" />
           </div>
+          <p className="text-sm text-gray-700">{warningModal?.message}</p>
         </div>
-      )}
+      </Dialogo>
 
-      {warningModal && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${warningModalClosing ? 'animate-overlay-out' : 'animate-overlay-in'}`}>
-          <div className={`bg-white rounded-lg border border-sky-200 shadow-xl max-w-md w-full mx-4 ${warningModalClosing ? 'animate-modal-out' : 'animate-modal-in'}`}>
-            <div className="p-6 flex items-start gap-3">
-              <div className="mt-0.5 rounded-full bg-sky-100 p-2 text-sky-700">
-                <InformationCircleIcon className="h-5 w-5" />
-              </div>
-              <div className="flex-1">
-                <div className="text-sm font-semibold text-gray-900">{warningModal.title}</div>
-                <div className="mt-1 text-sm text-gray-600">{warningModal.message}</div>
-              </div>
-              <button
-                type="button"
-                onClick={closeWarningModal}
-                className="rounded-full p-1 transition hover:bg-black/5 text-gray-500"
-                aria-label="Cerrar advertencia"
-              >
-                <XMarkIcon className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="px-4 pb-4 flex items-center justify-end">
-              <button
-                type="button"
-                onClick={closeWarningModal}
-                className="px-4 py-2 rounded-lg bg-white text-gray-700 border border-gray-200 text-sm font-medium hover:bg-neutral-100 transition-colors"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
+      <DialogoConfirmacion
+        abierto={modalOpen}
+        cerrando={modalClosing}
+        tamano="lg"
+        titulo={modalMode === 'create' ? 'Nuevo criterio' : 'Editar criterio'}
+        onCerrar={closeModal}
+        cerrarDeshabilitado={modalSubmitting}
+        onCancelar={closeModal}
+        onConfirmar={handleSubmitModal}
+        textoConfirmar={modalMode === 'create' ? 'Agregar criterio' : 'Guardar cambios'}
+        textoProcesando={modalMode === 'create' ? 'Agregando...' : 'Guardando...'}
+        procesando={modalSubmitting}
+      >
+        {modalError && <div className="mb-4 text-sm text-red-700 bg-red-100 border border-red-200 rounded-lg px-3 py-2">{modalError}</div>}
+
+        <div className="mb-4">
+          <label className="text-sm font-semibold text-gray-700 mb-1 block">Nombre del criterio</label>
+          <input
+            type="text"
+            value={form.nombre}
+            onChange={(e) => setForm((prev) => ({ ...prev, nombre: e.target.value }))}
+            disabled={modalSubmitting}
+            placeholder="Ej: Experiencia profesional"
+            className={CAMPO}
+          />
         </div>
-      )}
 
-      {modalOpen && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${modalClosing ? 'animate-overlay-out' : 'animate-overlay-in'}`}>
-          <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-lg w-full mx-4 ${modalClosing ? 'animate-modal-out' : 'animate-modal-in'}`}>
-            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">{modalMode === 'create' ? 'Nuevo criterio' : 'Editar criterio'}</h3>
-              <button onClick={closeModal} disabled={modalSubmitting} className="p-1 rounded-lg hover:bg-neutral-200 text-neutral-400 disabled:opacity-60">
-                <XMarkIcon className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-6">
-              {modalError && <div className="mb-4 text-sm text-red-700 bg-red-100 border border-red-200 rounded-lg px-3 py-2">{modalError}</div>}
-
-              <div className="mb-4">
-                <label className="text-sm font-semibold text-gray-700 mb-1 block">Nombre del criterio</label>
-                <input
-                  type="text"
-                  value={form.nombre}
-                  onChange={(e) => setForm((prev) => ({ ...prev, nombre: e.target.value }))}
-                  disabled={modalSubmitting}
-                  placeholder="Ej: Experiencia profesional"
-                  className="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 disabled:opacity-60 disabled:cursor-not-allowed"
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="text-sm font-semibold text-gray-700 mb-1 block">Descripción</label>
-                <textarea
-                  value={form.descripcion}
-                  onChange={(e) => setForm((prev) => ({ ...prev, descripcion: e.target.value }))}
-                  disabled={modalSubmitting}
-                  placeholder="Describe qué se evalúa en este criterio..."
-                  rows={3}
-                  className="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition resize-none hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 disabled:opacity-60 disabled:cursor-not-allowed"
-                />
-              </div>
-
-              <div className="mb-1">
-                <label className="text-sm font-semibold text-gray-700 mb-1 block">Puntaje máximo</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={form.peso || ''}
-                  onChange={(e) => setForm((prev) => ({ ...prev, peso: Number(e.target.value) || 0 }))}
-                  disabled={modalSubmitting}
-                  placeholder="0"
-                  className="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 disabled:opacity-60 disabled:cursor-not-allowed"
-                />
-              </div>
-            </div>
-
-            <div className="p-6 border-t border-gray-200 flex gap-3 justify-end">
-              <button
-                onClick={closeModal}
-                disabled={modalSubmitting}
-                className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-neutral-200 transition-colors text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleSubmitModal}
-                disabled={modalSubmitting}
-                className="flex items-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {modalSubmitting && <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />}
-                {modalMode === 'create' ? (modalSubmitting ? 'Agregando...' : 'Agregar criterio') : (modalSubmitting ? 'Guardando...' : 'Guardar cambios')}
-              </button>
-            </div>
-          </div>
+        <div className="mb-4">
+          <label className="text-sm font-semibold text-gray-700 mb-1 block">Descripción</label>
+          <textarea
+            value={form.descripcion}
+            onChange={(e) => setForm((prev) => ({ ...prev, descripcion: e.target.value }))}
+            disabled={modalSubmitting}
+            placeholder="Describe qué se evalúa en este criterio..."
+            rows={3}
+            className={`${CAMPO} resize-none`}
+          />
         </div>
-      )}
+
+        <div className="mb-1">
+          <label className="text-sm font-semibold text-gray-700 mb-1 block">Puntaje máximo</label>
+          <input
+            type="number"
+            min="0"
+            value={form.peso || ''}
+            onChange={(e) => setForm((prev) => ({ ...prev, peso: Number(e.target.value) || 0 }))}
+            disabled={modalSubmitting}
+            placeholder="0"
+            className={CAMPO}
+          />
+        </div>
+      </DialogoConfirmacion>
     </div>
   );
 }

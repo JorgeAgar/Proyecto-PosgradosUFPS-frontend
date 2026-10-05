@@ -1,9 +1,8 @@
 /**
  * programaService.ts
  *
- * Servicio de autenticación para el módulo Programa (Director de Programa).
- * Implementa `login`, `logout`, `refreshSession` y helpers similares al patrón
- * usado en `superadminService.ts`.
+ * Servicio de autenticación para el módulo Programa (Director de Programa)
+ * y resolución del id del programa con el que se trabaja.
  */
 
 import { createApiClient } from "../apiService";
@@ -42,37 +41,29 @@ export async function getProgramaRealId(): Promise<number> {
   return _programaIdCache;
 }
 
-// ── Helpers específicos de Programa ──────────────────────────────────────────
-export interface ProgramaBackend {
-  id: number;
-  codigo?: number;
-  nombre: string;
-  semestres?: number;
-  correo?: string;
-  sede?: { id?: number; nombre?: string };
-  facultad?: { id?: number; nombre?: string };
-  ofertaacademicaList?: Array<{ id?: number; encuentros?: string }>;
+/**
+ * Fija el programa con el que se trabajará (lo usa el usuario de Posgrados al
+ * entrar a un programa). Actualiza también la caché en memoria para que no se
+ * sigan mostrando los datos del programa visitado antes.
+ */
+export function seleccionarPrograma(id: number) {
+  _programaIdCache = id;
+  localStorage.setItem(PROGRAMA_KEY, String(id));
 }
 
-export const programaAuthService = {
-  ...createAuthService({
-    accessTokenKey: ACCESS_TOKEN_KEY,
-    refreshTokenKey: REFRESH_TOKEN_KEY,
-    sessionKey: SESSION_KEY,
-    requestedRole: "Director de programa",
-    extraKeys: [PROGRAMA_KEY],
-    onLogin: () => {
-      // Se limpia el programaId cacheado para que se resuelva de nuevo en la sesión nueva
-      _programaIdCache = null;
-    },
-    onLogout: () => {
-      _programaIdCache = null;
-    },
-  }),
-
-  async setProgramaId() {
-    await getProgramaRealId();
+export const programaAuthService = createAuthService({
+  accessTokenKey: ACCESS_TOKEN_KEY,
+  refreshTokenKey: REFRESH_TOKEN_KEY,
+  sessionKey: SESSION_KEY,
+  requestedRole: "Director de programa",
+  extraKeys: [PROGRAMA_KEY],
+  onLogin: () => {
+    // Se limpia el programaId cacheado para que se resuelva de nuevo en la sesión nueva
+    _programaIdCache = null;
   },
-};
+  onLogout: () => {
+    _programaIdCache = null;
+  },
+});
 
 export const programaApiClient = createApiClient(programaAuthService);

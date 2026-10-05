@@ -1,7 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate, useOutletContext, useParams, useLocation } from "react-router";
 import {
-	ArrowLeftIcon,
 	ArrowTopRightOnSquareIcon,
 	CheckCircleIcon,
 	ExclamationTriangleIcon,
@@ -14,33 +13,23 @@ import {
 	InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import type { ProgramaOutletContext } from "../../../layouts/ProgramaLayout";
-import {
-	obtenerPagosInscripcion,
-	aprobarPagoInscripcion,
-	rechazarPagoInscripcion,
-	type PagoInscripcionApi,
-} from "../../../services/programa/validacionPagosInscripcionService";
 import { SpinnerIcon } from "../../../assets/icons";
+import { Badge, type BadgeColor } from "../../../components/Badge";
+import Cargando from "../../../components/Cargando";
+import { DialogoConfirmacion } from "../../../components/Dialogo";
+import EncabezadoVolver from "../../../components/EncabezadoVolver";
+import { TIPOS_PAGO, type PagoApi, type TipoPago } from "./tipoPago";
+
+const ESTADOS_PAGO: Record<string, { label: string; color: BadgeColor }> = {
+	COMPLETADO: { label: "Completado", color: "verde" },
+	RECHAZADO:  { label: "Rechazado",  color: "rojo" },
+	"EN CURSO": { label: "En curso",   color: "amarillo" },
+	PENDIENTE:  { label: "Pendiente",  color: "gris" },
+};
 
 function EstadoBadge({ estado }: { estado: string }) {
-	const norm = estado.trim().toUpperCase();
-	const clases: Record<string, string> = {
-		COMPLETADO:  "bg-green-100 text-green-700",
-		RECHAZADO:   "bg-red-100 text-red-700",
-		"EN CURSO":  "bg-yellow-100 text-yellow-700",
-		PENDIENTE:   "bg-neutral-200 text-neutral-600",
-	};
-	const etiquetas: Record<string, string> = {
-		COMPLETADO: "Completado",
-		RECHAZADO:  "Rechazado",
-		"EN CURSO": "En curso",
-		PENDIENTE:  "Pendiente",
-	};
-	return (
-		<span className={`inline-block text-xs font-semibold px-3 py-1 rounded-lg ${clases[norm] ?? "bg-neutral-200 text-neutral-600"}`}>
-			{etiquetas[norm] ?? estado}
-		</span>
-	);
+	const config = ESTADOS_PAGO[estado.trim().toUpperCase()];
+	return <Badge color={config?.color ?? "gris"}>{config?.label ?? estado}</Badge>;
 }
 
 interface FacturaEstilo {
@@ -92,7 +81,8 @@ function resolverEstiloFactura(estado: string): FacturaEstilo {
 	};
 }
 
-export default function ValidacionPagosInscripcionDetalle() {
+export default function ValidacionPagosDetalle({ tipo }: { tipo: TipoPago }) {
+	const { nombre, ruta, obtener, aprobar, rechazar } = TIPOS_PAGO[tipo];
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { mostrarAlerta, mostrarConfirm } = useOutletContext<ProgramaOutletContext>();
@@ -102,7 +92,7 @@ export default function ValidacionPagosInscripcionDetalle() {
 	const aspiranteNombreState = (location.state as { aspiranteNombre?: string; cohorteId?: number } | null)?.aspiranteNombre;
 	const cohorteId = (location.state as { aspiranteNombre?: string; cohorteId?: number } | null)?.cohorteId;
 
-	const [pagos, setPagos] = useState<PagoInscripcionApi[]>([]);
+	const [pagos, setPagos] = useState<PagoApi[]>([]);
 	const [cargando, setCargando] = useState(true);
 	const [accionEnviando, setAccionEnviando] = useState<{ id: number; tipo: "APROBAR" | "RECHAZAR" } | null>(null);
 	const [downloadingId, setDownloadingId] = useState<number | null>(null);
@@ -114,18 +104,18 @@ export default function ValidacionPagosInscripcionDetalle() {
 	const [cerrandoRechazar, setCerrandoRechazar] = useState(false);
 
 	const rutaVolver = cohorteId
-		? `/programa/pagos/inscripcion/cohorte/${cohorteId}`
-		: "/programa/pagos/inscripcion";
+		? `${ruta}/cohorte/${cohorteId}`
+		: ruta;
 
 	const cargarPagos = async () => {
 		if (!cohorteId) {
 			mostrarAlerta("No se encontró el identificador de la cohorte.", "error");
-			navigate("/programa/pagos/inscripcion");
+			navigate(ruta);
 			return;
 		}
 		setCargando(true);
 		try {
-			const todos = await obtenerPagosInscripcion(cohorteId);
+			const todos = await obtener(cohorteId);
 			const filtrados = todos.filter((p) => p.idAspirante === aspiranteIdNum);
 			if (filtrados.length === 0) {
 				mostrarAlerta("No se encontraron pagos para este aspirante.", "error");
@@ -147,7 +137,7 @@ export default function ValidacionPagosInscripcionDetalle() {
 	useEffect(() => {
 		if (Number.isNaN(aspiranteIdNum)) {
 			mostrarAlerta("El identificador del aspirante no es válido.", "error");
-			navigate("/programa/pagos/inscripcion");
+			navigate(ruta);
 			return;
 		}
 		cargarPagos();
@@ -167,9 +157,9 @@ export default function ValidacionPagosInscripcionDetalle() {
 	const confirmarAprobar = async (idRecibo: number) => {
 		setAccionEnviando({ id: idRecibo, tipo: "APROBAR" });
 		try {
-			await aprobarPagoInscripcion(idRecibo);
+			await aprobar(idRecibo);
 			cerrarModalAprobar();
-			mostrarConfirm("Pago de inscripción aprobado con éxito.");
+			mostrarConfirm(`Pago de ${nombre.toLowerCase()} aprobado con éxito.`);
 			await cargarPagos();
 		} catch (err) {
 			if (!localStorage.getItem("ufps_programa_session")) {
@@ -185,9 +175,9 @@ export default function ValidacionPagosInscripcionDetalle() {
 	const confirmarRechazar = async (idRecibo: number) => {
 		setAccionEnviando({ id: idRecibo, tipo: "RECHAZAR" });
 		try {
-			await rechazarPagoInscripcion(idRecibo);
+			await rechazar(idRecibo);
 			cerrarModalRechazar();
-			mostrarConfirm("Pago de inscripción rechazado.");
+			mostrarConfirm(`Pago de ${nombre.toLowerCase()} rechazado.`);
 			await cargarPagos();
 		} catch (err) {
 			if (!localStorage.getItem("ufps_programa_session")) {
@@ -203,28 +193,14 @@ export default function ValidacionPagosInscripcionDetalle() {
 
 	return (
 		<div className="p-6 bg-gray-100 min-h-full" style={{ fontFamily: "Segoe UI, sans-serif" }}>
-			{/* Encabezado */}
-			<div className="flex items-center gap-3 mb-6 animate-fade-in">
-				<button
-					type="button"
-					onClick={() => navigate(rutaVolver)}
-					className="flex items-center gap-1 text-sm text-neutral-400 hover:text-red-700 transition-colors"
-				>
-					<ArrowLeftIcon className="h-[18px] w-[18px] shrink-0" />
-				</button>
-				<div>
-					<h1 className="text-xl font-bold text-gray-900">Validación de Pagos — Inscripción</h1>
-					<p className="text-sm text-neutral-400 mt-0.5">{aspiranteNombreState ?? "Detalle del aspirante"}</p>
-				</div>
-			</div>
+			<EncabezadoVolver
+				titulo={`Validación de Pagos — ${nombre}`}
+				onVolver={() => navigate(rutaVolver)}
+				subtitulo={aspiranteNombreState ?? "Detalle del aspirante"}
+			/>
 
 			{cargando ? (
-				<div className="flex items-center justify-center py-20 animate-fade-in">
-					<div className="flex items-center gap-3 text-neutral-400 text-sm">
-						<SpinnerIcon className="animate-spin shrink-0 h-6 w-6 text-red-700" />
-						Cargando pagos...
-					</div>
-				</div>
+				<Cargando texto="Cargando pagos..." />
 			) : (
 				<div className="space-y-6">
 					{/* Tarjeta resumen por pago */}
@@ -400,76 +376,36 @@ export default function ValidacionPagosInscripcionDetalle() {
 			)}
 
 			{/* Modal: Confirmar aprobación */}
-			{modalAprobar !== null && (
-				<div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoAprobar ? "animate-overlay-out" : "animate-overlay-in"}`}>
-					<div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${cerrandoAprobar ? "animate-modal-out" : "animate-modal-in"}`}>
-						<div className="p-6 border-b border-gray-200">
-							<h3 className="text-base font-semibold text-gray-900">Confirmar aprobación</h3>
-						</div>
-						<div className="p-6">
-							<p className="text-sm text-gray-700">
-								¿Está seguro de <strong>aprobar</strong> esta factura de pago de inscripción?
-							</p>
-						</div>
-						<div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-							<button
-								type="button"
-								onClick={cerrarModalAprobar}
-								disabled={accionEnviando !== null}
-								className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium disabled:opacity-60"
-							>
-								Cancelar
-							</button>
-							<button
-								type="button"
-								onClick={() => confirmarAprobar(modalAprobar)}
-								disabled={accionEnviando !== null}
-								className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-							>
-								{accionEnviando?.id === modalAprobar && accionEnviando.tipo === "APROBAR"
-									? <><SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-white" /> Aprobando...</>
-									: "Sí, aprobar"}
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
+			<DialogoConfirmacion
+				abierto={modalAprobar !== null}
+				cerrando={cerrandoAprobar}
+				titulo="Confirmar aprobación"
+				onCancelar={cerrarModalAprobar}
+				onConfirmar={() => modalAprobar !== null && confirmarAprobar(modalAprobar)}
+				textoConfirmar="Sí, aprobar"
+				textoProcesando="Aprobando..."
+				procesando={accionEnviando !== null}
+			>
+				<p className="text-sm text-gray-700">
+					¿Está seguro de <strong>aprobar</strong> esta factura de pago de {nombre.toLowerCase()}?
+				</p>
+			</DialogoConfirmacion>
 
 			{/* Modal: Confirmar rechazo */}
-			{modalRechazar !== null && (
-				<div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoRechazar ? "animate-overlay-out" : "animate-overlay-in"}`}>
-					<div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${cerrandoRechazar ? "animate-modal-out" : "animate-modal-in"}`}>
-						<div className="p-6 border-b border-gray-200">
-							<h3 className="text-base font-semibold text-gray-900">Confirmar rechazo</h3>
-						</div>
-						<div className="p-6">
-							<p className="text-sm text-gray-700">
-								¿Está seguro de <strong>rechazar</strong> esta factura de pago de inscripción?
-							</p>
-						</div>
-						<div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-							<button
-								type="button"
-								onClick={cerrarModalRechazar}
-								disabled={accionEnviando !== null}
-								className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium disabled:opacity-60"
-							>
-								Cancelar
-							</button>
-							<button
-								type="button"
-								onClick={() => confirmarRechazar(modalRechazar)}
-								disabled={accionEnviando !== null}
-								className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-							>
-								{accionEnviando?.id === modalRechazar && accionEnviando.tipo === "RECHAZAR"
-									? <><SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-white" /> Rechazando...</>
-									: "Sí, rechazar"}
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
+			<DialogoConfirmacion
+				abierto={modalRechazar !== null}
+				cerrando={cerrandoRechazar}
+				titulo="Confirmar rechazo"
+				onCancelar={cerrarModalRechazar}
+				onConfirmar={() => modalRechazar !== null && confirmarRechazar(modalRechazar)}
+				textoConfirmar="Sí, rechazar"
+				textoProcesando="Rechazando..."
+				procesando={accionEnviando !== null}
+			>
+				<p className="text-sm text-gray-700">
+					¿Está seguro de <strong>rechazar</strong> esta factura de pago de {nombre.toLowerCase()}?
+				</p>
+			</DialogoConfirmacion>
 		</div>
 	);
 }

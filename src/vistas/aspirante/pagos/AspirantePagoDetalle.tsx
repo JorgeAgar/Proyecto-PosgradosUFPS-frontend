@@ -21,10 +21,46 @@ import {
   DocumentArrowUpIcon,
 } from '@heroicons/react/24/outline';
 import { fetchInscripcionResumen, fetchInscripcionCheckout, uploadInscripcionFactura, patchInscripcionFactura } from '../../../services/aspirante/aspirantePagosInscripcionService';
+import { fetchMatriculaResumen, fetchMatriculaCheckout, uploadMatriculaFactura, patchMatriculaFactura } from '../../../services/aspirante/aspirantePagosMatriculaService';
 import { getAspiranteRealId } from '../../../services/aspirante/aspiranteService';
 import type { ResumenPagoResponse, WompiCheckoutResponse, PaymentReceipt } from '../../../services/aspirante/aspirantePagosService';
 import type { AspiranteOutletContext } from '../../../layouts/AspiranteLayout';
 import { SpinnerIcon } from "../../../assets/icons";
+import Cargando from "../../../components/Cargando";
+import { DialogoConfirmacion } from "../../../components/Dialogo";
+
+export type TipoPagoAspirante = 'inscripcion' | 'matricula';
+
+const CONFIG: Record<TipoPagoAspirante, {
+  /** Nombre visible: "Inscripción" / "Matrícula". */
+  nombre: string;
+  resumen: (aspiranteId: string) => Promise<ResumenPagoResponse>;
+  checkout: (aspiranteId: string, montoCentavos: number) => Promise<WompiCheckoutResponse>;
+  subirFactura: (aspiranteId: string, file: File) => Promise<void>;
+  reemplazarFactura: (aspiranteId: string, file: File) => Promise<void>;
+  redirectUrlPorDefecto: string;
+  /** La matrícula permite elegir el monto a pagar (entre valorminimo y valormatricula). */
+  conMonto: boolean;
+}> = {
+  inscripcion: {
+    nombre: 'Inscripción',
+    resumen: fetchInscripcionResumen,
+    checkout: (aspiranteId) => fetchInscripcionCheckout(aspiranteId),
+    subirFactura: uploadInscripcionFactura,
+    reemplazarFactura: patchInscripcionFactura,
+    redirectUrlPorDefecto: '',
+    conMonto: false,
+  },
+  matricula: {
+    nombre: 'Matrícula',
+    resumen: fetchMatriculaResumen,
+    checkout: fetchMatriculaCheckout,
+    subirFactura: uploadMatriculaFactura,
+    reemplazarFactura: patchMatriculaFactura,
+    redirectUrlPorDefecto: 'https://transaction-redirect.wompi.co/check',
+    conMonto: true,
+  },
+};
 
 function EstadoPagoBadge({ estado }: { estado: string }) {
   const norm = estado.trim().toUpperCase();
@@ -49,7 +85,9 @@ function EstadoPagoBadge({ estado }: { estado: string }) {
   );
 }
 
-export default function AspirantePagosInscripcion() {
+export default function AspirantePagoDetalle({ tipo }: { tipo: TipoPagoAspirante }) {
+  const cfg = CONFIG[tipo];
+  const nombreMinuscula = cfg.nombre.toLowerCase();
   const { mostrarAlerta, mostrarConfirm } = useOutletContext<AspiranteOutletContext>();
   const navigate = useNavigate();
 
@@ -60,6 +98,7 @@ export default function AspirantePagosInscripcion() {
   const [loadingCheckout, setLoadingCheckout]   = useState(false);
   const [wompiCheckout, setWompiCheckout]       = useState<WompiCheckoutResponse | null>(null);
   const [miniReceipt, setMiniReceipt]           = useState<PaymentReceipt | null>(null);
+  const [montoElegido, setMontoElegido]         = useState<string>('');
   const [downloadingRecibo, setDownloadingRecibo]   = useState(false);
   const [downloadingFactura, setDownloadingFactura] = useState(false);
   const [facturaFile, setFacturaFile]               = useState<File | null>(null);
@@ -78,9 +117,9 @@ export default function AspirantePagosInscripcion() {
 
   const cargarResumen = () => {
     setLoadingResumen(true);
-    fetchInscripcionResumen(aspiranteId)
+    cfg.resumen(aspiranteId)
       .then(setResumen)
-      .catch(e => mostrarAlerta(e instanceof Error ? e.message : 'No se pudo cargar el resumen de inscripción.'))
+      .catch(e => mostrarAlerta(e instanceof Error ? e.message : `No se pudo cargar el resumen de ${nombreMinuscula}.`))
       .finally(() => setLoadingResumen(false));
   };
 
@@ -118,7 +157,7 @@ export default function AspirantePagosInscripcion() {
     if (!receiptGenerated || !wompiWidgetRef.current || pagoCompletado || !wompiCheckout) return;
     const container = wompiWidgetRef.current;
     container.innerHTML = '';
-    const redirectUrl = wompiCheckout.redirectUrl ?? "";
+    const redirectUrl = wompiCheckout.redirectUrl ?? cfg.redirectUrlPorDefecto;
     const script = document.createElement('script');
     script.src = wompiCheckout.widgetScriptUrl;
     script.setAttribute('data-render', 'button');
@@ -138,10 +177,10 @@ export default function AspirantePagosInscripcion() {
     try {
       setUploadingFactura(true);
       if (resumen?.urlfactura) {
-        await patchInscripcionFactura(aspiranteId, facturaFile);
+        await cfg.reemplazarFactura(aspiranteId, facturaFile);
         mostrarConfirm('Factura reemplazada con éxito.');
       } else {
-        await uploadInscripcionFactura(aspiranteId, facturaFile);
+        await cfg.subirFactura(aspiranteId, facturaFile);
         mostrarConfirm('Factura subida con éxito.');
       }
       setFacturaFile(null);
@@ -163,10 +202,10 @@ export default function AspirantePagosInscripcion() {
     setTimeout(() => { setMostrarConfirmarSubida(false); setCerrandoConfirmarSubida(false); }, 170);
   };
 
-  const handleGenerarRecibo = async () => {
+  const handleGenerarRecibo = async (montoCentavos: number) => {
     try {
       setLoadingCheckout(true);
-      const checkout = await fetchInscripcionCheckout(aspiranteId);
+      const checkout = await cfg.checkout(aspiranteId, montoCentavos);
       setWompiCheckout(checkout);
       setMiniReceipt({
         id:       String(checkout.paymentId ?? '0'),
@@ -180,7 +219,7 @@ export default function AspirantePagosInscripcion() {
       setReceiptGenerated(true);
       mostrarConfirm('Recibo generado con éxito.');
       // Refrescar resumen para obtener urlrecibo/urlfactura/estado actualizados
-      fetchInscripcionResumen(aspiranteId).then(setResumen).catch(() => {});
+      cfg.resumen(aspiranteId).then(setResumen).catch(() => {});
     } catch (e) {
       mostrarAlerta(e instanceof Error ? e.message : 'No se pudo generar el recibo de pago.');
     } finally {
@@ -208,12 +247,7 @@ export default function AspirantePagosInscripcion() {
       <div className="p-6 bg-gray-100 min-h-full" style={{ fontFamily: 'Segoe UI, sans-serif' }}>
         <div className="">
           {encabezado}
-          <div className="flex items-center justify-center py-20 animate-fade-in">
-            <div className="flex items-center gap-3 text-neutral-400 text-sm">
-              <SpinnerIcon className="animate-spin shrink-0 h-6 w-6 text-red-700" />
-              Cargando información del pago...
-            </div>
-          </div>
+          <Cargando texto="Cargando información del pago..." />
         </div>
       </div>
     );
@@ -222,6 +256,16 @@ export default function AspirantePagosInscripcion() {
   const now = new Date();
   const receiptDate = now.toLocaleDateString('es-CO');
   const dueDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('es-CO');
+
+  // Estado EN CURSO: usa resumen.valor directamente sin pedir monto
+  const enCurso = resumen?.estado?.toUpperCase() === 'EN CURSO';
+
+  // Validación de monto (solo aplica si NO es EN CURSO)
+  const minMonto    = resumen?.valorminimo    ?? 0;
+  const maxMonto    = resumen?.valormatricula ?? 0;
+  const montoNum    = parseFloat(montoElegido) || 0;
+  const montoFuera  = montoElegido !== '' && (montoNum < minMonto || montoNum > maxMonto);
+  const montoValido = montoElegido !== '' && !montoFuera;
 
   return (
     <div className="p-6 bg-gray-100 min-h-full" style={{ fontFamily: 'Segoe UI, sans-serif' }}>
@@ -232,7 +276,7 @@ export default function AspirantePagosInscripcion() {
         {resumen && (
           <div className="space-y-2 animate-fade-in-up delay-200">
             <h3 className="flex text-sm font-semibold text-gray-900 gap-2 items-center">
-              <DocumentTextIcon className="w-5 h-5" /> Información de la Inscripción
+              <DocumentTextIcon className="w-5 h-5" /> Información de la {cfg.nombre}
             </h3>
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
@@ -256,13 +300,19 @@ export default function AspirantePagosInscripcion() {
                   <IdentificationIcon className="w-5 h-5 text-red-700 mt-0.5 shrink-0" />
                   <div><p className="text-xs text-neutral-400">Documento</p><p className="text-sm font-medium text-gray-900 mt-0.5">{resumen.documento}</p></div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <CurrencyDollarIcon className="w-5 h-5 text-red-700 mt-0.5 shrink-0" />
-                  <div><p className="text-xs text-neutral-400">Valor a pagar</p><p className="text-lg font-bold text-red-700 mt-0.5">${resumen.valor.toLocaleString('es-CO')} COP</p></div>
-                </div>
+                {resumen.valormatricula != null && (
+                  <div className="flex items-start gap-3">
+                    <CurrencyDollarIcon className="w-5 h-5 text-red-700 mt-0.5 shrink-0" />
+                    <div><p className="text-xs text-neutral-400">Valor general</p><p className="text-lg font-bold text-gray-700 mt-0.5">${resumen.valormatricula.toLocaleString('es-CO')} COP</p></div>
+                  </div>
+                )}
                 <div className="flex items-start gap-3">
                   <UserIcon className="w-5 h-5 text-red-700 mt-0.5 shrink-0" />
                   <div><p className="text-xs text-neutral-400">Aspirante</p><p className="text-sm font-medium text-gray-900 mt-0.5">{resumen.aspirante}</p></div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CurrencyDollarIcon className="w-5 h-5 text-red-700 mt-0.5 shrink-0" />
+                  <div><p className="text-xs text-neutral-400">Valor a pagar</p><p className="text-lg font-bold text-red-700 mt-0.5">${resumen.valor.toLocaleString('es-CO')} COP</p></div>
                 </div>
                 {resumen.estado && (
                   <div className="flex items-start gap-3">
@@ -405,9 +455,7 @@ export default function AspirantePagosInscripcion() {
             <div className="bg-green-50 border border-green-200 rounded-lg p-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-100 rounded-lg shrink-0">
-                    <CheckCircleIcon className="w-6 h-6 text-green-700" />
-                  </div>
+                  <div className="p-2 bg-green-100 rounded-lg shrink-0"><CheckCircleIcon className="w-6 h-6 text-green-700" /></div>
                   <div>
                     <p className="font-semibold text-green-700">Pago realizado</p>
                     <p className="text-sm text-green-600">El pago ha sido procesado exitosamente.</p>
@@ -459,9 +507,15 @@ export default function AspirantePagosInscripcion() {
               <DocumentCurrencyDollarIcon className="w-5 h-5" /> Generar Recibo de Pago
             </h3>
             <div className="bg-white rounded-lg border border-gray-200 p-6 text-center space-y-3">
-              <p className="text-sm text-neutral-400">Genera tu recibo de pago para continuar con la inscripción.</p>
+              <p className="text-sm text-neutral-400">Genera tu recibo de pago para continuar con la {nombreMinuscula}.</p>
               <button
-                onClick={() => setMostrarConfirmar(true)}
+                onClick={() => {
+                  if (cfg.conMonto && (enCurso || (pagoRechazado && resumen?.urlrecibo))) {
+                    handleGenerarRecibo(Math.round((resumen?.valor ?? 0) * 100));
+                  } else {
+                    setMostrarConfirmar(true);
+                  }
+                }}
                 disabled={receiptGenerated || loadingCheckout}
                 className={`font-bold px-6 py-3 rounded-lg flex items-center justify-center gap-2 w-full transition ${receiptGenerated ? 'bg-green-700 text-white cursor-not-allowed' : 'bg-red-700 text-white hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed'}`}
               >
@@ -480,7 +534,7 @@ export default function AspirantePagosInscripcion() {
               <div className={`border-2 border-dashed rounded-lg p-5 space-y-4 ${pagoCompletado ? 'border-green-300' : 'border-gray-300'}`}>
                 <div className="flex justify-between border-b-2 border-dashed border-gray-300 pb-3">
                   <div>
-                    <h4 className="font-bold text-base text-gray-900">Inscripción</h4>
+                    <h4 className="font-bold text-base text-gray-900">{cfg.nombre}</h4>
                     <p className={`font-semibold text-sm mt-0.5 ${pagoCompletado ? 'text-green-700' : 'text-red-700'}`}>N° {miniReceipt?.number ?? '—'}</p>
                   </div>
                 </div>
@@ -506,7 +560,7 @@ export default function AspirantePagosInscripcion() {
                   <p className="font-bold text-sm text-gray-900">VALOR A PAGAR:</p>
                   <p className={`font-bold flex items-center gap-1 ${pagoCompletado ? 'text-green-700' : 'text-red-700'}`}>
                     <CurrencyDollarIcon className="w-4 h-4 shrink-0" />
-                    ${(miniReceipt?.amount ?? resumen?.valor ?? 0).toLocaleString('es-CO')} {miniReceipt?.currency ?? 'COP'}
+                    ${(miniReceipt?.amount ?? (montoNum || (resumen?.valor ?? 0))).toLocaleString('es-CO')} {miniReceipt?.currency ?? 'COP'}
                   </p>
                 </div>
                 <div className="flex justify-between border-t-2 border-dashed border-gray-300 pt-3">
@@ -547,61 +601,69 @@ export default function AspirantePagosInscripcion() {
       </div>
 
       {/* Modal confirmar subida de factura */}
-      {mostrarConfirmarSubida && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoConfirmarSubida ? 'animate-overlay-out' : 'animate-overlay-in'}`}>
-          <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${cerrandoConfirmarSubida ? 'animate-modal-out' : 'animate-modal-in'}`}>
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-base font-semibold text-gray-900">{resumen?.urlfactura ? 'Confirmar reemplazo de factura' : 'Confirmar subida de factura'}</h3>
-            </div>
-            <div className="p-6 space-y-3">
-              <p className="text-sm text-gray-700">
-                {resumen?.urlfactura
-                  ? <>¿Deseas reemplazar la factura existente con <strong>{facturaFile?.name}</strong>?</>
-                  : <>¿Deseas subir el archivo <strong>{facturaFile?.name}</strong> como factura de pago?</>}
-              </p>
-              <p className="text-xs text-neutral-400">Formatos permitidos: PDF, PNG, JPG y JPEG.</p>
-            </div>
-            <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button onClick={cerrarConfirmarSubida} disabled={uploadingFactura} className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium disabled:opacity-60">
-                Cancelar
-              </button>
-              <button
-                onClick={() => { cerrarConfirmarSubida(); handleUploadFactura(); }}
-                disabled={uploadingFactura}
-                className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {uploadingFactura ? <><SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-white" /> Subiendo...</> : resumen?.urlfactura ? 'Sí, reemplazar' : 'Sí, subir factura'}
-              </button>
-            </div>
-          </div>
+      <DialogoConfirmacion
+        abierto={mostrarConfirmarSubida}
+        cerrando={cerrandoConfirmarSubida}
+        titulo={resumen?.urlfactura ? 'Confirmar reemplazo de factura' : 'Confirmar subida de factura'}
+        onCancelar={cerrarConfirmarSubida}
+        onConfirmar={() => { cerrarConfirmarSubida(); handleUploadFactura(); }}
+        textoConfirmar={resumen?.urlfactura ? 'Sí, reemplazar' : 'Sí, subir factura'}
+        textoProcesando="Subiendo..."
+        procesando={uploadingFactura}
+      >
+        <div className="space-y-3">
+          <p className="text-sm text-gray-700">
+            {resumen?.urlfactura
+              ? <>¿Deseas reemplazar la factura existente con <strong>{facturaFile?.name}</strong>?</>
+              : <>¿Deseas subir el archivo <strong>{facturaFile?.name}</strong> como factura de pago?</>}
+          </p>
+          <p className="text-xs text-neutral-400">Formatos permitidos: PDF, PNG, JPG y JPEG.</p>
         </div>
-      )}
+      </DialogoConfirmacion>
 
-      {/* Modal confirmar recibo */}
-      {mostrarConfirmar && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoConfirmar ? 'animate-overlay-out' : 'animate-overlay-in'}`}>
-          <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${cerrandoConfirmar ? 'animate-modal-out' : 'animate-modal-in'}`}>
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-base font-semibold text-gray-900">Confirmar generación de recibo</h3>
-            </div>
-            <div className="p-6">
-              <p className="text-sm text-gray-700">¿Deseas generar el recibo de pago para <strong>la inscripción</strong>?</p>
-            </div>
-            <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button onClick={cerrarConfirmar} disabled={loadingCheckout} className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium disabled:opacity-60">
-                Cancelar
-              </button>
-              <button
-                onClick={() => { cerrarConfirmar(); handleGenerarRecibo(); }}
+      {/* Modal confirmar recibo (con monto en matrícula) */}
+      <DialogoConfirmacion
+        abierto={mostrarConfirmar}
+        cerrando={cerrandoConfirmar}
+        titulo="Confirmar generación de recibo"
+        onCancelar={cerrarConfirmar}
+        onConfirmar={() => {
+          cerrarConfirmar();
+          handleGenerarRecibo(cfg.conMonto ? Math.round(parseFloat(montoElegido) * 100) : 0);
+        }}
+        textoConfirmar="Sí, generar recibo"
+        textoProcesando="Generando..."
+        procesando={loadingCheckout}
+        confirmarDeshabilitado={cfg.conMonto && !montoValido}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-700">¿Deseas generar el recibo de pago para <strong>la {nombreMinuscula}</strong>?</p>
+          {cfg.conMonto && (
+            <div>
+              <label className="text-sm font-semibold text-gray-700 mb-1 block">
+                Monto a pagar <span className="text-red-700">*</span>
+              </label>
+              <input
+                type="number"
+                min={minMonto}
+                max={maxMonto}
+                placeholder={`Mín. $${minMonto.toLocaleString('es-CO')}`}
+                value={montoElegido}
                 disabled={loadingCheckout}
-                className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loadingCheckout ? <><SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-white" /> Generando...</> : 'Sí, generar recibo'}
-              </button>
+                onChange={(e) => setMontoElegido(e.target.value)}
+                className={`w-full px-4 py-2.5 border rounded-lg text-sm text-gray-900 outline-none transition disabled:bg-gray-50 disabled:text-neutral-400 disabled:cursor-not-allowed ${montoFuera ? 'border-red-200 focus:border-red-300 focus:ring-2 focus:ring-red-200' : 'border-gray-200 hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200'}`}
+              />
+              <div className="mt-1.5 flex justify-between text-xs text-neutral-400">
+                <span>Mínimo: <span className="font-medium">${minMonto.toLocaleString('es-CO')} COP</span></span>
+                <span>Máximo: <span className="font-medium">${maxMonto.toLocaleString('es-CO')} COP</span></span>
+              </div>
+              {montoFuera && (
+                <p className="mt-1 text-xs text-red-700">El monto debe estar entre ${minMonto.toLocaleString('es-CO')} y ${maxMonto.toLocaleString('es-CO')} COP.</p>
+              )}
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </DialogoConfirmacion>
     </div>
   );
 }

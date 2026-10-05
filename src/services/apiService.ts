@@ -1,22 +1,29 @@
-import { extractErrorMessage, type AuthService } from "./authService";
-
-const BASE_URL = (import.meta.env.VITE_API_URL as string ?? "").replace(/\/$/, "");
+import { API_BASE_URL, extractErrorMessage, type AuthService } from "./authService";
 
 export interface ApiClient {
+  /** Petición autenticada; la respuesta se interpreta como JSON (o texto si no lo es). */
   fetch<T>(path: string, options?: RequestInit): Promise<T>;
+  /** Envía un `multipart/form-data` autenticado. */
+  upload<T>(path: string, formData: FormData, method?: "POST" | "PUT" | "PATCH"): Promise<T>;
+  /** Petición autenticada cuya respuesta es un archivo binario. */
+  blob(path: string, options?: RequestInit): Promise<Blob>;
 }
 
 export function createApiClient(authService: AuthService): ApiClient {
-  async function apiFetch<T>(path: string, options?: RequestInit, isRetry = false): Promise<T> {
+  /** Hace la petición con token, renueva la sesión ante 401/403 y lanza un error si la respuesta no es OK. */
+  async function request(path: string, options?: RequestInit, isRetry = false): Promise<Response> {
     const token = authService.getAccessToken();
     const headers = new Headers(options?.headers);
 
-    if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json");
+    // Con FormData el navegador debe poner el Content-Type (incluye el boundary).
+    if (!(options?.body instanceof FormData) && !headers.has("Content-Type")) {
+      headers.set("Content-Type", "application/json");
+    }
     if (token && !headers.has("Authorization")) {
       headers.set("Authorization", `Bearer ${token}`);
     }
 
-    const response = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+    const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
 
     if ((response.status === 401 || response.status === 403) && !isRetry) {
       const refreshed = await authService.refreshSession();
@@ -24,7 +31,7 @@ export function createApiClient(authService: AuthService): ApiClient {
         authService.logout();
         throw new Error("Sesión expirada. Por favor, inicia sesión de nuevo.");
       }
-      return apiFetch<T>(path, options, true);
+      return request(path, options, true);
     }
 
     if (!response.ok) {
@@ -45,6 +52,11 @@ export function createApiClient(authService: AuthService): ApiClient {
       throw error;
     }
 
+    return response;
+  }
+
+  async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+    const response = await request(path, options);
     const text = await response.text().catch(() => "");
     if (!text) return undefined as T;
 
@@ -55,5 +67,9 @@ export function createApiClient(authService: AuthService): ApiClient {
     }
   }
 
-  return { fetch: apiFetch };
+  return {
+    fetch: apiFetch,
+    upload: (path, formData, method = "POST") => apiFetch(path, { method, body: formData }),
+    blob: async (path, options) => (await request(path, options)).blob(),
+  };
 }

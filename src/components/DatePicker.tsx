@@ -19,6 +19,32 @@ function Label({ children, htmlFor }: { children: ReactNode; htmlFor: string }) 
 
 type DropdownPos = { top?: number; bottom?: number; left: number; width: number };
 
+/** Paletas: "rojo" (aspirante / programa) y "oscuro" (superadmin). */
+const TEMAS = {
+	rojo: {
+		trigger:     "border-gray-200 hover:border-gray-300",
+		abierto:     "border-red-300 ring-2 ring-red-200",
+		error:       "border-red-200",
+		panel:       "border-gray-200",
+		seleccionado: "bg-red-100 font-semibold text-red-700 ring-1 ring-red-200",
+		hoy:         "font-semibold text-red-700 ring-1 ring-red-200 hover:bg-red-50",
+		actual:      "font-semibold text-red-700 hover:bg-red-50",
+		zIndex:      9999,
+	},
+	oscuro: {
+		trigger:     "border-gray-300 hover:border-gray-400",
+		abierto:     "border-slate-400 ring-2 ring-slate-200",
+		error:       "border-red-300",
+		panel:       "border-gray-300",
+		seleccionado: "bg-slate-100 font-semibold text-slate-700 ring-1 ring-slate-300",
+		hoy:         "font-semibold text-slate-600 ring-1 ring-slate-300 hover:bg-slate-50",
+		actual:      "font-semibold text-slate-600 hover:bg-slate-50",
+		zIndex:      70,
+	},
+};
+
+export type TemaPicker = keyof typeof TEMAS;
+
 export function DatePicker({
 	id,
 	label,
@@ -27,6 +53,8 @@ export function DatePicker({
 	error,
 	minDate,
 	maxDate,
+	disabled = false,
+	tema = "rojo",
 }: {
 	id: string;
 	label: string;
@@ -35,7 +63,10 @@ export function DatePicker({
 	error?: string;
 	minDate?: string;
 	maxDate?: string;
+	disabled?: boolean;
+	tema?: TemaPicker;
 }) {
+	const t = TEMAS[tema];
 	type CalendarView = "days" | "months" | "years";
 
 	const parsed = value ? new Date(value + "T00:00:00") : null;
@@ -196,8 +227,9 @@ export function DatePicker({
 	}
 
 	const triggerClass = [
-		"mt-1 flex w-full items-center justify-between gap-2 rounded-lg border bg-white px-3 py-2.5 text-sm text-left transition outline-none cursor-pointer hover:border-gray-300",
-		error ? "border-red-200" : open ? "border-red-300 ring-2 ring-red-200" : "border-gray-200",
+		"mt-1 flex w-full items-center justify-between gap-2 rounded-lg border bg-white px-3 py-2.5 text-sm text-left transition outline-none",
+		disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
+		error ? t.error : open ? t.abierto : t.trigger,
 	].join(" ");
 
 	const openUpward = dropdownPos?.bottom !== undefined;
@@ -211,7 +243,9 @@ export function DatePicker({
 			<button
 				id={id}
 				type="button"
+				disabled={disabled}
 				onClick={() => {
+					if (disabled) return;
 					if (open) {
 						closeCalendar();
 					} else {
@@ -237,10 +271,10 @@ export function DatePicker({
 						bottom: dropdownPos.bottom,
 						left: dropdownPos.left,
 						width: dropdownPos.width,
-						zIndex: 9999,
+						zIndex: t.zIndex,
 						visibility: dropdownReady ? "visible" : "hidden",
 					}}
-					className={`rounded-lg border border-gray-200 bg-white shadow-lg ${dropdownReady ? animationClass : ""}`}
+					className={`rounded-lg border bg-white shadow-lg ${t.panel} ${dropdownReady ? animationClass : ""}`}
 				>
 					<div className="flex items-center justify-between border-b border-gray-200 px-2 py-2">
 						<button type="button" onMouseDown={(e) => e.preventDefault()} onClick={prevPeriod}
@@ -277,8 +311,8 @@ export function DatePicker({
 												onClick={() => { if (!isCellDisabled) { onChange(dateStr); closeCalendar(); } }}
 												className={["h-8 w-8 flex items-center justify-center rounded-lg text-xs transition",
 													isCellDisabled ? "text-neutral-300 cursor-not-allowed"
-													: isSelected ? "bg-red-100 font-semibold text-red-700 ring-1 ring-red-200"
-													: isToday ? "font-semibold text-red-700 ring-1 ring-red-200 hover:bg-red-50"
+													: isSelected ? t.seleccionado
+													: isToday ? t.hoy
 													: cell.current ? "text-gray-900 hover:bg-gray-100"
 													: "text-neutral-400 hover:bg-gray-100",
 												].join(" ")}>
@@ -305,8 +339,8 @@ export function DatePicker({
 										onClick={() => { if (!isMonthDisabled) { setViewMonth(i); setViewMode("days"); } }}
 										className={["rounded-lg py-2 text-sm transition",
 											isMonthDisabled ? "text-neutral-300 cursor-not-allowed"
-											: isSelected ? "bg-red-100 font-semibold text-red-700 ring-1 ring-red-200"
-											: isCurrentMonth ? "font-semibold text-red-700 hover:bg-red-50"
+											: isSelected ? t.seleccionado
+											: isCurrentMonth ? t.actual
 											: "text-gray-900 hover:bg-gray-100",
 										].join(" ")}>
 										{name}
@@ -327,8 +361,8 @@ export function DatePicker({
 										onClick={() => { if (!isYearDisabled) { setViewYear(year); setViewMode("months"); } }}
 										className={["rounded-lg py-2 text-sm transition",
 											isYearDisabled ? "text-neutral-300 cursor-not-allowed"
-											: isSelected ? "bg-red-100 font-semibold text-red-700 ring-1 ring-red-200"
-											: isCurrentYear ? "font-semibold text-red-700 hover:bg-red-50"
+											: isSelected ? t.seleccionado
+											: isCurrentYear ? t.actual
 											: "text-gray-900 hover:bg-gray-100",
 										].join(" ")}>
 										{year}

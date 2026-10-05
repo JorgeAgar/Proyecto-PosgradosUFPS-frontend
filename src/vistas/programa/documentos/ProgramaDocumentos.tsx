@@ -9,6 +9,7 @@ import { useOutletContext } from 'react-router';
 import programaDocsService, { type RequiredDoc } from '../../../services/programa/programaDocsService';
 import type { ProgramaOutletContext } from '../../../layouts/ProgramaLayout';
 import { SpinnerIcon } from "../../../assets/icons";
+import { DialogoConfirmacion } from '../../../components/Dialogo';
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
 
@@ -323,131 +324,86 @@ export default function ProgramaDocumentos() {
       )}
 
       {/* ── Modal: Crear / Editar documento ─────────────────────────────────── */}
-      {mostrarModal && (
-        <div
-          className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoModal ? 'animate-overlay-out' : 'animate-overlay-in'}`}
-        >
-          <div
-            className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-lg w-full mx-4 ${cerrandoModal ? 'animate-modal-out' : 'animate-modal-in'}`}
-          >
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {docEditando ? 'Editar documento' : 'Agregar documento'}
-              </h3>
-            </div>
+      <DialogoConfirmacion
+        abierto={mostrarModal}
+        cerrando={cerrandoModal}
+        tamano="lg"
+        titulo={docEditando ? 'Editar documento' : 'Agregar documento'}
+        onCancelar={cerrarModal}
+        onConfirmar={handleGuardar}
+        textoConfirmar={docEditando ? 'Guardar cambios' : 'Crear documento'}
+        textoProcesando={docEditando ? 'Guardando...' : 'Creando...'}
+        procesando={guardando}
+      >
+        <div className="space-y-4">
+          {/* Nombre */}
+          <div>
+            <label className="text-sm font-semibold text-gray-700 mb-1 block">
+              Nombre del documento <span className="text-red-700">*</span>
+            </label>
+            <input
+              type="text"
+              value={borrador.nombre}
+              onChange={e => setBorrador(prev => ({ ...prev, nombre: e.target.value }))}
+              placeholder="Ej. Hoja de vida, Acta de grado..."
+              disabled={guardando}
+              className="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+          </div>
 
-            <div className="p-6 space-y-4">
-              {/* Nombre */}
-              <div>
-                <label className="text-sm font-semibold text-gray-700 mb-1 block">
-                  Nombre del documento <span className="text-red-700">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={borrador.nombre}
-                  onChange={e => setBorrador(prev => ({ ...prev, nombre: e.target.value }))}
-                  placeholder="Ej. Hoja de vida, Acta de grado..."
-                  disabled={guardando}
-                  className="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-              </div>
-
-              {/* Formato */}
-              <div>
-                <label className="text-sm font-semibold text-gray-700 mb-1 block">
-                  Formato (opcional)
-                </label>
-                <div className="flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-3">
-                  <input
-                    id="modal-file-upload"
-                    type="file"
-                    className="hidden"
-                    onChange={e => handleArchivoChange(e.target.files?.[0] ?? null)}
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    disabled={guardando}
-                  />
-                  <label
-                    htmlFor="modal-file-upload"
-                    className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-700 transition hover:border-red-300 hover:bg-red-50 ${guardando ? 'pointer-events-none opacity-50' : ''}`}
-                  >
-                    <ArrowUpTrayIcon className="h-4 w-4" />
-                    Seleccionar archivo
-                  </label>
-                  <span className="text-sm text-gray-500">
-                    {archivoSeleccionado
-                      ? archivoSeleccionado.name
-                      : borrador.formato
-                        ? `Actual: ${borrador.formato}`
-                        : 'Sin formato adjunto'}
-                  </span>
-                </div>
-                {archivoSeleccionado && (
-                  <p className="mt-1.5 text-xs text-green-700 flex items-center gap-1">
-                    Archivo listo para subir: <span className="font-medium">{archivoSeleccionado.name}</span>
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={cerrarModal}
+          {/* Formato */}
+          <div>
+            <label className="text-sm font-semibold text-gray-700 mb-1 block">
+              Formato (opcional)
+            </label>
+            <div className="flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-3">
+              <input
+                id="modal-file-upload"
+                type="file"
+                className="hidden"
+                onChange={e => handleArchivoChange(e.target.files?.[0] ?? null)}
+                accept=".pdf,.jpg,.jpeg,.png"
                 disabled={guardando}
-                className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60"
+              />
+              <label
+                htmlFor="modal-file-upload"
+                className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-700 transition hover:border-red-300 hover:bg-red-50 ${guardando ? 'pointer-events-none opacity-50' : ''}`}
               >
-                Cancelar
-              </button>
-              <button
-                onClick={handleGuardar}
-                disabled={guardando}
-                className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {guardando ? (
-                  <><SpinnerIcon className="animate-spin h-4 w-4" />{docEditando ? 'Guardando...' : 'Creando...'}</>
-                ) : (
-                  docEditando ? 'Guardar cambios' : 'Crear documento'
-                )}
-              </button>
+                <ArrowUpTrayIcon className="h-4 w-4" />
+                Seleccionar archivo
+              </label>
+              <span className="text-sm text-gray-500">
+                {archivoSeleccionado
+                  ? archivoSeleccionado.name
+                  : borrador.formato
+                    ? `Actual: ${borrador.formato}`
+                    : 'Sin formato adjunto'}
+              </span>
             </div>
+            {archivoSeleccionado && (
+              <p className="mt-1.5 text-xs text-green-700 flex items-center gap-1">
+                Archivo listo para subir: <span className="font-medium">{archivoSeleccionado.name}</span>
+              </p>
+            )}
           </div>
         </div>
-      )}
+      </DialogoConfirmacion>
 
       {/* ── Modal: Confirmar eliminar ────────────────────────────────────────── */}
-      {mostrarConfirmarEliminar && (
-        <div
-          className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoConfirmarEliminar ? 'animate-overlay-out' : 'animate-overlay-in'}`}
-        >
-          <div
-            className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${cerrandoConfirmarEliminar ? 'animate-modal-out' : 'animate-modal-in'}`}
-          >
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Eliminar documento</h3>
-            </div>
-            <div className="p-6">
-              <p className="text-sm text-gray-700">
-                ¿Está seguro de eliminar el documento{' '}
-                <span className="font-semibold">"{docAEliminar?.nombre}"</span>?
-                Esta acción no se puede deshacer.
-              </p>
-            </div>
-            <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={cerrarConfirmarEliminar}
-                className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleEliminar}
-                className="px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium text-center"
-              >
-                Sí, eliminar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DialogoConfirmacion
+        abierto={mostrarConfirmarEliminar}
+        cerrando={cerrandoConfirmarEliminar}
+        titulo="Eliminar documento"
+        onCancelar={cerrarConfirmarEliminar}
+        onConfirmar={handleEliminar}
+        textoConfirmar="Sí, eliminar"
+      >
+        <p className="text-sm text-gray-700">
+          ¿Está seguro de eliminar el documento{' '}
+          <span className="font-semibold">"{docAEliminar?.nombre}"</span>?
+          Esta acción no se puede deshacer.
+        </p>
+      </DialogoConfirmacion>
     </div>
   );
 }

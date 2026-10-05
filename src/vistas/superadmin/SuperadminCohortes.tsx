@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useOutletContext } from 'react-router';
-import { Modal } from './components/Modal';
-import { SelectSA } from './components/SelectSA';
-import { DatePickerSA } from './components/DatePickerSA';
+import { Modal } from '../../components/Modal';
+import { Select } from '../../components/Select';
+import { DatePicker } from '../../components/DatePicker';
 import type { SuperadminOutletContext } from '../../layouts/SuperadminLayout';
 import {
   superadminFacultadesService,
@@ -627,14 +627,16 @@ export default function SuperadminCohortes() {
         idFacultad: progForm.idFacultad as number,
         idOtros: (progForm.idOtros as number) || 0,
       };
+      let advertencia: string | undefined;
       if (editingProg) {
         await superadminProgramasService.actualizar({ id: editingProg.id, ...payload });
       } else {
-        await superadminProgramasService.crear(payload);
+        ({ advertencia } = await superadminProgramasService.crear(payload));
       }
       setShowProgModal(false);
       await cargar();
-      mostrarConfirm(editingProg ? 'Programa actualizado con éxito.' : 'Programa creado con éxito.');
+      if (advertencia) mostrarAlerta(advertencia, 'advertencia');
+      else mostrarConfirm(editingProg ? 'Programa actualizado con éxito.' : 'Programa creado con éxito.');
     } catch (err) {
       mostrarAlerta(err instanceof Error ? err.message : 'Error al guardar el programa.');
     } finally {
@@ -977,7 +979,7 @@ export default function SuperadminCohortes() {
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <SelectSA
+            <Select tema="oscuro"
               id="progNivel"
               label="Nivel de formación"
               value={progForm.nivelformacion}
@@ -985,7 +987,7 @@ export default function SuperadminCohortes() {
               options={["Maestría","Doctorado","Especialización","Especialización Médico-Quirúrgica"].map((n) => ({ value: n, label: n }))}
               disabled={progSubmitting}
             />
-            <SelectSA
+            <Select tema="oscuro"
               id="progPeriodicidad"
               label="Periodicidad"
               value={progForm.periodicidad}
@@ -1037,7 +1039,7 @@ export default function SuperadminCohortes() {
             </div>
           </div>
 
-          <SelectSA
+          <Select tema="oscuro"
             id="progFacultad"
             label="Facultad"
             value={String(progForm.idFacultad)}
@@ -1046,7 +1048,7 @@ export default function SuperadminCohortes() {
             disabled={progSubmitting}
           />
 
-          <SelectSA
+          <Select tema="oscuro"
             id="progSede"
             label="Sede"
             value={String(progForm.idSede)}
@@ -1055,7 +1057,7 @@ export default function SuperadminCohortes() {
             disabled={progSubmitting}
           />
 
-          <SelectSA
+          <Select tema="oscuro"
             id="progTipoRegistro"
             label="Tipo de registro"
             value={String(progForm.idTiporegistro)}
@@ -1065,7 +1067,7 @@ export default function SuperadminCohortes() {
           />
 
           {programaRequiereSeleccionModalidad && (
-            <SelectSA
+            <Select tema="oscuro"
               id="progModalidad"
               label="Modalidad"
               value={String(progForm.idModalidad)}
@@ -1075,7 +1077,7 @@ export default function SuperadminCohortes() {
             />
           )}
 
-          <SelectSA
+          <Select tema="oscuro"
             id="progOtros"
             label="Otros valores"
             value={String(progForm.idOtros)}
@@ -1165,7 +1167,7 @@ export default function SuperadminCohortes() {
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <SelectSA
+            <Select tema="oscuro"
               id="cohEstado"
               label="Estado"
               value={String(cohForm.idEstado)}
@@ -1176,7 +1178,7 @@ export default function SuperadminCohortes() {
               }))}
               disabled={cohSubmitting}
             />
-            <SelectSA
+            <Select tema="oscuro"
               id="cohSemestre"
               label="Semestre"
               value={String(cohForm.idSemestre)}
@@ -1186,7 +1188,7 @@ export default function SuperadminCohortes() {
             />
           </div>
 
-          <SelectSA
+          <Select tema="oscuro"
             id="cohModalidad"
             label="Modalidad"
             value={String(cohForm.idModalidad)}
@@ -1196,33 +1198,33 @@ export default function SuperadminCohortes() {
           />
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <DatePickerSA id="docInicio" label="Inicio documentación"
+            <DatePicker tema="oscuro" id="docInicio" label="Inicio documentación"
               value={cohForm.plazodocumentacion.fechainicio}
               onChange={(v) => setPlazo('plazodocumentacion', 'fechainicio', v)}
               disabled={cohSubmitting} />
-            <DatePickerSA id="docFin" label="Fin documentación"
+            <DatePicker tema="oscuro" id="docFin" label="Fin documentación"
               value={cohForm.plazodocumentacion.fechafin}
               onChange={(v) => setPlazo('plazodocumentacion', 'fechafin', v)}
               disabled={cohSubmitting} />
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <DatePickerSA id="inscInicio" label="Inicio inscripción"
+            <DatePicker tema="oscuro" id="inscInicio" label="Inicio inscripción"
               value={cohForm.plazoinscripcion.fechainicio}
               onChange={(v) => setPlazo('plazoinscripcion', 'fechainicio', v)}
               disabled={cohSubmitting} />
-            <DatePickerSA id="inscFin" label="Fin inscripción"
+            <DatePicker tema="oscuro" id="inscFin" label="Fin inscripción"
               value={cohForm.plazoinscripcion.fechafin}
               onChange={(v) => setPlazo('plazoinscripcion', 'fechafin', v)}
               disabled={cohSubmitting} />
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <DatePickerSA id="pagoInicio" label="Inicio pago"
+            <DatePicker tema="oscuro" id="pagoInicio" label="Inicio pago"
               value={cohForm.plazopago.fechainicio}
               onChange={(v) => setPlazo('plazopago', 'fechainicio', v)}
               disabled={cohSubmitting} />
-            <DatePickerSA id="pagoFin" label="Fin pago"
+            <DatePicker tema="oscuro" id="pagoFin" label="Fin pago"
               value={cohForm.plazopago.fechafin}
               onChange={(v) => setPlazo('plazopago', 'fechafin', v)}
               disabled={cohSubmitting} />

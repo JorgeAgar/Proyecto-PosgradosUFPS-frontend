@@ -3,8 +3,6 @@ import { useNavigate, useOutletContext } from 'react-router';
 import {
   ArrowLeftIcon,
   ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   DocumentTextIcon,
   PencilSquareIcon,
   SparklesIcon,
@@ -12,8 +10,10 @@ import {
 import type { CohorteDetalle, DocumentoCohorte, CriterioItem } from '../../../services/programa/programaCohorteService';
 import type { CriterioEvaluacion } from '../../../services/programa/programaCriteriosService';
 import type { ProgramaOutletContext } from '../../../layouts/ProgramaLayout';
-import EditarCohorte from './EditarCohorte';
+import EditarCohorte, { type SavePayload } from './EditarCohorte';
 import { SpinnerIcon } from "../../../assets/icons";
+import { DialogoConfirmacion } from '../../../components/Dialogo';
+import Paginacion from '../../../components/Paginacion';
 
 export default function CohorteDetalleView({
   cohorte,
@@ -25,7 +25,7 @@ export default function CohorteDetalleView({
 }: {
   cohorte: CohorteDetalle;
   onBack?: () => void | Promise<void>;
-  onSave: (payload: Partial<{ cupos: number; idSemestre?: string | number; idModalidad?: string | number; nombre: string; activa?: boolean; fechaInicioDocumentacion?: string; fechaFinDocumentacion?: string; fechaInicioInscripcion?: string; fechaFinInscripcion?: string; fechaInicioPago?: string; fechaFinPago?: string; documentosConsejo?: { idDocrequisito?: string | number; idCohorte?: string | number; nombre?: string }[]; documentosPrograma?: { idDocrequisito?: string | number; idCohorte?: string | number; nombre?: string }[]; criteriosCohorte?: { id?: string | number; idCriterio?: string | number; pesoSnapshot?: number }[] }>) => Promise<void> | void;
+  onSave: (payload: SavePayload) => Promise<void> | void;
   onSaveConfirmed?: () => Promise<void> | void;
   onToggleEstado: (next: boolean) => Promise<void> | void;
   availableCriterios?: CriterioEvaluacion[];
@@ -126,7 +126,7 @@ export default function CohorteDetalleView({
             cohorte={cohorte}
             onCancel={() => setIsEditing(false)}
             onSaved={async (payload) => {
-              await onSave(payload as Partial<{ cupos: number; idSemestre?: string | number; idModalidad?: string | number; nombre: string; activa?: boolean; fechaInicioDocumentacion?: string; fechaFinDocumentacion?: string; fechaInicioInscripcion?: string; fechaFinInscripcion?: string; fechaInicioPago?: string; fechaFinPago?: string; documentosConsejo?: { idDocrequisito?: string | number; idCohorte?: string | number; nombre?: string }[]; documentosPrograma?: { idDocrequisito?: string | number; idCohorte?: string | number; nombre?: string }[]; criteriosCohorte?: { id?: string | number; idCriterio?: string | number; pesoSnapshot?: number }[] }>);
+              await onSave(payload);
             }}
             onSavedConfirmed={onSaveConfirmed}
             availableCriterios={availableCriterios}
@@ -363,7 +363,6 @@ export default function CohorteDetalleView({
 
             {isInscritosExpanded && editedData.id !== 'new' && (() => {
               const inscritos = editedData.inscritosData ?? [];
-              const totalPaginasInscritos = Math.ceil(inscritos.length / POR_PAGINA);
               const inscritosPagina = inscritos.slice((paginaInscritos - 1) * POR_PAGINA, paginaInscritos * POR_PAGINA);
               return (
                 <div className="border-t border-gray-200 animate-accordion-open">
@@ -398,32 +397,7 @@ export default function CohorteDetalleView({
                       </tbody>
                     </table>
                   </div>
-                  {totalPaginasInscritos > 1 && (
-                    <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-                      <span className="text-xs text-neutral-400">
-                        {(paginaInscritos - 1) * POR_PAGINA + 1}–{Math.min(paginaInscritos * POR_PAGINA, inscritos.length)} de {inscritos.length} inscritos
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setPaginaInscritos((p) => p - 1)}
-                          disabled={paginaInscritos === 1}
-                          className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-gray-700"
-                        >
-                          <ChevronLeftIcon className="w-4 h-4" />
-                          Anterior
-                        </button>
-                        <span className="text-sm font-medium text-gray-600 px-1">{paginaInscritos} / {totalPaginasInscritos}</span>
-                        <button
-                          onClick={() => setPaginaInscritos((p) => p + 1)}
-                          disabled={paginaInscritos === totalPaginasInscritos}
-                          className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-gray-700"
-                        >
-                          Siguiente
-                          <ChevronRightIcon className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                  <Paginacion pagina={paginaInscritos} porPagina={POR_PAGINA} totalElementos={inscritos.length} onCambiar={setPaginaInscritos} etiqueta="inscritos" />
                 </div>
               );
             })()}
@@ -442,7 +416,6 @@ export default function CohorteDetalleView({
 
               {isAdmitidosExpanded && (() => {
                 const admitidos = editedData.admitidosData ?? [];
-                const totalPaginasAdmitidos = Math.ceil(admitidos.length / POR_PAGINA);
                 const admitidosPagina = admitidos.slice((paginaAdmitidos - 1) * POR_PAGINA, paginaAdmitidos * POR_PAGINA);
                 return (
                   <div className="border-t border-gray-200 animate-accordion-open">
@@ -477,32 +450,7 @@ export default function CohorteDetalleView({
                         </tbody>
                       </table>
                     </div>
-                    {totalPaginasAdmitidos > 1 && (
-                      <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-                        <span className="text-xs text-neutral-400">
-                          {(paginaAdmitidos - 1) * POR_PAGINA + 1}–{Math.min(paginaAdmitidos * POR_PAGINA, admitidos.length)} de {admitidos.length} admitidos
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => setPaginaAdmitidos((p) => p - 1)}
-                            disabled={paginaAdmitidos === 1}
-                            className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-gray-700"
-                          >
-                            <ChevronLeftIcon className="w-4 h-4" />
-                            Anterior
-                          </button>
-                          <span className="text-sm font-medium text-gray-600 px-1">{paginaAdmitidos} / {totalPaginasAdmitidos}</span>
-                          <button
-                            onClick={() => setPaginaAdmitidos((p) => p + 1)}
-                            disabled={paginaAdmitidos === totalPaginasAdmitidos}
-                            className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-gray-700"
-                          >
-                            Siguiente
-                            <ChevronRightIcon className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                    <Paginacion pagina={paginaAdmitidos} porPagina={POR_PAGINA} totalElementos={admitidos.length} onCambiar={setPaginaAdmitidos} etiqueta="admitidos" />
                   </div>
                 );
               })()}
@@ -512,49 +460,27 @@ export default function CohorteDetalleView({
       </div>
 
       {/* Modal: Confirmar abrir / cerrar cohorte */}
-      {mostrarConfirmarEstado && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoConfirmarEstado ? 'animate-overlay-out' : 'animate-overlay-in'}`}>
-          <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${cerrandoConfirmarEstado ? 'animate-modal-out' : 'animate-modal-in'}`}>
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {nextEstadoPendiente ? 'Abrir cohorte' : 'Cerrar cohorte'}
-              </h3>
-            </div>
-            <div className="p-6">
-              {nextEstadoPendiente ? (
-                <p className="text-sm text-gray-700">
-                  ¿Estás seguro de <span className="font-semibold text-green-700">abrir</span> la cohorte <span className="font-semibold">"{editedData.nombre}"</span>? Los aspirantes podrán inscribirse una vez esté activa.
-                </p>
-              ) : (
-                <p className="text-sm text-gray-700">
-                  ¿Estás seguro de <span className="font-semibold text-gray-800">cerrar</span> la cohorte <span className="font-semibold">"{editedData.nombre}"</span>? No se aceptarán nuevas inscripciones mientras esté cerrada.
-                </p>
-              )}
-            </div>
-            <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={cerrarConfirmarEstado}
-                disabled={isTogglingEstado}
-                className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleConfirmarEstado}
-                disabled={isTogglingEstado}
-                className={`flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
-                  nextEstadoPendiente
-                    ? 'bg-green-700 text-white hover:bg-green-800'
-                    : 'bg-neutral-700 text-white hover:bg-neutral-800'
-                }`}
-              >
-                {isTogglingEstado ? <SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-white" /> : null}
-                {nextEstadoPendiente ? 'Sí, abrir cohorte' : 'Sí, cerrar cohorte'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DialogoConfirmacion
+        abierto={mostrarConfirmarEstado}
+        cerrando={cerrandoConfirmarEstado}
+        titulo={nextEstadoPendiente ? 'Abrir cohorte' : 'Cerrar cohorte'}
+        onCancelar={cerrarConfirmarEstado}
+        onConfirmar={handleConfirmarEstado}
+        textoConfirmar={nextEstadoPendiente ? 'Sí, abrir cohorte' : 'Sí, cerrar cohorte'}
+        textoProcesando={nextEstadoPendiente ? 'Abriendo...' : 'Cerrando...'}
+        procesando={isTogglingEstado}
+        colorConfirmar={nextEstadoPendiente ? 'verde' : 'neutro'}
+      >
+        {nextEstadoPendiente ? (
+          <p className="text-sm text-gray-700">
+            ¿Estás seguro de <span className="font-semibold text-green-700">abrir</span> la cohorte <span className="font-semibold">"{editedData.nombre}"</span>? Los aspirantes podrán inscribirse una vez esté activa.
+          </p>
+        ) : (
+          <p className="text-sm text-gray-700">
+            ¿Estás seguro de <span className="font-semibold text-gray-800">cerrar</span> la cohorte <span className="font-semibold">"{editedData.nombre}"</span>? No se aceptarán nuevas inscripciones mientras esté cerrada.
+          </p>
+        )}
+      </DialogoConfirmacion>
     </div>
   );
 }

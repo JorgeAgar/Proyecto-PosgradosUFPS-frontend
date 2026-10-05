@@ -1,4 +1,4 @@
-import { aspiranteApiClient, aspiranteApiUploadFile } from './aspiranteService';
+import { aspiranteApiClient } from './aspiranteService';
 import type { ResumenPagoResponse, WompiCheckoutResponse } from './aspirantePagosService';
 
 export interface MatriculaReciboResponse {
@@ -35,7 +35,7 @@ export async function fetchMatriculaCheckout(aspiranteId: string, montoElegido: 
 export async function uploadMatriculaFactura(aspiranteId: string, file: File): Promise<void> {
   const formData = new FormData();
   formData.append('file', file);
-  return aspiranteApiUploadFile<void>(
+  return aspiranteApiClient.upload<void>(
     `/api/application/case/aspirantes/${aspiranteId}/pagos/matricula/factura`,
     formData
   );
@@ -44,10 +44,9 @@ export async function uploadMatriculaFactura(aspiranteId: string, file: File): P
 export async function patchMatriculaFactura(aspiranteId: string, file: File): Promise<void> {
   const formData = new FormData();
   formData.append('file', file);
-  return aspiranteApiUploadFile<void>(
+  return aspiranteApiClient.upload<void>(
     `/api/application/case/aspirantes/${aspiranteId}/pagos/matricula/factura`,
     formData,
-    false,
     'PATCH'
   );
 }

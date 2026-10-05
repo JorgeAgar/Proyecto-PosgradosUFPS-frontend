@@ -112,70 +112,78 @@ function normalizeSemestreEstado(value: unknown) {
   return raw;
 }
 
-function getSemestreNombre(value: unknown) {
-  if (typeof value === 'string') return value;
-  if (isObject(value)) {
-    const semestre = value as Record<string, unknown>;
-    return String(semestre.nombreSemestre ?? semestre.nombre ?? semestre.descripcion ?? '');
-  }
+function getNombre(value: unknown, claveNombre: string) {
+  if (typeof value === 'string' || typeof value === 'number') return String(value);
+  if (isObject(value)) return String(value[claveNombre] ?? value.nombre ?? value.descripcion ?? '');
   return '';
 }
 
-function getModalidadNombre(value: unknown) {
-  if (typeof value === 'string') return value;
-  if (isObject(value)) {
-    const modalidad = value as Record<string, unknown>;
-    return String(modalidad.nombreModalidad ?? modalidad.nombre ?? modalidad.descripcion ?? '');
-  }
-  return '';
+function getIdAnidado(value: unknown): string | number | undefined {
+  return isObject(value) && value.id !== undefined ? (value.id as string | number) : undefined;
 }
 
 function isObject(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null;
 }
 
+function optionalNumber(value: unknown) {
+  return value !== undefined ? Number(value) : undefined;
+}
+
+function optionalString(value: unknown) {
+  return value !== undefined ? String(value) : undefined;
+}
+
+/**
+ * Convierte una cohorte del backend al formato del frontend. El backend no es
+ * uniforme (a veces envía el semestre/modalidad como objeto y otras solo el
+ * nombre), así que se aceptan todas las variantes conocidas.
+ */
+export function normalizeCohorte(cohorte: Record<string, unknown>): CohorteItem {
+  const nombreSemestre = String(cohorte.nombreSemestre ?? getNombre(cohorte.semestre, 'nombreSemestre'));
+  const nombreModalidad = String(cohorte.nombreModalidad ?? getNombre(cohorte.modalidad, 'nombreModalidad'));
+  return {
+    id: String(cohorte.id ?? cohorte._id ?? cohorte.cohorteId ?? ''),
+    nombre: String(cohorte.nombre ?? ''),
+    activa: Boolean(cohorte.activa),
+    idSemestre: (cohorte.idSemestre as string | number | undefined) ?? getIdAnidado(cohorte.semestre),
+    nombreSemestre,
+    semestre: nombreSemestre,
+    idModalidad: (cohorte.idModalidad as string | number | undefined) ?? getIdAnidado(cohorte.modalidad),
+    nombreModalidad,
+    modalidad: nombreModalidad,
+    cupos: Number(cohorte.cupos ?? 0),
+    fechaLimiteDocs: String(cohorte.fechaLimiteDocs ?? cohorte.fechaLimiteDocumentos ?? ''),
+    fechaLimiteInscripcion: String(cohorte.fechaLimiteInscripcion ?? cohorte.fechaLimitePago ?? ''),
+    totalInscritos: Number(cohorte.totalInscritos ?? cohorte.inscritos ?? 0),
+    totalValidados: Number(cohorte.totalValidados ?? 0),
+    totalCalificados: Number(cohorte.totalCalificados ?? 0),
+    totalAdmitidos: Number(cohorte.totalAdmitidos ?? cohorte.admitidos ?? 0),
+    inscritos: optionalNumber(cohorte.inscritos),
+    admitidos: optionalNumber(cohorte.admitidos),
+    fechaInicioDocumentacion: optionalString(cohorte.fechaInicioDocumentacion),
+    fechaFinDocumentacion: optionalString(cohorte.fechaFinDocumentacion),
+    fechaInicioInscripcion: optionalString(cohorte.fechaInicioInscripcion),
+    fechaFinInscripcion: optionalString(cohorte.fechaFinInscripcion),
+    fechaInicioPago: optionalString(cohorte.fechaInicioPago),
+    fechaFinPago: optionalString(cohorte.fechaFinPago),
+    documentos: Array.isArray(cohorte.documentos)
+      ? cohorte.documentos.map((doc) => {
+          const documento = doc as Record<string, unknown>;
+          return {
+            nombre: String(documento.nombre ?? ''),
+            obligatorio: Boolean(documento.obligatorio),
+          };
+        })
+      : undefined,
+  };
+}
+
 export async function fetchCohortes(): Promise<CohorteItem[]> {
   const programaId = await getProgramaRealId();
   const path = `/api/application/case/director-programa/programa/${programaId}/cohortes`;
   const data = await programaApiClient.fetch<unknown[]>(path, { method: 'GET' });
-  const normalized = data.map((item) => {
-    const cohorte = item as Record<string, unknown>;
-    return {
-      id: String(cohorte.id ?? ''),
-      nombre: String(cohorte.nombre ?? ''),
-      activa: Boolean(cohorte.activa),
-      idSemestre: cohorte.idSemestre !== undefined ? (cohorte.idSemestre as string | number) : undefined,
-      nombreSemestre: String(cohorte.nombreSemestre ?? getSemestreNombre(cohorte.semestre) ?? ''),
-      semestre: String(cohorte.nombreSemestre ?? getSemestreNombre(cohorte.semestre) ?? cohorte.semestre ?? ''),
-      idModalidad: cohorte.idModalidad !== undefined ? (cohorte.idModalidad as string | number) : undefined,
-      nombreModalidad: String(cohorte.nombreModalidad ?? getModalidadNombre(cohorte.modalidad) ?? ''),
-      modalidad: String(cohorte.nombreModalidad ?? getModalidadNombre(cohorte.modalidad) ?? cohorte.modalidad ?? ''),
-      cupos: Number(cohorte.cupos ?? 0),
-      fechaLimiteDocs: String(cohorte.fechaLimiteDocs ?? cohorte.fechaLimiteDocumentos ?? ''),
-      fechaLimiteInscripcion: String(cohorte.fechaLimiteInscripcion ?? cohorte.fechaLimitePago ?? ''),
-      totalInscritos: Number(cohorte.totalInscritos ?? cohorte.inscritos ?? 0),
-      totalValidados: Number(cohorte.totalValidados ?? 0),
-      totalCalificados: Number(cohorte.totalCalificados ?? 0),
-      totalAdmitidos: Number(cohorte.totalAdmitidos ?? cohorte.admitidos ?? 0),
-      inscritos: cohorte.inscritos !== undefined ? Number(cohorte.inscritos) : undefined,
-      admitidos: cohorte.admitidos !== undefined ? Number(cohorte.admitidos) : undefined,
-      fechaInicioDocumentacion: cohorte.fechaInicioDocumentacion !== undefined ? String(cohorte.fechaInicioDocumentacion) : undefined,
-      fechaFinDocumentacion: cohorte.fechaFinDocumentacion !== undefined ? String(cohorte.fechaFinDocumentacion) : undefined,
-      fechaInicioInscripcion: cohorte.fechaInicioInscripcion !== undefined ? String(cohorte.fechaInicioInscripcion) : undefined,
-      fechaFinInscripcion: cohorte.fechaFinInscripcion !== undefined ? String(cohorte.fechaFinInscripcion) : undefined,
-      fechaInicioPago: cohorte.fechaInicioPago !== undefined ? String(cohorte.fechaInicioPago) : undefined,
-      fechaFinPago: cohorte.fechaFinPago !== undefined ? String(cohorte.fechaFinPago) : undefined,
-      documentos: Array.isArray(cohorte.documentos)
-        ? cohorte.documentos.map((doc) => {
-            const documento = doc as Record<string, unknown>;
-            return {
-              nombre: String(documento.nombre ?? ''),
-              obligatorio: Boolean(documento.obligatorio),
-            };
-          })
-        : undefined,
-    } as CohorteItem;
-  });
+  const normalized = data.map((item) => normalizeCohorte(item as Record<string, unknown>));
   normalized.sort((a, b) => {
     if (a.activa !== b.activa) return a.activa ? -1 : 1;
     const aDate = a.fechaInicioDocumentacion ? new Date(a.fechaInicioDocumentacion).getTime() : Number.MAX_SAFE_INTEGER;
@@ -229,10 +237,3 @@ export async function fetchModalidadesDisponibles(): Promise<ModalidadItem[]> {
     } as ModalidadItem;
   });
 }
-
-export default {
-  fetchCohortes,
-  createCohorte,
-  fetchSemestresDisponibles,
-  fetchModalidadesDisponibles,
-};

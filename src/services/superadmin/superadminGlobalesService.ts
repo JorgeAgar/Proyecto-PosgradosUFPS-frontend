@@ -1,4 +1,5 @@
 import { superadminApiClient } from './superadminService';
+import { soloDecimal } from '../../utils/numeros';
 
 export interface ValorGlobalOutput {
 	id: number;
@@ -74,33 +75,13 @@ function extraerBaseClaveBackend(clave: string): string {
 	return match ? match[1] : normalized;
 }
 
-function normalizarValorNumerico(valor: string): string {
-	const trimmed = valor.trim().replace(',', '.');
-	let resultado = '';
-	let yaTienePuntoDecimal = false;
-
-	for (const caracter of trimmed) {
-		if (/\d/.test(caracter)) {
-			resultado += caracter;
-			continue;
-		}
-
-		if (caracter === '.' && !yaTienePuntoDecimal) {
-			resultado += caracter;
-			yaTienePuntoDecimal = true;
-		}
-	}
-
-	return resultado;
-}
-
 function limpiarValorParaMostrar(valor: string, slot: ValorGlobalSlot | null): string {
 	const trimmed = valor.trim();
 	if (!trimmed) return '';
 
 	const suffix = slot ? VALORES_GLOBALES_CONFIG[slot].valorSuffix : '';
 	const withoutSuffix = suffix ? trimmed.replace(new RegExp(`\\s*${suffix}\\s*$`, 'i'), '') : trimmed;
-	return normalizarValorNumerico(withoutSuffix);
+	return soloDecimal(withoutSuffix);
 }
 
 function resolverSlotDesdeClave(clave: string): ValorGlobalSlot | null {
@@ -194,7 +175,7 @@ export const superadminGlobalesService = {
 				method: 'POST',
 				body: JSON.stringify({
 					clave: VALORES_GLOBALES_CONFIG[slot].displayClave,
-					valor: normalizarValorNumerico(data.valor),
+					valor: soloDecimal(data.valor),
 				}),
 			}),
 			data,

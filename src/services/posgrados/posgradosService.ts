@@ -7,9 +7,9 @@
 import { createApiClient } from "../apiService";
 import { createAuthService } from "../authService";
 
-export const ACCESS_TOKEN_KEY  = "ufps_posgrados_access_token";
-export const REFRESH_TOKEN_KEY = "ufps_posgrados_refresh_token";
-export const SESSION_KEY       = "ufps_posgrados_session";
+const ACCESS_TOKEN_KEY  = "ufps_posgrados_access_token";
+const REFRESH_TOKEN_KEY = "ufps_posgrados_refresh_token";
+const SESSION_KEY       = "ufps_posgrados_session";
 
 export const posgradosAuthService = createAuthService({
   accessTokenKey: ACCESS_TOKEN_KEY,

@@ -2,17 +2,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useOutletContext } from 'react-router';
 import {
 	ExclamationTriangleIcon,
-	MagnifyingGlassIcon,
 	PencilSquareIcon,
 	TagIcon,
 } from '@heroicons/react/24/outline';
-import { Modal } from './components/Modal';
+import { Modal } from '../../components/Modal';
 import type { SuperadminOutletContext } from '../../layouts/SuperadminLayout';
 import {
 	superadminGlobalesService,
 	type ValorGlobalOutput,
 } from '../../services/superadmin/superadminGlobalesService';
 import { SpinnerIcon } from "../../assets/icons";
+import { CampoBusqueda, CatalogoVacio, EncabezadoCatalogo } from '../../components/Catalogo';
+import { soloDecimal } from '../../utils/numeros';
 
 type ValorGlobalForm = {
 	id: number;
@@ -35,26 +36,6 @@ function formatValuePreview(value: string) {
 	if (!trimmed) return 'Sin valor';
 	if (trimmed.length <= 160) return trimmed;
 	return `${trimmed.slice(0, 157)}...`;
-}
-
-function sanitizeDecimalValue(value: string) {
-	const trimmed = value.trim().replace(',', '.');
-	let resultado = '';
-	let yaTienePuntoDecimal = false;
-
-	for (const caracter of trimmed) {
-		if (/\d/.test(caracter)) {
-			resultado += caracter;
-			continue;
-		}
-
-		if (caracter === '.' && !yaTienePuntoDecimal) {
-			resultado += caracter;
-			yaTienePuntoDecimal = true;
-		}
-	}
-
-	return resultado;
 }
 
 function getUnidadValorGlobal(clave: string) {
@@ -143,7 +124,7 @@ export default function SuperadminValoresGlobales() {
 		setSubmitting(true);
 		try {
 			const clave = formData.clave.trim();
-			const valor = sanitizeDecimalValue(formData.valor);
+			const valor = soloDecimal(formData.valor);
 
 			if (!valor) {
 				setFormError('El valor debe contener solo números decimales.');
@@ -186,37 +167,13 @@ export default function SuperadminValoresGlobales() {
 			) : (
 			<>
 
-			<div className="animate-fade-in-up delay-100 mb-5">
-				<div className="relative">
-					<span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
-						<MagnifyingGlassIcon className="h-5 w-5" />
-					</span>
-					<input
-						type="text"
-						placeholder="Buscar por clave, valor o ID..."
-						value={searchTerm}
-						onChange={(e) => setSearchTerm(e.target.value)}
-						className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
-					/>
-				</div>
-			</div>
+			<CampoBusqueda valor={searchTerm} onCambiar={setSearchTerm} placeholder="Buscar por clave, valor o ID..." />
 
 			<div className="animate-fade-in-up delay-200 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-				<div className="flex flex-col gap-2 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-					<div>
-						<h2 className="text-base font-semibold text-gray-900">Catálogo de configuración</h2>
-						<p className="text-sm text-gray-500">{valoresFiltrados.length} registro{valoresFiltrados.length === 1 ? '' : 's'} visible{valoresFiltrados.length === 1 ? '' : 's'}</p>
-					</div>
-				</div>
+				<EncabezadoCatalogo titulo="Catálogo de configuración" visibles={valoresFiltrados.length} />
 
 				{valoresFiltrados.length === 0 ? (
-					<div className="px-6 py-16 text-center">
-						<div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-gray-400">
-							<TagIcon className="h-7 w-7" />
-						</div>
-						<h3 className="text-lg font-semibold text-gray-900">No hay valores que coincidan</h3>
-						<p className="mt-1 text-sm text-gray-500">Prueba con otra clave, valor o ID.</p>
-					</div>
+					<CatalogoVacio Icono={TagIcon} titulo="No hay valores que coincidan" descripcion="Prueba con otra clave, valor o ID." />
 				) : (
 					<div className="divide-y divide-gray-100">
 						{valoresFiltrados.map((item) => (
@@ -304,7 +261,7 @@ export default function SuperadminValoresGlobales() {
 								inputMode="decimal"
 								pattern="[0-9]*[.,]?[0-9]*"
 								value={formData.valor}
-								onChange={(e) => setFormData((current) => ({ ...current, valor: sanitizeDecimalValue(e.target.value) }))}
+								onChange={(e) => setFormData((current) => ({ ...current, valor: soloDecimal(e.target.value) }))}
 								disabled={submitting}
 								className="block min-w-0 flex-1 border-0 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
 								placeholder="Ej. 2000.50"

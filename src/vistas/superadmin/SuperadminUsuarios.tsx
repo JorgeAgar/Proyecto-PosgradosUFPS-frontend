@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router';
-import { Modal } from './components/Modal';
+import { Modal } from '../../components/Modal';
 import type { SuperadminOutletContext } from '../../layouts/SuperadminLayout';
 import {
   superadminUsuariosService,
@@ -17,7 +17,7 @@ import {
   listarSexosBiologicosRegistro,
   type RegistroSelectOption,
 } from '../../services/registroService';
-import { SelectSA } from './components/SelectSA';
+import { Select } from '../../components/Select';
 import { EyeIcon, EyeSlashIcon, PencilIcon, RefreshIcon, SearchIcon, SpinnerIcon, TrashIcon, UserPlusIcon } from "../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
@@ -756,7 +756,7 @@ export default function SuperadminUsuarios() {
                   { field: 'idDiscapacidad', label: 'Discapacidad', options: catalogosPersona.discapacidades },
                   { field: 'idCapacidadexepcional', label: 'Capacidad excepcional', options: catalogosPersona.capacidadesExcepcionales },
                 ].map(({ field, label, options }) => (
-                  <SelectSA
+                  <Select tema="oscuro"
                     key={field}
                     id={field}
                     label={<>{label} <span className="text-gray-400 font-normal">(opcional)</span></>}
@@ -773,7 +773,7 @@ export default function SuperadminUsuarios() {
           </div>
 
           {/* Rol */}
-          <SelectSA
+          <Select tema="oscuro"
             id="idRol"
             label="Rol"
             value={String(formData.idRol)}
@@ -783,7 +783,7 @@ export default function SuperadminUsuarios() {
           />
 
           {esDirectorPrograma && (
-            <SelectSA
+            <Select tema="oscuro"
               id="idPrograma"
               label="Programa a dirigir"
               value={formData.idPrograma === '' ? PROGRAMA_NINGUNO_VALUE : String(formData.idPrograma)}
