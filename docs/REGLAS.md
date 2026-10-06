@@ -30,14 +30,14 @@ Cada rol tiene su propia subcarpeta en `src/services/`:
 
 ## Git
 
-**Repositorio:** [https://github.com/JorgeAgar/Proyecto-Postgrados-UFPS-frontend](https://github.com/JorgeAgar/Proyecto-Postgrados-UFPS-frontend)
+**Repositorio:** [https://github.com/JorgeAgar/Proyecto-PosgradosUFPS-frontend](https://github.com/JorgeAgar/Proyecto-PosgradosUFPS-frontend)
 
 ### Flujo de trabajo
 
-1. Tener la `dev` actualizada (`git pull`)
-2. Crear una rama desde `dev` para lo que se va a trabajar
+1. Tener la `main` actualizada (`git pull`)
+2. Crear una rama desde `main` para lo que se va a trabajar
 3. Trabajar sobre esa rama
-4. Hacer Pull Request a `dev` (base: `dev` — compare: rama de trabajo)
+4. Hacer Pull Request a `main` (base: `main` — compare: rama de trabajo)
 5. Si todo está bien, mergear la PR y borrar la rama
 
 ### Reglas de git
@@ -45,10 +45,10 @@ Cada rol tiene su propia subcarpeta en `src/services/`:
 - Las ramas son para **una sola cosa**; si se va a hacer algo diferente, se crea otra rama
 - Solo realizar cambios a lo que se está haciendo en la rama (modificar los mínimos archivos posibles)
 - Solo se puede hacer push a las ramas de trabajo
-- **No se puede hacer push directo a `dev` ni a `main` bajo ninguna circunstancia**
-- `main` solo se actualiza con PRs desde `dev`
+- **No se puede hacer push directo a `main` ni a `prod` bajo ninguna circunstancia**
+- `prod` solo se actualiza con PRs desde `main`
 - Tratar de no hacer push en cada commit, porque cada push dispara un build de preview en el deploy
-- Si no se han podido mergear cambios a `dev` y se va a trabajar en otra cosa, se puede crear la nueva rama desde la rama en la que se está trabajando
+- Si no se han podido mergear cambios a `main` y se va a trabajar en otra cosa, se puede crear la nueva rama desde la rama en la que se está trabajando
 - Pueden coexistir varias ramas de trabajo al tiempo
 - Idealmente las PRs las evalúa otro miembro del equipo, pero se entiende que por tiempo esto no siempre es posible
 - No hacer `--force-push`

@@ -70,10 +70,6 @@ export async function fetchProgramaInicioData(): Promise<ProgramaInicioData[]> {
   return normalizeProgramaInicioResponse(response);
 }
 
-export default {
-  fetchProgramaInicioData,
-};
-
 /*
   Requisitos de backend para que esta vista funcione:
 

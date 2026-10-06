@@ -1,4 +1,4 @@
-import { aspiranteApiClient, aspiranteApiUploadFile } from './aspiranteService';
+import { aspiranteApiClient } from './aspiranteService';
 import type { ResumenPagoResponse, WompiCheckoutResponse } from './aspirantePagosService';
 
 export async function fetchInscripcionResumen(aspiranteId: string): Promise<ResumenPagoResponse> {
@@ -17,7 +17,7 @@ export async function fetchInscripcionCheckout(aspiranteId: string): Promise<Wom
 export async function uploadInscripcionFactura(aspiranteId: string, file: File): Promise<void> {
   const formData = new FormData();
   formData.append('file', file);
-  return aspiranteApiUploadFile<void>(
+  return aspiranteApiClient.upload<void>(
     `/api/application/case/aspirantes/${aspiranteId}/pagos/inscripcion/factura`,
     formData
   );
@@ -26,10 +26,9 @@ export async function uploadInscripcionFactura(aspiranteId: string, file: File):
 export async function patchInscripcionFactura(aspiranteId: string, file: File): Promise<void> {
   const formData = new FormData();
   formData.append('file', file);
-  return aspiranteApiUploadFile<void>(
+  return aspiranteApiClient.upload<void>(
     `/api/application/case/aspirantes/${aspiranteId}/pagos/inscripcion/factura`,
     formData,
-    false,
     'PATCH'
   );
 }

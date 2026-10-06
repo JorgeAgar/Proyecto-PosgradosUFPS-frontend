@@ -3,15 +3,17 @@ import { useOutletContext } from 'react-router';
 import {
 	ExclamationTriangleIcon,
 	HashtagIcon,
-	MagnifyingGlassIcon,
 	PencilSquareIcon,
 } from '@heroicons/react/24/outline';
-import { Modal } from './components/Modal';
+import { Modal } from '../../components/Modal';
 import type { SuperadminOutletContext } from '../../layouts/SuperadminLayout';
 import {
 	superadminUltimosCodigosService,
 	type UltimoCodigoProgramaOutput,
 } from '../../services/superadmin/superadminUltimosCodigosService';
+import { SpinnerIcon } from "../../assets/icons";
+import { CampoBusqueda, CatalogoVacio, EncabezadoCatalogo } from '../../components/Catalogo';
+import { soloDigitos } from '../../utils/numeros';
 
 type UltimoCodigoForm = {
 	idPrograma: number;
@@ -25,21 +27,8 @@ const EMPTY_FORM: UltimoCodigoForm = {
 	codigo: '',
 };
 
-function Spinner({ className = 'h-4 w-4' }: { className?: string }) {
-	return (
-		<svg className={`animate-spin shrink-0 ${className}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-			<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-			<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-		</svg>
-	);
-}
-
 function sortUltimosCodigos(items: UltimoCodigoProgramaOutput[]) {
 	return [...items].sort((a, b) => a.nombrePrograma.localeCompare(b.nombrePrograma, 'es', { sensitivity: 'base' }));
-}
-
-function sanitizeIntegerValue(value: string) {
-	return value.replace(/\D/g, '');
 }
 
 export default function SuperadminUltimosCodigos() {
@@ -151,43 +140,19 @@ export default function SuperadminUltimosCodigos() {
 			{loading ? (
 				<div className="flex items-center justify-center py-20 animate-fade-in">
 					<div className="flex items-center gap-3 text-neutral-400 text-sm">
-						<Spinner className="h-6 w-6 text-slate-700" />
+						<SpinnerIcon className="animate-spin shrink-0 h-6 w-6 text-slate-700" />
 						Cargando últimos códigos...
 					</div>
 				</div>
 			) : (
 				<>
-					<div className="animate-fade-in-up delay-100 mb-5">
-						<div className="relative">
-							<span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
-								<MagnifyingGlassIcon className="h-5 w-5" />
-							</span>
-							<input
-								type="text"
-								placeholder="Buscar por programa, código o ID..."
-								value={searchTerm}
-								onChange={(e) => setSearchTerm(e.target.value)}
-								className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
-							/>
-						</div>
-					</div>
+					<CampoBusqueda valor={searchTerm} onCambiar={setSearchTerm} placeholder="Buscar por programa, código o ID..." />
 
 					<div className="animate-fade-in-up delay-200 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-						<div className="flex flex-col gap-2 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-							<div>
-								<h2 className="text-base font-semibold text-gray-900">Consecutivos por programa</h2>
-								<p className="text-sm text-gray-500">{codigosFiltrados.length} registro{codigosFiltrados.length === 1 ? '' : 's'} visible{codigosFiltrados.length === 1 ? '' : 's'}</p>
-							</div>
-						</div>
+						<EncabezadoCatalogo titulo="Consecutivos por programa" visibles={codigosFiltrados.length} />
 
 						{codigosFiltrados.length === 0 ? (
-							<div className="px-6 py-16 text-center">
-								<div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-gray-400">
-									<HashtagIcon className="h-7 w-7" />
-								</div>
-								<h3 className="text-lg font-semibold text-gray-900">No hay códigos que coincidan</h3>
-								<p className="mt-1 text-sm text-gray-500">Prueba con otro programa, código o ID.</p>
-							</div>
+							<CatalogoVacio Icono={HashtagIcon} titulo="No hay códigos que coincidan" descripcion="Prueba con otro programa, código o ID." />
 						) : (
 							<div className="overflow-x-auto">
 								<table className="min-w-full divide-y divide-gray-200">
@@ -263,7 +228,7 @@ export default function SuperadminUltimosCodigos() {
 							inputMode="numeric"
 							pattern="[0-9]*"
 							value={formData.codigo}
-							onChange={(e) => setFormData((current) => ({ ...current, codigo: sanitizeIntegerValue(e.target.value) }))}
+							onChange={(e) => setFormData((current) => ({ ...current, codigo: soloDigitos(e.target.value) }))}
 							disabled={submitting}
 							className="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
 							placeholder="Ej. 120"
@@ -285,7 +250,7 @@ export default function SuperadminUltimosCodigos() {
 							disabled={submitting}
 							className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
 						>
-							{submitting && <Spinner />}
+							{submitting && <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />}
 							Guardar cambios
 						</button>
 					</div>

@@ -2,41 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { useOutletContext } from "react-router";
 import { fetchEstadoProceso, type PasoProceso } from "../../services/aspirante/aspiranteEstadoService";
 import type { AspiranteOutletContext } from "../../layouts/AspiranteLayout";
+import { ClockIcon, DotIcon, SpinnerIcon, StatusCheckIcon as CheckIcon } from "../../assets/icons";
 
 // ── Íconos (Heroicons) ────────────────────────────────────────────────────────
-
-function CheckIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-5 h-5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-    </svg>
-  );
-}
-
-function ClockIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor" className="w-5 h-5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-    </svg>
-  );
-}
-
-function DotIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-      <circle cx="12" cy="12" r="4" />
-    </svg>
-  );
-}
-
-function Spinner() {
-  return (
-    <svg className="animate-spin h-6 w-6 text-red-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
 
 // ── Helper: mensaje dinámico ─────────────────────────────────────────────────
 
@@ -160,7 +128,7 @@ function Indicador({ estado }: { estado: PasoProceso["estado"] }) {
   if (estado === "en-progreso") {
     return (
       <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-400 flex items-center justify-center shrink-0">
-        <ClockIcon />
+        <ClockIcon className="w-5 h-5" strokeWidth="1.8" />
       </div>
     );
   }
@@ -211,7 +179,7 @@ export default function AspiranteEstado() {
         {cargando ? (
           <div className="flex items-center justify-center py-20 animate-fade-in">
             <div className="flex items-center gap-3 text-neutral-400 text-sm">
-              <Spinner />
+              <SpinnerIcon className="animate-spin h-6 w-6 text-red-700" />
               Cargando estado del proceso...
             </div>
           </div>

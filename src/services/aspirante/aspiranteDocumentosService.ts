@@ -1,6 +1,4 @@
-import { aspiranteApiClient, getAspiranteRealId, ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "./aspiranteService";
-
-const BASE_URL = import.meta.env.VITE_API_URL as string;
+import { aspiranteApiClient, getAspiranteRealId } from "./aspiranteService";
 
 // ── Tipos backend ─────────────────────────────────────────────────────────────
 
@@ -47,34 +45,6 @@ export async function fetchDocumentosSubidos(): Promise<DocumentosSubidosRespons
   );
 }
 
-async function _refreshAccessToken(): Promise<string | null> {
-  const rt = localStorage.getItem(REFRESH_TOKEN_KEY);
-  if (!rt) return null;
-  try {
-    const res = await fetch(`${BASE_URL}/auth/refresh`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken: rt }),
-    });
-    if (!res.ok) return null;
-    const data = (await res.json()) as { accessToken?: string };
-    if (data.accessToken) {
-      localStorage.setItem(ACCESS_TOKEN_KEY, data.accessToken);
-      return data.accessToken;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-function _extractErrorMessage(body: unknown, status: number): string {
-  const obj = body && typeof body === "object" ? (body as Record<string, unknown>) : {};
-  if (typeof obj.message === "string" && obj.message) return obj.message;
-  if (typeof obj.mensaje === "string" && obj.mensaje) return obj.mensaje;
-  return `Error ${status} al subir el documento`;
-}
-
 async function _enviarDocumento(
   method: "POST" | "PATCH",
   idDocumentosrequisitoconsejocohorte: number,
@@ -91,34 +61,13 @@ async function _enviarDocumento(
     params.set("idDocumentosrequisitoprogramacohorte", String(idDocumentosrequisitoprogramacohorte));
   }
 
-  const url = `${BASE_URL}/api/application/case/aspirantes/${idAspirante}/documentos/requeridos?${params.toString()}`;
-
-  const doFetch = async (token: string | null) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    return fetch(url, {
-      method,
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      body: formData,
-    });
-  };
-
-  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
-  let res = await doFetch(token);
-
-  if (res.status === 401 || res.status === 403) {
-    const newToken = await _refreshAccessToken();
-    if (newToken) {
-      res = await doFetch(newToken);
-    }
-  }
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    let body: unknown;
-    try { body = JSON.parse(text); } catch { body = text; }
-    throw new Error(_extractErrorMessage(body, res.status));
-  }
+  const formData = new FormData();
+  formData.append("file", file);
+  await aspiranteApiClient.upload<void>(
+    `/api/application/case/aspirantes/${idAspirante}/documentos/requeridos?${params.toString()}`,
+    formData,
+    method
+  );
 }
 
 export async function subirDocumento(

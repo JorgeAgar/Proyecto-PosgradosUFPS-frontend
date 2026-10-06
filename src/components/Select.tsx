@@ -2,6 +2,7 @@ import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { ChevronDownIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
+import { SpinnerIcon } from "../assets/icons";
 
 export type SelectOption = { value: string; label: string };
 
@@ -13,21 +14,34 @@ function Label({ children, htmlFor }: { children: ReactNode; htmlFor: string }) 
 	);
 }
 
-function Spinner() {
-	return (
-		<svg className="animate-spin h-4 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-			<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-			<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-		</svg>
-	);
-}
-
 type DropdownPos = {
 	top?: number;
 	bottom?: number;
 	left: number;
 	width: number;
 	maxHeight: number;
+};
+
+/** Paletas: "rojo" (aspirante / programa) y "oscuro" (superadmin). */
+const TEMAS = {
+	rojo: {
+		trigger:      "border-gray-200",
+		hover:        "hover:border-gray-300",
+		abierto:      "border-red-300 ring-2 ring-red-200",
+		error:        "border-red-200",
+		panel:        "border-gray-200",
+		seleccionado: "bg-red-100 font-medium text-red-700",
+		zIndex:       9999,
+	},
+	oscuro: {
+		trigger:      "border-gray-300",
+		hover:        "hover:border-gray-400",
+		abierto:      "border-slate-400 ring-2 ring-slate-200",
+		error:        "border-red-300",
+		panel:        "border-gray-300",
+		seleccionado: "bg-slate-100 font-medium text-slate-700",
+		zIndex:       70,
+	},
 };
 
 export function Select({
@@ -40,9 +54,11 @@ export function Select({
 	loading,
 	disabled,
 	fixedLabel,
+	tema = "rojo",
 }: {
 	id: string;
-	label: string;
+	/** Etiqueta sobre el campo; se omite si está vacía. */
+	label?: ReactNode;
 	value: string;
 	onChange: (value: string) => void;
 	options: SelectOption[];
@@ -50,7 +66,9 @@ export function Select({
 	loading?: boolean;
 	disabled?: boolean;
 	fixedLabel?: string;
+	tema?: keyof typeof TEMAS;
 }) {
+	const t = TEMAS[tema];
 	const [open, setOpen] = useState(false);
 	const [closing, setClosing] = useState(false);
 	const [search, setSearch] = useState("");
@@ -153,13 +171,13 @@ export function Select({
 
 	const triggerClass = [
 		"mt-1 flex w-full items-center justify-between gap-2 rounded-lg border bg-white px-3 py-2.5 text-sm text-left transition outline-none",
-		isDisabled ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:border-gray-300",
-		error ? "border-red-200" : open ? "border-red-300 ring-2 ring-red-200" : "border-gray-200",
+		isDisabled ? "cursor-not-allowed opacity-50" : `cursor-pointer ${t.hover}`,
+		error ? t.error : open ? t.abierto : t.trigger,
 	].join(" ");
 
 	return (
 		<div ref={containerRef}>
-			<Label htmlFor={id}>{label}</Label>
+			{label && <Label htmlFor={id}>{label}</Label>}
 			<button
 				ref={triggerRef}
 				id={id}
@@ -173,7 +191,7 @@ export function Select({
 			>
 				{loading ? (
 					<span className="flex items-center gap-2 text-neutral-400">
-						<Spinner />
+						<SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />
 						Cargando opciones...
 					</span>
 				) : fixedLabel && isDisabled ? (
@@ -197,17 +215,17 @@ export function Select({
 						left: dropdownPos.left,
 						width: dropdownPos.width,
 						maxHeight: dropdownPos.maxHeight,
-						zIndex: 9999,
+						zIndex: t.zIndex,
 						overflow: "auto",
 					}}
-					className={`rounded-lg border border-gray-200 bg-white shadow-lg ${closing ? (dropdownPos?.bottom !== undefined ? "animate-dropdown-out-up" : "animate-dropdown-out") : (dropdownPos?.bottom !== undefined ? "animate-dropdown-in-up" : "animate-dropdown-in")}`}
+					className={`rounded-lg border bg-white shadow-lg ${t.panel} ${closing ? (dropdownPos?.bottom !== undefined ? "animate-dropdown-out-up" : "animate-dropdown-out") : (dropdownPos?.bottom !== undefined ? "animate-dropdown-in-up" : "animate-dropdown-in")}`}
 				>
 					{!search.trim() && (
 						<li
 							role="option"
 							aria-selected={value === ""}
 							onMouseDown={(e) => { e.preventDefault(); handleSelect(""); }}
-							className={`cursor-pointer px-3 py-2 text-sm transition-colors ${value === "" ? "bg-red-100 font-medium text-red-700" : "text-neutral-400 hover:bg-gray-50"}`}
+							className={`cursor-pointer px-3 py-2 text-sm transition-colors ${value === "" ? t.seleccionado : "text-neutral-400 hover:bg-gray-50"}`}
 						>
 							Selecciona una opción
 						</li>
@@ -218,7 +236,7 @@ export function Select({
 							role="option"
 							aria-selected={value === option.value}
 							onMouseDown={(e) => { e.preventDefault(); handleSelect(option.value); }}
-							className={`cursor-pointer px-3 py-2 text-sm transition-colors ${value === option.value ? "bg-red-100 font-medium text-red-700" : "text-gray-900 hover:bg-gray-50"}`}
+							className={`cursor-pointer px-3 py-2 text-sm transition-colors ${value === option.value ? t.seleccionado : "text-gray-900 hover:bg-gray-50"}`}
 						>
 							{option.label}
 						</li>

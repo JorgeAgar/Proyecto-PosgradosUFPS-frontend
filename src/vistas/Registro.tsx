@@ -16,50 +16,12 @@ import { Select } from "../components/Select.tsx";
 import { DatePicker } from "../components/DatePicker.tsx";
 import { useNavigate } from "react-router";
 import ufpsLogo from "../assets/logoufps.png";
-import { listarCapacidadesExcepcionalesRegistro, listarCohortesRegistro, listarDepartamentosPorPaisRegistro, listarDepartamentosExpedicionRegistro, listarDiscapacidadesRegistro, listarDocumentosRegistro, listarEstadosCivilesRegistro, listarGruposEtnicosRegistro, listarMunicipiosPorDepartamentoRegistro, listarPaisesRegistro, listarPueblosIndigenasRegistro, listarProgramasInscripcionRegistro, listarSiNoRegistro, listarSexosBiologicosRegistro, listarVinculacionesProgramaRegistro, listarZonasResidenciaRegistro, registrarAspiranteCompleto, type RegistroSelectOption, type RegistroSelectOptions } from "../services/registroService.ts";
+import { listarCapacidadesExcepcionalesRegistro, listarCohortesRegistro, listarDepartamentosPorPaisRegistro, listarDepartamentosExpedicionRegistro, listarDiscapacidadesRegistro, listarDocumentosRegistro, listarEstadosCivilesRegistro, listarGruposEtnicosRegistro, listarMunicipiosPorDepartamentoRegistro, listarPaisesRegistro, listarPueblosIndigenasRegistro, listarProgramasInscripcionRegistro, listarSiNoRegistro, listarSexosBiologicosRegistro, listarVinculacionesProgramaRegistro, listarZonasResidenciaRegistro, registrarAspiranteCompleto, type RegistroFormularioData, type RegistroSelectOption, type RegistroSelectOptions } from "../services/registroService.ts";
+import { SpinnerIcon } from "../assets/icons";
 
 type TabId = "personales" | "residencia" | "especial" | "laboral" | "academica" | "usuario";
 
-type FormState = {
-	nombres: string;
-	apellidos: string;
-	tipoDocumento: string;
-	numeroDocumento: string;
-	estadoCivil: string;
-	sexoBiologico: string;
-	fechaNacimiento: string;
-	paisNacimiento: string;
-	departamentoNacimiento: string;
-	municipioNacimiento: string;
-	fechaExpedicion: string;
-	departamentoExpedicion: string;
-	municipioExpedicion: string;
-	zonaResidencia: string;
-	paisResidencia: string;
-	departamentoResidencia: string;
-	municipioResidencia: string;
-	direccionResidencia: string;
-	correoPersonal: string;
-	telefonoContacto: string;
-	grupoEtnico: string;
-	puebloIndigena: string;
-	tipoDiscapacidad: string;
-	capacidadExcepcional: string;
-	empresaTrabajo: string;
-	paisTrabajo: string;
-	departamentoTrabajo: string;
-	municipioTrabajo: string;
-	direccionTrabajo: string;
-	experienciaLaboral: string;
-	programaInscripcion: string;
-	cohorteInscripcion: string;
-	vinculacionPrograma: string;
-	tituloPregrado: string;
-	promedioPregrado: string;
-	titulosPostgrado: string;
-	egresadoUFPS: string;
-	usuarioRegistro: string;
-	contrasenaRegistro: string;
+type FormState = RegistroFormularioData & {
 	confirmarContrasena: string;
 };
 
@@ -254,15 +216,6 @@ function fieldClass(error?: string) {
 		"mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition",
 		error ? "border-red-200 focus:border-red-300 focus:ring-2 focus:ring-red-200" : "border-gray-200 focus:border-red-300 focus:ring-2 focus:ring-red-200",
 	].join(" ");
-}
-
-function Spinner() {
-	return (
-		<svg className="animate-spin h-4 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-			<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-			<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-		</svg>
-	);
 }
 
 function Label({ children, htmlFor }: { children: ReactNode; htmlFor: string }) {
@@ -539,104 +492,64 @@ export default function Registro() {
 		};
 	}, []);
 
-	useEffect(() => {
+	/**
+	 * Carga los departamentos del país elegido en uno de los selects de ubicación.
+	 * Devuelve la función de limpieza del efecto para descartar respuestas viejas.
+	 */
+	function cargarDepartamentosPorPais(
+		pais: string,
+		departamentoActual: string,
+		catalogo: "departamentoNacimiento" | "departamentoTrabajo" | "departamentoResidencia",
+		loadingKey: SelectCatalogKey,
+		descripcionConsola: string,
+		mensajeError: string,
+	) {
 		let cancelled = false;
 
-		async function loadDepartamentosNacimiento() {
-			if (!form.paisNacimiento || form.departamentoNacimiento === SENTINEL_EXTRANJERO) {
-				updateSelectCatalog("departamentoNacimiento", []);
-				setCatalogLoading("departamentosNacimiento", false);
+		async function cargar() {
+			if (!pais || departamentoActual === SENTINEL_EXTRANJERO) {
+				updateSelectCatalog(catalogo, []);
+				setCatalogLoading(loadingKey, false);
 				return;
 			}
 
-			setCatalogLoading("departamentosNacimiento", true);
+			setCatalogLoading(loadingKey, true);
 			try {
-				const options = await listarDepartamentosPorPaisRegistro(form.paisNacimiento);
+				const options = await listarDepartamentosPorPaisRegistro(pais);
 				if (cancelled) return;
-				updateSelectCatalog("departamentoNacimiento", options);
+				updateSelectCatalog(catalogo, options);
 			} catch (error) {
-				console.error("No se pudieron cargar los departamentos del país seleccionado:", error);
+				console.error(`No se pudieron cargar los departamentos del país ${descripcionConsola}:`, error);
 				if (!cancelled) {
-					updateSelectCatalog("departamentoNacimiento", []);
-					setSelectOptionsError("No se pudieron cargar los departamentos del país de nacimiento.");
+					updateSelectCatalog(catalogo, []);
+					setSelectOptionsError(mensajeError);
 				}
 			} finally {
-				if (!cancelled) setCatalogLoading("departamentosNacimiento", false);
+				if (!cancelled) setCatalogLoading(loadingKey, false);
 			}
 		}
 
-		void loadDepartamentosNacimiento();
+		void cargar();
 
 		return () => {
 			cancelled = true;
 		};
-	}, [form.paisNacimiento]);
+	}
 
-	useEffect(() => {
-		let cancelled = false;
+	useEffect(() => cargarDepartamentosPorPais(
+		form.paisNacimiento, form.departamentoNacimiento, "departamentoNacimiento", "departamentosNacimiento",
+		"seleccionado", "No se pudieron cargar los departamentos del país de nacimiento.",
+	), [form.paisNacimiento]);
 
-		async function loadDepartamentosTrabajo() {
-			if (!form.paisTrabajo || form.departamentoTrabajo === SENTINEL_EXTRANJERO) {
-				updateSelectCatalog("departamentoTrabajo", []);
-				setCatalogLoading("departamentosTrabajo", false);
-				return;
-			}
+	useEffect(() => cargarDepartamentosPorPais(
+		form.paisTrabajo, form.departamentoTrabajo, "departamentoTrabajo", "departamentosTrabajo",
+		"de trabajo seleccionado", "No se pudieron cargar los departamentos del país donde trabaja.",
+	), [form.paisTrabajo]);
 
-			setCatalogLoading("departamentosTrabajo", true);
-			try {
-				const options = await listarDepartamentosPorPaisRegistro(form.paisTrabajo);
-				if (cancelled) return;
-				updateSelectCatalog("departamentoTrabajo", options);
-			} catch (error) {
-				console.error("No se pudieron cargar los departamentos del país de trabajo seleccionado:", error);
-				if (!cancelled) {
-					updateSelectCatalog("departamentoTrabajo", []);
-					setSelectOptionsError("No se pudieron cargar los departamentos del país donde trabaja.");
-				}
-			} finally {
-				if (!cancelled) setCatalogLoading("departamentosTrabajo", false);
-			}
-		}
-
-		void loadDepartamentosTrabajo();
-
-		return () => {
-			cancelled = true;
-		};
-	}, [form.paisTrabajo]);
-
-	useEffect(() => {
-		let cancelled = false;
-
-		async function loadDepartamentosResidencia() {
-			if (!form.paisResidencia || form.departamentoResidencia === SENTINEL_EXTRANJERO) {
-				updateSelectCatalog("departamentoResidencia", []);
-				setCatalogLoading("departamentosResidencia", false);
-				return;
-			}
-
-			setCatalogLoading("departamentosResidencia", true);
-			try {
-				const options = await listarDepartamentosPorPaisRegistro(form.paisResidencia);
-				if (cancelled) return;
-				updateSelectCatalog("departamentoResidencia", options);
-			} catch (error) {
-				console.error("No se pudieron cargar los departamentos del país de residencia seleccionado:", error);
-				if (!cancelled) {
-					updateSelectCatalog("departamentoResidencia", []);
-					setSelectOptionsError("No se pudieron cargar los departamentos del país de residencia.");
-				}
-			} finally {
-				if (!cancelled) setCatalogLoading("departamentosResidencia", false);
-			}
-		}
-
-		void loadDepartamentosResidencia();
-
-		return () => {
-			cancelled = true;
-		};
-	}, [form.paisResidencia]);
+	useEffect(() => cargarDepartamentosPorPais(
+		form.paisResidencia, form.departamentoResidencia, "departamentoResidencia", "departamentosResidencia",
+		"de residencia seleccionado", "No se pudieron cargar los departamentos del país de residencia.",
+	), [form.paisResidencia]);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -1203,7 +1116,7 @@ export default function Registro() {
 											disabled={submitting}
 											className="inline-flex items-center justify-center gap-2 rounded-lg bg-red-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-800 disabled:opacity-70 disabled:cursor-not-allowed"
 										>
-											{submitting ? <><Spinner />Enviando inscripción...</> : <><CheckCircleIcon className="h-4 w-4" />Enviar inscripción</>}
+											{submitting ? <><SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />Enviando inscripción...</> : <><CheckCircleIcon className="h-4 w-4" />Enviar inscripción</>}
 										</button>
 									)}
 								</div>

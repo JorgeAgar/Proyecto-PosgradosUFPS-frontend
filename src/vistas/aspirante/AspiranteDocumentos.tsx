@@ -9,65 +9,11 @@ import {
   type DocumentoSubido,
 } from "../../services/aspirante/aspiranteDocumentosService";
 import type { AspiranteOutletContext } from "../../layouts/AspiranteLayout";
+import { ArrowDownTrayIcon, ArrowTopRightOnSquareIcon, CheckCircleIcon, DocumentTextIcon, InformationCircleIcon, SpinnerIcon } from "../../assets/icons";
+import SeccionBloqueada from "./components/SeccionBloqueada";
+import { DialogoConfirmacion } from "../../components/Dialogo";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
-
-function Spinner({ className }: { className?: string }) {
-  return (
-    <svg className={`animate-spin shrink-0 ${className ?? 'h-6 w-6 text-red-700'}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
-
-function DocumentIcon({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={className ?? "w-5 h-5"}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-    </svg>
-  );
-}
-
-function ArrowDownTrayIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-3.5 h-3.5 shrink-0">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-    </svg>
-  );
-}
-
-function ArrowTopRightOnSquareIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-3.5 h-3.5 shrink-0">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-    </svg>
-  );
-}
-
-function CheckCircleIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4 shrink-0 text-green-600">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-    </svg>
-  );
-}
-
-function InformationCircleIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5 shrink-0 text-gray-400">
-      <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
-    </svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-8 h-8 text-neutral-400">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-    </svg>
-  );
-}
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
@@ -333,22 +279,7 @@ export default function AspiranteDocumentos() {
   // ── UI ────────────────────────────────────────────────────────────────────
 
   if (soloInscrito === true) {
-    return (
-      <div className="p-6 bg-gray-100 min-h-full flex items-center justify-center">
-        <div className="bg-white border border-gray-200 rounded-lg p-8 max-w-sm w-full text-center">
-          <div className="flex justify-center mb-4">
-            <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center">
-              <LockIcon />
-            </div>
-          </div>
-          <h2 className="text-base font-semibold text-gray-900 mb-2">Sección no disponible</h2>
-          <p className="text-sm text-neutral-400 leading-relaxed">
-            Esta sección estará disponible una vez hayas completado el pago de inscripción{" "}
-            <span className="font-medium text-gray-600">(Paz y salvo)</span>.
-          </p>
-        </div>
-      </div>
-    );
+    return <SeccionBloqueada />;
   }
 
   return (
@@ -365,7 +296,7 @@ export default function AspiranteDocumentos() {
         {cargando && (
           <div className="flex items-center justify-center py-20 animate-fade-in">
             <div className="flex items-center gap-3 text-neutral-400 text-sm">
-              <Spinner />
+              <SpinnerIcon className="animate-spin shrink-0 h-6 w-6 text-red-700" />
               Cargando documentos...
             </div>
           </div>
@@ -427,7 +358,7 @@ export default function AspiranteDocumentos() {
                           rechazado ? "bg-red-50" : "bg-neutral-100"
                         }`}
                       >
-                        <DocumentIcon
+                        <DocumentTextIcon
                           className={`w-5 h-5 ${rechazado ? "text-red-600" : "text-gray-600"}`}
                         />
                       </div>
@@ -516,7 +447,7 @@ export default function AspiranteDocumentos() {
 
                               {localFile && !fileErrors[idx] && (
                                 <span className="flex items-center gap-1.5 text-xs text-green-700 min-w-0">
-                                  <CheckCircleIcon />
+                                  <CheckCircleIcon className="w-4 h-4 shrink-0 text-green-600" />
                                   <span className="truncate max-w-[200px]">{localFile.name}</span>
                                 </span>
                               )}
@@ -534,12 +465,12 @@ export default function AspiranteDocumentos() {
                                 >
                                   {/* reserva el ancho del estado más amplio */}
                                   <span className="flex items-center gap-1.5 invisible select-none pointer-events-none" aria-hidden="true">
-                                    <Spinner className="h-4 w-4" />
+                                    <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />
                                     Enviando...
                                   </span>
                                   <span className="absolute inset-0 flex items-center justify-center gap-1.5">
                                     {enviandoIdx[idx] ? (
-                                      <><Spinner className="h-4 w-4 text-neutral-400" /> Enviando...</>
+                                      <><SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-neutral-400" /> Enviando...</>
                                     ) : (
                                       "Enviar"
                                     )}
@@ -578,7 +509,7 @@ export default function AspiranteDocumentos() {
                 >
                   {enviando ? (
                     <>
-                      <Spinner className="h-4 w-4 text-neutral-400" />
+                      <SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-neutral-400" />
                       Enviando documentos...
                     </>
                   ) : (
@@ -592,45 +523,18 @@ export default function AspiranteDocumentos() {
       </div>
 
       {/* ── Modal: Confirmar envío ──────────────────────────────────────────── */}
-      {mostrarConfirmar && (
-        <div
-          className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${
-            cerrandoConfirmar ? "animate-overlay-out" : "animate-overlay-in"
-          }`}
-          onClick={cerrarConfirmar}
-        >
-          <div
-            className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-sm w-full mx-4 ${
-              cerrandoConfirmar ? "animate-modal-out" : "animate-modal-in"
-            }`}
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-base font-semibold text-gray-900">Enviar documentos</h3>
-            </div>
-            <div className="p-6">
-              <p className="text-sm text-gray-700">
-                ¿Estás seguro de que deseas enviar los archivos seleccionados para revisión?
-                Asegúrate de que todos los documentos estén correctos antes de continuar.
-              </p>
-            </div>
-            <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={cerrarConfirmar}
-                className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleEnviarConfirmado}
-                className="px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium"
-              >
-                Sí, enviar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DialogoConfirmacion
+        abierto={mostrarConfirmar}
+        cerrando={cerrandoConfirmar}
+        tamano="sm"
+        titulo="Enviar documentos"
+        onClickFondo={cerrarConfirmar}
+        onCancelar={cerrarConfirmar}
+        onConfirmar={handleEnviarConfirmado}
+        textoConfirmar="Sí, enviar"
+      >
+        ¿Estás seguro de que deseas enviar los archivos seleccionados para revisión? Asegúrate de que todos los documentos estén correctos antes de continuar.
+      </DialogoConfirmacion>
     </div>
   );
 }

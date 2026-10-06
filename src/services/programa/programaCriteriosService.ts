@@ -152,11 +152,3 @@ export async function updateCriterio(
   - La suma total de pesos debe ser exactamente 100 al guardar.
   - Si no cumple, responder 409 o 422 con mensaje claro.
 */
-
-export default {
-  updateCriterio,
-  fetchCriteriosPrograma,
-  createCriterioPrograma,
-  updateCriterioPrograma,
-  deleteCriterioPrograma,
-};

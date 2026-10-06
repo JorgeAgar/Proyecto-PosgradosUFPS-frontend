@@ -21,66 +21,11 @@ import type { DatosAspiranteResponse } from "../../../services/programa/programa
 import type { ProgramaOutletContext } from "../../../layouts/ProgramaLayout";
 import { DatePicker } from "../../../components/DatePicker";
 import { TimePicker } from "../../../components/TimePicker";
-import { CalendarIcon, ClockIcon, MapPinIcon } from "../../../assets/icons";
+import { DialogoConfirmacion } from "../../../components/Dialogo";
+import SeccionAgenda from "./SeccionAgenda";
+import { ArrowLeftIcon, BroomIcon, RefreshIcon, SpinnerIcon } from "../../../assets/icons";
 
 // ── Íconos (Heroicons) ────────────────────────────────────────────────────────
-
-function ArrowLeftIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4.5 w-4.5 shrink-0">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-    </svg>
-  );
-}
-
-function PlusIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4 shrink-0">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-    </svg>
-  );
-}
-
-function RefreshIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4 shrink-0">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-    </svg>
-  );
-}
-
-function Spinner() {
-  return (
-    <svg className="animate-spin h-4 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
-
-function BroomIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4 shrink-0">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21 3 9 15" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 15c0 0-3 1-4 3-1 1.5-.5 3.5 1.5 3.5s4-1 4-3.5V15Z" />
-    </svg>
-  );
-}
-
-function ChevronDownIcon({ open }: { open: boolean }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth="2"
-      stroke="currentColor"
-      className={`h-4 w-4 shrink-0 text-neutral-400 transition-transform duration-300 ease-in-out ${open ? "rotate-180" : "rotate-0"}`}
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-    </svg>
-  );
-}
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
@@ -135,57 +80,6 @@ function modalidadToId(modalidad: "virtual" | "presencial"): number {
   return modalidad === "presencial" ? 1 : 2;
 }
 
-// ── Helper: badge de estado entrevista ────────────────────────────────────────
-
-function EntrevistaBadge({ estado }: { estado: string }) {
-  const map: Record<string, string> = {
-    confirmada:            "bg-blue-100 text-blue-700 border border-blue-200",
-    "solicitud de cambio": "bg-amber-100 text-amber-600 border border-amber-200",
-    pendiente:             "bg-yellow-100 text-yellow-600 border border-yellow-200",
-    cancelada:             "bg-red-100 text-red-700 border border-red-200",
-    completada:            "bg-green-100 text-green-700 border border-green-200",
-  };
-  const labels: Record<string, string> = {
-    confirmada:            "Confirmada",
-    "solicitud de cambio": "Solicitud de cambio",
-    pendiente:             "Pendiente de confirmación",
-    cancelada:             "Cancelada",
-    completada:            "Completada",
-  };
-  return (
-    <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-lg ${map[estado] ?? "bg-gray-100 text-gray-700"}`}>
-      {labels[estado] ?? estado}
-    </span>
-  );
-}
-
-function ModalidadBadge({ modalidad }: { modalidad: string }) {
-  return (
-    <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-lg ${
-      modalidad === "virtual" ? "bg-blue-100 text-blue-700" : "bg-neutral-200 text-neutral-700"
-    }`}>
-      {modalidad === "virtual" ? "Virtual" : "Presencial"}
-    </span>
-  );
-}
-
-// ── Helpers de formato ────────────────────────────────────────────────────────
-
-const MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-
-function formatFecha(iso: string): string {
-  if (!iso) return "";
-  const [year, month, day] = iso.split("-");
-  return `${parseInt(day)} de ${MESES[parseInt(month) - 1]} de ${year}`;
-}
-
-function formatHora(time: string): string {
-  if (!time) return "";
-  const [h, m] = time.split(":").map(Number);
-  const ampm = h >= 12 ? "PM" : "AM";
-  const hour = h % 12 || 12;
-  return `${hour}:${String(m).padStart(2, "0")} ${ampm}`;
-}
 
 // ── Componente principal ──────────────────────────────────────────────────────
 
@@ -265,8 +159,7 @@ export default function CalificacionAspirante() {
   const [cerrandoFormularioPrueba, setCerrandoFormularioPrueba] = useState(false);
   const [cerrandoDialogoCancelarPrueba, setCerrandoDialogoCancelarPrueba] = useState(false);
 
-  const [historialAbierto, setHistorialAbierto] = useState(false);
-  const [historialPruebasAbierto, setHistorialPruebasAbierto] = useState(false);
+
 
   const [mostrarConfirmarCompletar, setMostrarConfirmarCompletar] = useState(false);
   const [entrevistaCompletarId, setEntrevistaCompletarId] = useState<string | null>(null);
@@ -720,27 +613,6 @@ export default function CalificacionAspirante() {
     }
   };
 
-  // ── Grupos de entrevistas ─────────────────────────────────────────────────
-
-  const confirmadas = entrevistas.filter(e => e.estado === "confirmada");
-  const activas     = [
-    ...entrevistas.filter(e => e.estado === "solicitud de cambio"),
-    ...entrevistas.filter(e => e.estado === "pendiente"),
-  ];
-  const historial   = [
-    ...entrevistas.filter(e => e.estado === "completada"),
-    ...entrevistas.filter(e => e.estado === "cancelada"),
-  ];
-
-  const confirmadasPruebas = pruebas.filter(p => p.estado === "confirmada");
-  const activasPruebas     = [
-    ...pruebas.filter(p => p.estado === "solicitud de cambio"),
-    ...pruebas.filter(p => p.estado === "pendiente"),
-  ];
-  const historialPruebas   = [
-    ...pruebas.filter(p => p.estado === "completada"),
-    ...pruebas.filter(p => p.estado === "cancelada"),
-  ];
 
   // ── UI ────────────────────────────────────────────────────────────────────
 
@@ -758,7 +630,7 @@ export default function CalificacionAspirante() {
           )}
           className="flex items-center gap-2 text-red-700 hover:text-red-800 mb-6 transition-colors animate-fade-in group"
         >
-          <ArrowLeftIcon />
+          <ArrowLeftIcon className="h-4.5 w-4.5 shrink-0" />
           <div className="flex flex-col items-start">
             <span className="font-medium text-sm leading-tight">Volver</span>
             {nombreCohorte && (
@@ -780,7 +652,7 @@ export default function CalificacionAspirante() {
           </h2>
           {cargandoDatos ? (
             <div className="flex items-center gap-2 py-4 text-sm text-neutral-400">
-              <Spinner />
+              <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />
               Cargando información...
             </div>
           ) : datosAspirante ? (
@@ -846,380 +718,50 @@ export default function CalificacionAspirante() {
         </div>
 
         {/* Sección entrevistas */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6 animate-fade-in-up delay-300">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-              Entrevistas
-            </h2>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={cargarEntrevistas}
-                disabled={cargandoEntrevistas}
-                title="Recargar entrevistas"
-                className="p-2 text-neutral-400 hover:text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {cargandoEntrevistas ? <Spinner /> : <RefreshIcon />}
-              </button>
-              <button
-                onClick={() => {
-                  setEntrevistaEditando(null);
-                  setNuevaEntrevista({ fecha: "", hora: "", modalidad: "virtual", lugar: "" });
-                  setErroresAgendar({});
-                  setMostrarFormulario(true);
-                }}
-                className="flex items-center gap-2 px-4 py-2 bg-red-700 text-white text-sm rounded-lg hover:bg-red-800 transition-colors font-medium"
-              >
-                <PlusIcon />
-                Agendar entrevista
-              </button>
-            </div>
-          </div>
-
-          {/* Confirmadas */}
-          {confirmadas.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-xs font-semibold text-gray-600 mb-3">Entrevistas confirmadas</h3>
-              <div className="space-y-3">
-                {confirmadas.map(e => (
-                  <div key={e.id} className="border border-blue-200 bg-blue-50/30 rounded-lg p-4">
-                    <div className="flex flex-wrap items-center gap-2 mb-3">
-                      <EntrevistaBadge estado={e.estado} />
-                      <ModalidadBadge modalidad={e.modalidad} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <CalendarIcon /><span>{formatFecha(e.fecha)}</span>
-                        <ClockIcon /><span>{formatHora(e.hora)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <MapPinIcon />
-                        <span>{e.modalidad === "virtual" ? "Enlace: " : "Lugar: "}{e.lugar}</span>
-                      </div>
-                    </div>
-                    <div className="mt-3 pt-3 border-t border-blue-200 flex gap-2">
-                      <button
-                        onClick={() => handleCompletarReunion(e.id)}
-                        className="flex-1 px-3 py-1.5 bg-red-700 text-white text-xs rounded-lg hover:bg-red-800 transition-colors font-medium"
-                      >
-                        Completar reunión
-                      </button>
-                      <button
-                        onClick={() => { setEntrevistaCancelarId(e.id); setMostrarDialogoCancelar(true); }}
-                        className="flex-1 px-3 py-1.5 bg-white text-gray-700 border border-gray-200 text-xs rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors font-medium"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Pendientes / solicitud de cambio */}
-          {activas.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-xs font-semibold text-gray-600 mb-3">Otras entrevistas</h3>
-              <div className="space-y-3">
-                {activas.map(e => (
-                  <div key={e.id} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex flex-wrap items-center gap-2 mb-3">
-                      <EntrevistaBadge estado={e.estado} />
-                      <ModalidadBadge modalidad={e.modalidad} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <CalendarIcon /><span>{formatFecha(e.fecha)}</span>
-                        <ClockIcon /><span>{formatHora(e.hora)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <MapPinIcon />
-                        <span>{e.modalidad === "virtual" ? "Enlace: " : "Lugar: "}{e.lugar}</span>
-                      </div>
-                      {e.estado === "solicitud de cambio" && e.motivo && (
-                        <>
-                          <div className="mt-3 pt-3 border-t border-gray-200">
-                            <div className="text-xs font-semibold text-neutral-400 mb-1">Motivo de solicitud:</div>
-                            <div className="text-sm text-gray-700 italic">"{e.motivo}"</div>
-                          </div>
-                          <div className="mt-2">
-                            <button
-                              onClick={() => handleReagendar(e)}
-                              className="px-3 py-1.5 bg-red-700 text-white text-xs rounded-lg hover:bg-red-800 transition-colors font-medium"
-                            >
-                              Reagendar entrevista
-                            </button>
-                          </div>
-                        </>
-                      )}
-                      {e.estado === "pendiente" && (
-                        <div className="mt-3 pt-3 border-t border-gray-200">
-                          <button
-                            onClick={() => handleEditarEntrevista(e)}
-                            className="px-3 py-1.5 bg-red-700 text-white text-xs rounded-lg hover:bg-red-800 transition-colors font-medium"
-                          >
-                            Editar entrevista
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Historial */}
-          {historial.length > 0 && (
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
-              <button
-                onClick={() => setHistorialAbierto(v => !v)}
-                className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors group focus:outline-none"
-              >
-                <span className="text-xs font-semibold text-gray-600 group-hover:text-gray-900 transition-colors">
-                  Historial
-                  <span className="ml-2 text-neutral-400 font-normal">({historial.length})</span>
-                </span>
-                <ChevronDownIcon open={historialAbierto} />
-              </button>
-              <div
-                className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                  historialAbierto ? "max-h-1000 opacity-100" : "max-h-0 opacity-0"
-                }`}
-              >
-                <div className="p-4 space-y-3">
-                  {historial.map(e => (
-                    <div key={e.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                      <div className="flex flex-wrap items-center gap-2 mb-3">
-                        <EntrevistaBadge estado={e.estado} />
-                        <ModalidadBadge modalidad={e.modalidad} />
-                      </div>
-                      <div className="space-y-1.5">
-                        <div className="flex items-center gap-2 text-sm text-gray-700">
-                          <CalendarIcon /><span>{formatFecha(e.fecha)}</span>
-                          <ClockIcon /><span>{formatHora(e.hora)}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-700">
-                          <MapPinIcon />
-                          <span>{e.modalidad === "virtual" ? "Enlace: " : "Lugar: "}{e.lugar}</span>
-                        </div>
-                        {e.estado === "cancelada" && e.motivo && (
-                          <div className="mt-3 pt-3 border-t border-gray-200">
-                            <div className="text-xs font-semibold text-neutral-400 mb-1">Motivo de cancelación:</div>
-                            <div className="text-sm text-gray-700 italic">"{e.motivo}"</div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {cargandoEntrevistas ? (
-            <div className="flex items-center justify-center gap-2 py-8 text-sm text-neutral-400">
-              <Spinner />
-              Cargando entrevistas...
-            </div>
-          ) : entrevistas.length === 0 && (
-            <p className="text-center py-8 text-sm text-neutral-400">No hay entrevistas agendadas.</p>
-          )}
-        </div>
+        <SeccionAgenda
+          titulo="Entrevistas"
+          singular="entrevista"
+          items={entrevistas}
+          cargando={cargandoEntrevistas}
+          onRecargar={cargarEntrevistas}
+          textoNuevo="Agendar entrevista"
+          onNuevo={() => {
+            setEntrevistaEditando(null);
+            setNuevaEntrevista({ fecha: "", hora: "", modalidad: "virtual", lugar: "" });
+            setErroresAgendar({});
+            setMostrarFormulario(true);
+          }}
+          textoCompletar="Completar reunión"
+          onCompletar={handleCompletarReunion}
+          onCancelar={(id) => { setEntrevistaCancelarId(id); setMostrarDialogoCancelar(true); }}
+          onReagendar={handleReagendar}
+          onEditar={handleEditarEntrevista}
+          mensajeVacio="No hay entrevistas agendadas."
+          className="delay-300"
+        />
 
         {/* Sección pruebas */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6 animate-fade-in-up delay-300">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-              Pruebas
-            </h2>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={cargarPruebas}
-                disabled={cargandoPruebas}
-                title="Recargar pruebas"
-                className="p-2 text-neutral-400 hover:text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {cargandoPruebas ? <Spinner /> : <RefreshIcon />}
-              </button>
-              <button
-                onClick={() => {
-                  setPruebaEditando(null);
-                  setNuevaPrueba({ nombre: "", descripcion: "", fecha: "", hora: "", modalidad: "virtual", lugar: "" });
-                  setErroresPrueba({});
-                  setMostrarFormularioPrueba(true);
-                }}
-                className="flex items-center gap-2 px-4 py-2 bg-red-700 text-white text-sm rounded-lg hover:bg-red-800 transition-colors font-medium"
-              >
-                <PlusIcon />
-                Crear prueba
-              </button>
-            </div>
-          </div>
-
-          {/* Confirmadas */}
-          {confirmadasPruebas.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-xs font-semibold text-gray-600 mb-3">Pruebas confirmadas</h3>
-              <div className="space-y-3">
-                {confirmadasPruebas.map(p => (
-                  <div key={p.id} className="border border-blue-200 bg-blue-50/30 rounded-lg p-4">
-                    <div className="mb-3">
-                      <div className="text-sm font-semibold text-gray-900">{p.nombre}</div>
-                      {p.descripcion && <div className="text-xs text-gray-500 mt-0.5">{p.descripcion}</div>}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 mb-3">
-                      <EntrevistaBadge estado={p.estado} />
-                      <ModalidadBadge modalidad={p.modalidad} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <CalendarIcon /><span>{formatFecha(p.fecha)}</span>
-                        <ClockIcon /><span>{formatHora(p.hora)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <MapPinIcon />
-                        <span>{p.modalidad === "virtual" ? "Enlace: " : "Lugar: "}{p.lugar}</span>
-                      </div>
-                    </div>
-                    <div className="mt-3 pt-3 border-t border-blue-200 flex gap-2">
-                      <button
-                        onClick={() => handleCompletarPrueba(p.id)}
-                        className="flex-1 px-3 py-1.5 bg-red-700 text-white text-xs rounded-lg hover:bg-red-800 transition-colors font-medium"
-                      >
-                        Completar prueba
-                      </button>
-                      <button
-                        onClick={() => { setPruebaCancelarId(p.id); setMostrarDialogoCancelarPrueba(true); }}
-                        className="flex-1 px-3 py-1.5 bg-white text-gray-700 border border-gray-200 text-xs rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors font-medium"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Pendientes / solicitud de cambio */}
-          {activasPruebas.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-xs font-semibold text-gray-600 mb-3">Otras pruebas</h3>
-              <div className="space-y-3">
-                {activasPruebas.map(p => (
-                  <div key={p.id} className="border border-gray-200 rounded-lg p-4">
-                    <div className="mb-3">
-                      <div className="text-sm font-semibold text-gray-900">{p.nombre}</div>
-                      {p.descripcion && <div className="text-xs text-gray-500 mt-0.5">{p.descripcion}</div>}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 mb-3">
-                      <EntrevistaBadge estado={p.estado} />
-                      <ModalidadBadge modalidad={p.modalidad} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <CalendarIcon /><span>{formatFecha(p.fecha)}</span>
-                        <ClockIcon /><span>{formatHora(p.hora)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <MapPinIcon />
-                        <span>{p.modalidad === "virtual" ? "Enlace: " : "Lugar: "}{p.lugar}</span>
-                      </div>
-                      {p.estado === "solicitud de cambio" && p.motivo && (
-                        <>
-                          <div className="mt-3 pt-3 border-t border-gray-200">
-                            <div className="text-xs font-semibold text-neutral-400 mb-1">Motivo de solicitud:</div>
-                            <div className="text-sm text-gray-700 italic">"{p.motivo}"</div>
-                          </div>
-                          <div className="mt-2">
-                            <button
-                              onClick={() => handleReagendarPrueba(p)}
-                              className="px-3 py-1.5 bg-red-700 text-white text-xs rounded-lg hover:bg-red-800 transition-colors font-medium"
-                            >
-                              Reagendar prueba
-                            </button>
-                          </div>
-                        </>
-                      )}
-                      {p.estado === "pendiente" && (
-                        <div className="mt-3 pt-3 border-t border-gray-200">
-                          <button
-                            onClick={() => handleEditarPrueba(p)}
-                            className="px-3 py-1.5 bg-red-700 text-white text-xs rounded-lg hover:bg-red-800 transition-colors font-medium"
-                          >
-                            Editar prueba
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Historial */}
-          {historialPruebas.length > 0 && (
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
-              <button
-                onClick={() => setHistorialPruebasAbierto(v => !v)}
-                className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors group focus:outline-none"
-              >
-                <span className="text-xs font-semibold text-gray-600 group-hover:text-gray-900 transition-colors">
-                  Historial
-                  <span className="ml-2 text-neutral-400 font-normal">({historialPruebas.length})</span>
-                </span>
-                <ChevronDownIcon open={historialPruebasAbierto} />
-              </button>
-              <div
-                className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                  historialPruebasAbierto ? "max-h-1000 opacity-100" : "max-h-0 opacity-0"
-                }`}
-              >
-                <div className="p-4 space-y-3">
-                  {historialPruebas.map(p => (
-                    <div key={p.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                      <div className="mb-3">
-                        <div className="text-sm font-semibold text-gray-900">{p.nombre}</div>
-                        {p.descripcion && <div className="text-xs text-gray-500 mt-0.5">{p.descripcion}</div>}
-                      </div>
-                      <div className="flex flex-wrap items-center gap-2 mb-3">
-                        <EntrevistaBadge estado={p.estado} />
-                        <ModalidadBadge modalidad={p.modalidad} />
-                      </div>
-                      <div className="space-y-1.5">
-                        <div className="flex items-center gap-2 text-sm text-gray-700">
-                          <CalendarIcon /><span>{formatFecha(p.fecha)}</span>
-                          <ClockIcon /><span>{formatHora(p.hora)}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-700">
-                          <MapPinIcon />
-                          <span>{p.modalidad === "virtual" ? "Enlace: " : "Lugar: "}{p.lugar}</span>
-                        </div>
-                        {p.estado === "cancelada" && p.motivo && (
-                          <div className="mt-3 pt-3 border-t border-gray-200">
-                            <div className="text-xs font-semibold text-neutral-400 mb-1">Motivo de cancelación:</div>
-                            <div className="text-sm text-gray-700 italic">"{p.motivo}"</div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {cargandoPruebas ? (
-            <div className="flex items-center justify-center gap-2 py-8 text-sm text-neutral-400">
-              <Spinner />
-              Cargando pruebas...
-            </div>
-          ) : pruebas.length === 0 && (
-            <p className="text-center py-8 text-sm text-neutral-400">No hay pruebas registradas.</p>
-          )}
-        </div>
+        <SeccionAgenda
+          titulo="Pruebas"
+          singular="prueba"
+          items={pruebas}
+          cargando={cargandoPruebas}
+          onRecargar={cargarPruebas}
+          textoNuevo="Crear prueba"
+          onNuevo={() => {
+            setPruebaEditando(null);
+            setNuevaPrueba({ nombre: "", descripcion: "", fecha: "", hora: "", modalidad: "virtual", lugar: "" });
+            setErroresPrueba({});
+            setMostrarFormularioPrueba(true);
+          }}
+          textoCompletar="Completar prueba"
+          onCompletar={handleCompletarPrueba}
+          onCancelar={(id) => { setPruebaCancelarId(id); setMostrarDialogoCancelarPrueba(true); }}
+          onReagendar={handleReagendarPrueba}
+          onEditar={handleEditarPrueba}
+          mensajeVacio="No hay pruebas registradas."
+          className="delay-300"
+        />
 
         {/* Tabla criterios */}
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden animate-fade-in-up delay-400">
@@ -1233,7 +775,7 @@ export default function CalificacionAspirante() {
               title="Recargar criterios"
               className="p-2 text-neutral-400 hover:text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {cargandoCriterios ? <Spinner /> : <RefreshIcon />}
+              {cargandoCriterios ? <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" /> : <RefreshIcon />}
             </button>
           </div>
           <div className="overflow-x-auto">
@@ -1251,7 +793,7 @@ export default function CalificacionAspirante() {
                 <tr>
                   <td colSpan={4} className="px-6 py-8 text-center">
                     <div className="flex items-center justify-center gap-2 text-sm text-neutral-400">
-                      <Spinner />
+                      <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />
                       Cargando criterios...
                     </div>
                   </td>
@@ -1286,7 +828,7 @@ export default function CalificacionAspirante() {
                         disabled={cargandoGuardar || cargandoLimpiar === c.id || c.puntajeGuardado === null}
                         className="inline-flex items-center justify-center gap-1.5 w-24 px-3 py-2 text-neutral-400 enabled:hover:text-red-700 border border-gray-200 rounded-lg enabled:hover:bg-red-50 enabled:hover:border-red-200 transition-colors text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {cargandoLimpiar === c.id ? <Spinner /> : <><BroomIcon />Limpiar</>}
+                        {cargandoLimpiar === c.id ? <SpinnerIcon className="animate-spin h-4 w-4 shrink-0" /> : <><BroomIcon />Limpiar</>}
                       </button>
                     </td>
                   </tr>
@@ -1316,7 +858,7 @@ export default function CalificacionAspirante() {
               disabled={cargandoGuardar || criterios.length === 0 || criterios.every(c => c.puntaje === null)}
               className="flex items-center gap-2 px-6 py-2.5 bg-red-700 text-white text-sm rounded-lg enabled:hover:bg-red-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {cargandoGuardar ? <><Spinner />Guardando...</> : "Guardar calificación"}
+              {cargandoGuardar ? <><SpinnerIcon className="animate-spin h-4 w-4 shrink-0" />Guardando...</> : "Guardar calificación"}
             </button>
           </div>
         </div>
@@ -1324,444 +866,296 @@ export default function CalificacionAspirante() {
       </div>
 
       {/* Modal: Agendar / Reagendar entrevista */}
-      {mostrarFormulario && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoFormulario ? "animate-overlay-out" : "animate-overlay-in"}`}>
-          <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-lg w-full mx-4 ${cerrandoFormulario ? "animate-modal-out" : "animate-modal-in"}`}>
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {entrevistaEditando
-                  ? (modoEdicionEntrevista === "editar" ? "Editar entrevista" : "Reagendar entrevista")
-                  : "Agendar entrevista"}
-              </h3>
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <DatePicker
-                  id="fechaEntrevista"
-                  label="Fecha"
-                  value={nuevaEntrevista.fecha}
-                  onChange={(value) => {
-                    setNuevaEntrevista(p => ({ ...p, fecha: value }));
-                    setErroresAgendar(p => ({ ...p, fecha: undefined }));
-                  }}
-                  error={erroresAgendar.fecha}
-                />
-                <TimePicker
-                  id="horaEntrevista"
-                  label="Hora"
-                  value={nuevaEntrevista.hora}
-                  onChange={(value) => {
-                    setNuevaEntrevista(p => ({ ...p, hora: value }));
-                    setErroresAgendar(p => ({ ...p, hora: undefined }));
-                  }}
-                  error={erroresAgendar.hora}
-                  disabled={cargandoEntrevista}
-                />
-              </div>
-              <div>
-                <label className="text-sm font-semibold text-gray-700 mb-1 block">Modalidad</label>
-                <div className="mt-1 flex gap-4">
-                  {(["virtual", "presencial"] as const).map(m => (
-                    <label key={m} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="modalidad"
-                        value={m}
-                        checked={nuevaEntrevista.modalidad === m}
-                        onChange={() => setNuevaEntrevista(p => ({ ...p, modalidad: m, lugar: "" }))}
-                        disabled={cargandoEntrevista}
-                        className="accent-red-700 disabled:cursor-not-allowed"
-                      />
-                      <span className="text-sm text-gray-700 capitalize">{m}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-semibold text-gray-700 mb-1 block">
-                  {nuevaEntrevista.modalidad === "virtual" ? "Enlace virtual" : "Lugar"}
-                </label>
-                <input
-                  type="text"
-                  value={nuevaEntrevista.lugar}
-                  onChange={e => {
-                    setNuevaEntrevista(p => ({ ...p, lugar: e.target.value }));
-                    setErroresAgendar(p => ({ ...p, lugar: undefined }));
-                  }}
-                  placeholder={nuevaEntrevista.modalidad === "virtual" ? "meet.google.com/xxx" : "Edificio, Sala..."}
-                  disabled={cargandoEntrevista}
-                  className={`mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed ${erroresAgendar.lugar ? "border-red-200 focus:border-red-300 focus:ring-2 focus:ring-red-200" : "border-gray-200 hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200"}`}
-                />
-                {erroresAgendar.lugar && (
-                  <p className="mt-1 inline-flex items-center gap-1 text-xs text-red-700">{erroresAgendar.lugar}</p>
-                )}
-              </div>
-            </div>
-            <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={cerrarModalAgendar}
-                disabled={cargandoEntrevista}
-                className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleAgendar}
-                disabled={cargandoEntrevista}
-                className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {cargandoEntrevista
-                  ? <><Spinner />{entrevistaEditando ? (modoEdicionEntrevista === "editar" ? "Guardando..." : "Reagendando...") : "Agendando..."}</>
-                  : (entrevistaEditando ? (modoEdicionEntrevista === "editar" ? "Guardar cambios" : "Reagendar") : "Agendar")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DialogoConfirmacion
+        abierto={mostrarFormulario}
+        cerrando={cerrandoFormulario}
+        tamano="lg"
+        titulo={entrevistaEditando
+          ? (modoEdicionEntrevista === "editar" ? "Editar entrevista" : "Reagendar entrevista")
+          : "Agendar entrevista"}
+        onCancelar={cerrarModalAgendar}
+        onConfirmar={handleAgendar}
+        textoConfirmar={entrevistaEditando ? (modoEdicionEntrevista === "editar" ? "Guardar cambios" : "Reagendar") : "Agendar"}
+        textoProcesando={entrevistaEditando ? (modoEdicionEntrevista === "editar" ? "Guardando..." : "Reagendando...") : "Agendando..."}
+        procesando={cargandoEntrevista}
+      >
+        <CamposAgenda
+          idPrefijo="Entrevista"
+          valores={nuevaEntrevista}
+          errores={erroresAgendar}
+          deshabilitado={cargandoEntrevista}
+          onCambio={(campo, valor) => {
+            setNuevaEntrevista(p => ({ ...p, [campo]: valor, ...(campo === "modalidad" ? { lugar: "" } : {}) }));
+            setErroresAgendar(p => ({ ...p, [campo]: undefined }));
+          }}
+        />
+      </DialogoConfirmacion>
 
       {/* Modal: Confirmar guardar calificación */}
-      {mostrarConfirmarGuardar && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoConfirmarGuardar ? "animate-overlay-out" : "animate-overlay-in"}`}>
-          <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${cerrandoConfirmarGuardar ? "animate-modal-out" : "animate-modal-in"}`}>
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Confirmar calificación</h3>
-            </div>
-            <div className="p-6">
-              <p className="text-sm text-gray-700">
-                ¿Está seguro de guardar las calificaciones para este aspirante? Esta acción actualizará el puntaje registrado.
-              </p>
-            </div>
-            <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={cerrarConfirmarGuardar}
-                className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleGuardarCalificacion}
-                className="px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium text-center"
-              >
-                Sí, guardar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DialogoConfirmacion
+        abierto={mostrarConfirmarGuardar}
+        cerrando={cerrandoConfirmarGuardar}
+        titulo="Confirmar calificación"
+        onCancelar={cerrarConfirmarGuardar}
+        onConfirmar={handleGuardarCalificacion}
+        textoConfirmar="Sí, guardar"
+      >
+        ¿Está seguro de guardar las calificaciones para este aspirante? Esta acción actualizará el puntaje registrado.
+      </DialogoConfirmacion>
 
       {/* Modal: Cancelar entrevista */}
-      {mostrarDialogoCancelar && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoDialogoCancelar ? "animate-overlay-out" : "animate-overlay-in"}`}>
-          <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-lg w-full mx-4 ${cerrandoDialogoCancelar ? "animate-modal-out" : "animate-modal-in"}`}>
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Cancelar entrevista</h3>
-            </div>
-            <div className="p-6">
-              <label className="text-sm font-semibold text-gray-700 mb-1 block">
-                Motivo de cancelación <span className="text-red-700">*</span>
-              </label>
-              <textarea
-                value={motivoCancelacion}
-                onChange={e => setMotivoCancelacion(e.target.value)}
-                placeholder="Ingrese el motivo por el cual se cancela la entrevista..."
-                rows={4}
-                disabled={cargandoCancelar}
-                className="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition resize-none hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              />
-              {!motivoCancelacion.trim() && (
-                <p className="text-xs text-neutral-400 mt-1">El motivo es obligatorio para cancelar.</p>
-              )}
-            </div>
-            <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={cerrarDialogoCancelar}
-                disabled={cargandoCancelar}
-                className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60"
-              >
-                Volver
-              </button>
-              <button
-                onClick={handleCancelarConfirmada}
-                disabled={!motivoCancelacion.trim() || cargandoCancelar}
-                className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {cargandoCancelar ? <><Spinner />Cancelando...</> : "Cancelar entrevista"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DialogoConfirmacion
+        abierto={mostrarDialogoCancelar}
+        cerrando={cerrandoDialogoCancelar}
+        tamano="lg"
+        titulo="Cancelar entrevista"
+        onCancelar={cerrarDialogoCancelar}
+        onConfirmar={handleCancelarConfirmada}
+        textoCancelar="Volver"
+        textoConfirmar="Cancelar entrevista"
+        textoProcesando="Cancelando..."
+        procesando={cargandoCancelar}
+        confirmarDeshabilitado={!motivoCancelacion.trim()}
+      >
+        <CampoMotivoCancelacion
+          valor={motivoCancelacion}
+          onCambio={setMotivoCancelacion}
+          placeholder="Ingrese el motivo por el cual se cancela la entrevista..."
+          deshabilitado={cargandoCancelar}
+        />
+      </DialogoConfirmacion>
 
       {/* Modal: Crear / Reagendar prueba */}
-      {mostrarFormularioPrueba && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoFormularioPrueba ? "animate-overlay-out" : "animate-overlay-in"}`}>
-          <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-lg w-full mx-4 ${cerrandoFormularioPrueba ? "animate-modal-out" : "animate-modal-in"}`}>
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {pruebaEditando
-                  ? (modoEdicionPrueba === "editar" ? "Editar prueba" : "Reagendar prueba")
-                  : "Crear prueba"}
-              </h3>
-            </div>
-            <div className="p-6 space-y-4">
-              {(!pruebaEditando || modoEdicionPrueba === "editar") && (
-                <>
-                  <div>
-                    <label className="text-sm font-semibold text-gray-700 mb-1 block">Nombre</label>
-                    <input
-                      type="text"
-                      value={nuevaPrueba.nombre}
-                      onChange={e => {
-                        setNuevaPrueba(p => ({ ...p, nombre: e.target.value }));
-                        setErroresPrueba(p => ({ ...p, nombre: undefined }));
-                      }}
-                      placeholder="Nombre de la prueba"
-                      disabled={cargandoPrueba}
-                      className={`mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed ${erroresPrueba.nombre ? "border-red-200 focus:border-red-300 focus:ring-2 focus:ring-red-200" : "border-gray-200 hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200"}`}
-                    />
-                    {erroresPrueba.nombre && (
-                      <p className="mt-1 inline-flex items-center gap-1 text-xs text-red-700">{erroresPrueba.nombre}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="text-sm font-semibold text-gray-700 mb-1 block">Descripción</label>
-                    <textarea
-                      value={nuevaPrueba.descripcion}
-                      onChange={e => {
-                        setNuevaPrueba(p => ({ ...p, descripcion: e.target.value }));
-                        setErroresPrueba(p => ({ ...p, descripcion: undefined }));
-                      }}
-                      placeholder="Descripción de la prueba"
-                      rows={3}
-                      disabled={cargandoPrueba}
-                      className={`mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition resize-none disabled:opacity-50 disabled:cursor-not-allowed ${erroresPrueba.descripcion ? "border-red-200 focus:border-red-300 focus:ring-2 focus:ring-red-200" : "border-gray-200 hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200"}`}
-                    />
-                    {erroresPrueba.descripcion && (
-                      <p className="mt-1 inline-flex items-center gap-1 text-xs text-red-700">{erroresPrueba.descripcion}</p>
-                    )}
-                  </div>
-                </>
-              )}
-              <div className="grid grid-cols-2 gap-4">
-                <DatePicker
-                  id="fechaPrueba"
-                  label="Fecha"
-                  value={nuevaPrueba.fecha}
-                  onChange={(value) => {
-                    setNuevaPrueba(p => ({ ...p, fecha: value }));
-                    setErroresPrueba(p => ({ ...p, fecha: undefined }));
-                  }}
-                  error={erroresPrueba.fecha}
-                />
-                <TimePicker
-                  id="horaPrueba"
-                  label="Hora"
-                  value={nuevaPrueba.hora}
-                  onChange={(value) => {
-                    setNuevaPrueba(p => ({ ...p, hora: value }));
-                    setErroresPrueba(p => ({ ...p, hora: undefined }));
-                  }}
-                  error={erroresPrueba.hora}
-                  disabled={cargandoPrueba}
-                />
-              </div>
+      <DialogoConfirmacion
+        abierto={mostrarFormularioPrueba}
+        cerrando={cerrandoFormularioPrueba}
+        tamano="lg"
+        titulo={pruebaEditando
+          ? (modoEdicionPrueba === "editar" ? "Editar prueba" : "Reagendar prueba")
+          : "Crear prueba"}
+        onCancelar={cerrarModalPrueba}
+        onConfirmar={handleCrearPrueba}
+        textoConfirmar={pruebaEditando ? (modoEdicionPrueba === "editar" ? "Guardar cambios" : "Reagendar") : "Crear"}
+        textoProcesando={pruebaEditando ? (modoEdicionPrueba === "editar" ? "Guardando..." : "Reagendando...") : "Creando..."}
+        procesando={cargandoPrueba}
+      >
+        <div className="space-y-4">
+          {(!pruebaEditando || modoEdicionPrueba === "editar") && (
+            <>
               <div>
-                <label className="text-sm font-semibold text-gray-700 mb-1 block">Modalidad</label>
-                <div className="mt-1 flex gap-4">
-                  {(["virtual", "presencial"] as const).map(m => (
-                    <label key={m} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="modalidadPrueba"
-                        value={m}
-                        checked={nuevaPrueba.modalidad === m}
-                        onChange={() => setNuevaPrueba(p => ({ ...p, modalidad: m, lugar: "" }))}
-                        disabled={cargandoPrueba}
-                        className="accent-red-700 disabled:cursor-not-allowed"
-                      />
-                      <span className="text-sm text-gray-700 capitalize">{m}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-semibold text-gray-700 mb-1 block">
-                  {nuevaPrueba.modalidad === "virtual" ? "Enlace virtual" : "Lugar"}
-                </label>
+                <label className="text-sm font-semibold text-gray-700 mb-1 block">Nombre</label>
                 <input
                   type="text"
-                  value={nuevaPrueba.lugar}
+                  value={nuevaPrueba.nombre}
                   onChange={e => {
-                    setNuevaPrueba(p => ({ ...p, lugar: e.target.value }));
-                    setErroresPrueba(p => ({ ...p, lugar: undefined }));
+                    setNuevaPrueba(p => ({ ...p, nombre: e.target.value }));
+                    setErroresPrueba(p => ({ ...p, nombre: undefined }));
                   }}
-                  placeholder={nuevaPrueba.modalidad === "virtual" ? "meet.google.com/xxx" : "Edificio, Sala..."}
+                  placeholder="Nombre de la prueba"
                   disabled={cargandoPrueba}
-                  className={`mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed ${erroresPrueba.lugar ? "border-red-200 focus:border-red-300 focus:ring-2 focus:ring-red-200" : "border-gray-200 hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200"}`}
+                  className={claseCampo(!!erroresPrueba.nombre)}
                 />
-                {erroresPrueba.lugar && (
-                  <p className="mt-1 inline-flex items-center gap-1 text-xs text-red-700">{erroresPrueba.lugar}</p>
-                )}
+                <ErrorCampo mensaje={erroresPrueba.nombre} />
               </div>
-            </div>
-            <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={cerrarModalPrueba}
-                disabled={cargandoPrueba}
-                className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleCrearPrueba}
-                disabled={cargandoPrueba}
-                className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {cargandoPrueba
-                  ? <><Spinner />{pruebaEditando ? (modoEdicionPrueba === "editar" ? "Guardando..." : "Reagendando...") : "Creando..."}</>
-                  : (pruebaEditando ? (modoEdicionPrueba === "editar" ? "Guardar cambios" : "Reagendar") : "Crear")}
-              </button>
-            </div>
-          </div>
+              <div>
+                <label className="text-sm font-semibold text-gray-700 mb-1 block">Descripción</label>
+                <textarea
+                  value={nuevaPrueba.descripcion}
+                  onChange={e => {
+                    setNuevaPrueba(p => ({ ...p, descripcion: e.target.value }));
+                    setErroresPrueba(p => ({ ...p, descripcion: undefined }));
+                  }}
+                  placeholder="Descripción de la prueba"
+                  rows={3}
+                  disabled={cargandoPrueba}
+                  className={`${claseCampo(!!erroresPrueba.descripcion)} resize-none`}
+                />
+                <ErrorCampo mensaje={erroresPrueba.descripcion} />
+              </div>
+            </>
+          )}
+          <CamposAgenda
+            idPrefijo="Prueba"
+            valores={nuevaPrueba}
+            errores={erroresPrueba}
+            deshabilitado={cargandoPrueba}
+            onCambio={(campo, valor) => {
+              setNuevaPrueba(p => ({ ...p, [campo]: valor, ...(campo === "modalidad" ? { lugar: "" } : {}) }));
+              setErroresPrueba(p => ({ ...p, [campo]: undefined }));
+            }}
+          />
         </div>
-      )}
+      </DialogoConfirmacion>
 
       {/* Modal: Confirmar completar entrevista */}
-      {mostrarConfirmarCompletar && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoConfirmarCompletar ? "animate-overlay-out" : "animate-overlay-in"}`}>
-          <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${cerrandoConfirmarCompletar ? "animate-modal-out" : "animate-modal-in"}`}>
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Completar reunión</h3>
-            </div>
-            <div className="p-6">
-              <p className="text-sm text-gray-700">
-                ¿Está seguro de marcar esta entrevista como completada? Esta acción no se puede deshacer.
-              </p>
-            </div>
-            <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={cerrarConfirmarCompletar}
-                disabled={cargandoCompletar}
-                className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleCompletarReunionConfirmado}
-                disabled={cargandoCompletar}
-                className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {cargandoCompletar ? <><Spinner />Completando...</> : "Sí, completar"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DialogoConfirmacion
+        abierto={mostrarConfirmarCompletar}
+        cerrando={cerrandoConfirmarCompletar}
+        titulo="Completar reunión"
+        onCancelar={cerrarConfirmarCompletar}
+        onConfirmar={handleCompletarReunionConfirmado}
+        textoConfirmar="Sí, completar"
+        textoProcesando="Completando..."
+        procesando={cargandoCompletar}
+      >
+        ¿Está seguro de marcar esta entrevista como completada? Esta acción no se puede deshacer.
+      </DialogoConfirmacion>
 
       {/* Modal: Confirmar completar prueba */}
-      {mostrarConfirmarCompletarPrueba && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoConfirmarCompletarPrueba ? "animate-overlay-out" : "animate-overlay-in"}`}>
-          <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${cerrandoConfirmarCompletarPrueba ? "animate-modal-out" : "animate-modal-in"}`}>
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Completar prueba</h3>
-            </div>
-            <div className="p-6">
-              <p className="text-sm text-gray-700">
-                ¿Está seguro de marcar esta prueba como completada? Esta acción no se puede deshacer.
-              </p>
-            </div>
-            <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={cerrarConfirmarCompletarPrueba}
-                disabled={cargandoCompletarPrueba}
-                className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleCompletarPruebaConfirmado}
-                disabled={cargandoCompletarPrueba}
-                className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {cargandoCompletarPrueba ? <><Spinner />Completando...</> : "Sí, completar"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DialogoConfirmacion
+        abierto={mostrarConfirmarCompletarPrueba}
+        cerrando={cerrandoConfirmarCompletarPrueba}
+        titulo="Completar prueba"
+        onCancelar={cerrarConfirmarCompletarPrueba}
+        onConfirmar={handleCompletarPruebaConfirmado}
+        textoConfirmar="Sí, completar"
+        textoProcesando="Completando..."
+        procesando={cargandoCompletarPrueba}
+      >
+        ¿Está seguro de marcar esta prueba como completada? Esta acción no se puede deshacer.
+      </DialogoConfirmacion>
 
       {/* Modal: Confirmar limpiar criterio */}
-      {mostrarConfirmarLimpiar && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoConfirmarLimpiar ? "animate-overlay-out" : "animate-overlay-in"}`}>
-          <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${cerrandoConfirmarLimpiar ? "animate-modal-out" : "animate-modal-in"}`}>
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Limpiar calificación</h3>
-            </div>
-            <div className="p-6">
-              <p className="text-sm text-gray-700">
-                ¿Está seguro de limpiar la calificación de este criterio? El puntaje obtenido será eliminado.
-              </p>
-            </div>
-            <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={cerrarConfirmarLimpiar}
-                className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleLimpiarCriterioConfirmado}
-                className="px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium text-center"
-              >
-                Sí, limpiar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DialogoConfirmacion
+        abierto={mostrarConfirmarLimpiar}
+        cerrando={cerrandoConfirmarLimpiar}
+        titulo="Limpiar calificación"
+        onCancelar={cerrarConfirmarLimpiar}
+        onConfirmar={handleLimpiarCriterioConfirmado}
+        textoConfirmar="Sí, limpiar"
+      >
+        ¿Está seguro de limpiar la calificación de este criterio? El puntaje obtenido será eliminado.
+      </DialogoConfirmacion>
 
       {/* Modal: Cancelar prueba */}
-      {mostrarDialogoCancelarPrueba && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoDialogoCancelarPrueba ? "animate-overlay-out" : "animate-overlay-in"}`}>
-          <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-lg w-full mx-4 ${cerrandoDialogoCancelarPrueba ? "animate-modal-out" : "animate-modal-in"}`}>
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Cancelar prueba</h3>
-            </div>
-            <div className="p-6">
-              <label className="text-sm font-semibold text-gray-700 mb-1 block">
-                Motivo de cancelación <span className="text-red-700">*</span>
-              </label>
-              <textarea
-                value={motivoCancelacionPrueba}
-                onChange={e => setMotivoCancelacionPrueba(e.target.value)}
-                placeholder="Ingrese el motivo por el cual se cancela la prueba..."
-                rows={4}
-                disabled={cargandoCancelarPrueba}
-                className="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition resize-none hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              />
-              {!motivoCancelacionPrueba.trim() && (
-                <p className="text-xs text-neutral-400 mt-1">El motivo es obligatorio para cancelar.</p>
-              )}
-            </div>
-            <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={cerrarDialogoCancelarPrueba}
-                disabled={cargandoCancelarPrueba}
-                className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60"
-              >
-                Volver
-              </button>
-              <button
-                onClick={handleCancelarPruebaConfirmada}
-                disabled={!motivoCancelacionPrueba.trim() || cargandoCancelarPrueba}
-                className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {cargandoCancelarPrueba ? <><Spinner />Cancelando...</> : "Cancelar prueba"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DialogoConfirmacion
+        abierto={mostrarDialogoCancelarPrueba}
+        cerrando={cerrandoDialogoCancelarPrueba}
+        tamano="lg"
+        titulo="Cancelar prueba"
+        onCancelar={cerrarDialogoCancelarPrueba}
+        onConfirmar={handleCancelarPruebaConfirmada}
+        textoCancelar="Volver"
+        textoConfirmar="Cancelar prueba"
+        textoProcesando="Cancelando..."
+        procesando={cargandoCancelarPrueba}
+        confirmarDeshabilitado={!motivoCancelacionPrueba.trim()}
+      >
+        <CampoMotivoCancelacion
+          valor={motivoCancelacionPrueba}
+          onCambio={setMotivoCancelacionPrueba}
+          placeholder="Ingrese el motivo por el cual se cancela la prueba..."
+          deshabilitado={cargandoCancelarPrueba}
+        />
+      </DialogoConfirmacion>
     </div>
+  );
+}
+
+// ── Campos compartidos de los formularios de entrevista y prueba ─────────────
+
+function claseCampo(conError: boolean) {
+  return `mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed ${conError ? "border-red-200 focus:border-red-300 focus:ring-2 focus:ring-red-200" : "border-gray-200 hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200"}`;
+}
+
+function ErrorCampo({ mensaje }: { mensaje?: string }) {
+  if (!mensaje) return null;
+  return <p className="mt-1 inline-flex items-center gap-1 text-xs text-red-700">{mensaje}</p>;
+}
+
+type CampoAgenda = "fecha" | "hora" | "modalidad" | "lugar";
+
+interface CamposAgendaProps {
+  /** Sufijo para los id/name de los campos ("Entrevista", "Prueba"). */
+  idPrefijo: string;
+  valores: { fecha: string; hora: string; modalidad: "virtual" | "presencial"; lugar: string };
+  errores: Partial<Record<CampoAgenda, string>>;
+  deshabilitado: boolean;
+  onCambio: (campo: CampoAgenda, valor: string) => void;
+}
+
+/** Fecha, hora, modalidad y lugar/enlace de una entrevista o prueba. */
+function CamposAgenda({ idPrefijo, valores, errores, deshabilitado, onCambio }: CamposAgendaProps) {
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <DatePicker
+          id={`fecha${idPrefijo}`}
+          label="Fecha"
+          value={valores.fecha}
+          onChange={(value) => onCambio("fecha", value)}
+          error={errores.fecha}
+        />
+        <TimePicker
+          id={`hora${idPrefijo}`}
+          label="Hora"
+          value={valores.hora}
+          onChange={(value) => onCambio("hora", value)}
+          error={errores.hora}
+          disabled={deshabilitado}
+        />
+      </div>
+      <div>
+        <label className="text-sm font-semibold text-gray-700 mb-1 block">Modalidad</label>
+        <div className="mt-1 flex gap-4">
+          {(["virtual", "presencial"] as const).map(m => (
+            <label key={m} className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name={`modalidad${idPrefijo}`}
+                value={m}
+                checked={valores.modalidad === m}
+                onChange={() => onCambio("modalidad", m)}
+                disabled={deshabilitado}
+                className="accent-red-700 disabled:cursor-not-allowed"
+              />
+              <span className="text-sm text-gray-700 capitalize">{m}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+      <div>
+        <label className="text-sm font-semibold text-gray-700 mb-1 block">
+          {valores.modalidad === "virtual" ? "Enlace virtual" : "Lugar"}
+        </label>
+        <input
+          type="text"
+          value={valores.lugar}
+          onChange={e => onCambio("lugar", e.target.value)}
+          placeholder={valores.modalidad === "virtual" ? "meet.google.com/xxx" : "Edificio, Sala..."}
+          disabled={deshabilitado}
+          className={claseCampo(!!errores.lugar)}
+        />
+        <ErrorCampo mensaje={errores.lugar} />
+      </div>
+    </div>
+  );
+}
+
+interface CampoMotivoCancelacionProps {
+  valor: string;
+  onCambio: (valor: string) => void;
+  placeholder: string;
+  deshabilitado: boolean;
+}
+
+function CampoMotivoCancelacion({ valor, onCambio, placeholder, deshabilitado }: CampoMotivoCancelacionProps) {
+  return (
+    <>
+      <label className="text-sm font-semibold text-gray-700 mb-1 block">
+        Motivo de cancelación <span className="text-red-700">*</span>
+      </label>
+      <textarea
+        value={valor}
+        onChange={e => onCambio(e.target.value)}
+        placeholder={placeholder}
+        rows={4}
+        disabled={deshabilitado}
+        className="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition resize-none hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
+      />
+      {!valor.trim() && (
+        <p className="text-xs text-neutral-400 mt-1">El motivo es obligatorio para cancelar.</p>
+      )}
+    </>
   );
 }

@@ -7,45 +7,9 @@ import programaDocsService, { type RequiredDoc } from '../../../services/program
 import type { ProgramaOutletContext } from '../../../layouts/ProgramaLayout';
 import { DatePicker } from '../../../components/DatePicker';
 import { Select, type SelectOption } from '../../../components/Select';
-
-function Spinner({ className = 'h-4 w-4' }: { className?: string }) {
-  return (
-    <svg className={`animate-spin shrink-0 ${className}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
-
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) {
-    const brandedError = error as Error & { body?: unknown; status?: number };
-    const body = brandedError.body;
-    const status = brandedError.status;
-    if (body && typeof body === 'object') {
-      const bodyRecord = body as Record<string, unknown>;
-      if (status === 409) {
-        if (typeof bodyRecord.message === 'string' && bodyRecord.message.trim()) return bodyRecord.message.trim();
-        if (typeof bodyRecord.mensaje === 'string' && bodyRecord.mensaje.trim()) return bodyRecord.mensaje.trim();
-        if (typeof bodyRecord.error === 'string' && bodyRecord.error.trim()) return bodyRecord.error.trim();
-      }
-      if (typeof bodyRecord.message === 'string' && bodyRecord.message.trim()) return bodyRecord.message.trim();
-      if (typeof bodyRecord.mensaje === 'string' && bodyRecord.mensaje.trim()) return bodyRecord.mensaje.trim();
-    }
-
-    return error.message.trim() || 'No se pudo crear la cohorte.';
-  }
-
-  if (typeof error === 'string' && error.trim()) return error.trim();
-
-  if (error && typeof error === 'object') {
-    const record = error as Record<string, unknown>;
-    if (typeof record.message === 'string' && record.message.trim()) return record.message.trim();
-    if (typeof record.mensaje === 'string' && record.mensaje.trim()) return record.mensaje.trim();
-  }
-
-  return 'No se pudo crear la cohorte.';
-}
+import { SpinnerIcon } from "../../../assets/icons";
+import { DialogoConfirmacion } from '../../../components/Dialogo';
+import { mensajeErrorCohorte } from './mensajeErrorCohorte';
 
 export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void; onBack?: () => void | Promise<void> }) {
   const navigate = useNavigate();
@@ -219,7 +183,7 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
       else navigate('/programa/cohortes');
     } catch (err) {
       console.error(err);
-      mostrarAlerta(getErrorMessage(err), 'error');
+      mostrarAlerta(mensajeErrorCohorte(err, 'No se pudo crear la cohorte.'), 'error');
     } finally {
       setSaving(false);
     }
@@ -357,7 +321,7 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
 
             {loading ? (
               <div className="rounded-lg border border-gray-200 bg-neutral-50 p-4 flex items-center gap-3 text-sm text-neutral-500">
-                <Spinner className="h-4 w-4 text-neutral-400" />
+                <SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-neutral-400" />
                 Cargando documentos...
               </div>
             ) : (
@@ -414,7 +378,7 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
 
             {loading ? (
               <div className="rounded-lg border border-gray-200 bg-neutral-50 p-4 flex items-center gap-3 text-sm text-neutral-500">
-                <Spinner className="h-4 w-4 text-neutral-400" />
+                <SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-neutral-400" />
                 Cargando criterios...
               </div>
             ) : (
@@ -479,7 +443,7 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
               disabled={disabled || selectedCriterios.length === 0}
               className="flex items-center gap-2 px-4 py-2 bg-red-700 text-white text-sm rounded-lg hover:bg-red-800 transition-colors font-medium disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {saving && <Spinner />}
+              {saving && <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />}
               <span>{saving ? 'Creando...' : 'Crear cohorte'}</span>
             </button>
           </div>
@@ -488,35 +452,18 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
 
     </div>
 
-    {mostrarConfirmarCrear && (
-      <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoConfirmarCrear ? 'animate-overlay-out' : 'animate-overlay-in'}`}>
-        <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${cerrandoConfirmarCrear ? 'animate-modal-out' : 'animate-modal-in'}`}>
-          <div className="p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Confirmar creación</h3>
-          </div>
-          <div className="p-6">
-            <p className="text-sm text-gray-700">¿Está seguro de crear la cohorte <strong>"{nombre}"</strong>?</p>
-          </div>
-          <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-            <button
-              onClick={cerrarModalCrear}
-              disabled={saving}
-              className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleSaveAction}
-              disabled={saving}
-              className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg text-sm font-medium transition-colors hover:bg-red-800 disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {saving ? <Spinner /> : null}
-              {saving ? 'Creando...' : 'Sí, crear cohorte'}
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
+    <DialogoConfirmacion
+      abierto={mostrarConfirmarCrear}
+      cerrando={cerrandoConfirmarCrear}
+      titulo="Confirmar creación"
+      onCancelar={cerrarModalCrear}
+      onConfirmar={handleSaveAction}
+      textoConfirmar="Sí, crear cohorte"
+      textoProcesando="Creando..."
+      procesando={saving}
+    >
+      <p className="text-sm text-gray-700">¿Está seguro de crear la cohorte <strong>"{nombre}"</strong>?</p>
+    </DialogoConfirmacion>
     </>
   );
 }

@@ -1,62 +1,17 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import InputField from "../../components/InputField";
+import PaginaAuth from "../../components/auth/PaginaAuth";
+import SelectorTipoUsuario from "../../components/auth/SelectorTipoUsuario";
 import ufpsLogo from "../../assets/NEGROufps.png";
-import flujoabs from "../../assets/flujoabs.jpg";
 import { superadminAuthService } from "../../services/superadmin/superadminService";
 import {
-  UserCheckIcon as FacultyUserCheckIcon,
-  UserIcon as FacultyUserIcon,
-  UserShieldIcon as FacultyUserShieldIcon,
-} from "../posgrados/PosgradosLogin";
-
-function Spinner() {
-  return (
-    <svg
-      className="animate-spin h-4 w-4 text-white"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
-
-function UserIconLabel({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="1.8">
-      <circle cx="12" cy="8" r="4" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-    </svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="1.8">
-      <rect x="4" y="11" width="16" height="9" rx="2" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8 11V8a4 4 0 118 0v3" />
-    </svg>
-  );
-}
-
-function ShieldIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="1.8">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z" />
-    </svg>
-  );
-}
-
-function ExclamationIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-4 w-4 shrink-0" stroke="currentColor" strokeWidth="1.8">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-    </svg>
-  );
-}
+  ExclamationCircleIcon,
+  LockBoxIcon,
+  SpinnerIcon,
+  ShieldIcon,
+  UserIconLabel,
+} from "../../assets/icons";
 
 export default function LoginSuperAdmin() {
   const navigate = useNavigate();
@@ -99,168 +54,98 @@ export default function LoginSuperAdmin() {
   };
 
   return (
-    <div
-      className="animate-fade-in min-h-screen w-full relative overflow-hidden bg-no-repeat bg-cover bg-center"
-      style={{ backgroundImage: `url(${flujoabs})` }}
-    >
-      {/* ── Logos institucionales ── */}
-      <div className="relative flex flex-col w-full min-h-30">
-        <div className="animate-slide-left delay-200 flex items-center gap-5 px-8 py-5">
-          <img
-            src={ufpsLogo}
-            alt="Universidad Francisco de Paula Santander"
-            className="h-14 w-auto"
-          />
+    <PaginaAuth fondo="imagen" logo={ufpsLogo}>
+      <form onSubmit={handleSubmit} noValidate className="w-full flex flex-col gap-4">
+        <div className="text-center animate-fade-in-up bg-slate-900 text-white rounded-md p-4">
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <ShieldIcon />
+            <h1 className="text-2xl font-bold tracking-wide">Administrador</h1>
+          </div>
+          <p className="text-xs mt-1 text-slate-300">Acceso restringido al panel administrativo</p>
         </div>
-      </div>
 
-      {/* ── Tarjeta flotante de login ── */}
-      <div className="flex items-center justify-center -mt-3 md:-mt-6">
-        <div
-          className="
-            bg-white
-            rounded-xl
-            shadow-[0_8px_40px_rgba(0,0,0,0.15)]
-            p-8
-            w-full
-            max-w-90
-            animate-fade-in-up
-            delay-200
-          "
-        >
-          <form onSubmit={handleSubmit} noValidate className="w-full flex flex-col gap-4">
-            <div className="text-center animate-fade-in-up bg-slate-900 text-white rounded-md p-4">
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <ShieldIcon />
-                <h1 className="text-2xl font-bold tracking-wide">Administrador</h1>
-              </div>
-              <p className="text-xs mt-1 text-slate-300">Acceso restringido al panel administrativo</p>
-            </div>
+        {error && (
+          <div className="px-4 py-3 rounded-md text-sm border animate-fade-in bg-red-50 border-red-200 text-red-900">
+            {error}
+          </div>
+        )}
 
-            {error && (
-              <div className="px-4 py-3 rounded-md text-sm border animate-fade-in bg-red-50 border-red-200 text-red-900">
-                {error}
-              </div>
-            )}
-
-            <div className="animate-fade-in-up">
-              <label htmlFor="usuario" className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-gray-700">
-                <UserIconLabel />
-                Usuario
-              </label>
-              <div className="bg-white rounded-lg border border-gray-300 hover:border-gray-400 focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-200">
-                <InputField
-                  id="usuario"
-                  type="text"
-                  placeholder="administrador"
-                  value={usuario}
-                  onChange={(v) => { setUsuario(v); setFieldErrors((p) => ({ ...p, usuario: undefined })); setError(null); }}
-                  autoComplete="username"
-                  disabled={loading}
-                />
-              </div>
-              {mostrarErrorUsuario && (
-                <p className="mt-1 inline-flex items-center gap-1 text-xs text-red-600">
-                  <ExclamationIcon />
-                  {fieldErrors.usuario}
-                </p>
-              )}
-            </div>
-
-            <div className="animate-fade-in-up">
-              <label htmlFor="sa-password" className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-gray-700">
-                <LockIcon />
-                Contraseña
-              </label>
-              <div className="bg-white rounded-lg border border-gray-300 hover:border-gray-400 focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-200">
-                <InputField
-                  id="sa-password"
-                  type="password"
-                  placeholder="tu.contraseña"
-                  value={password}
-                  onChange={(v) => { setPassword(v); setFieldErrors((p) => ({ ...p, password: undefined })); setError(null); }}
-                  autoComplete="current-password"
-                  disabled={loading}
-                />
-              </div>
-              {mostrarErrorPassword && (
-                <p className="mt-1 inline-flex items-center gap-1 text-xs text-red-600">
-                  <ExclamationIcon />
-                  {fieldErrors.password}
-                </p>
-              )}
-            </div>
-
-            {/* ¿Olvidaste tu contraseña? — navega sin recargar la página (SPA) */}
-            <div className="text-right -mt-1 -mb-2">
-              <button
-                type="button"
-                className="text-xs text-slate-600 hover:text-slate-900 hover:underline transition-colors"
-                onClick={() =>
-                  navigate(
-                    "/recuperar-password?loginRuta=/superadmin/login&rol=Superadmin"
-                  )
-                }
-              >
-                ¿Olvidaste tu contraseña?
-              </button>
-            </div>
-
-            <div className="mt-1 animate-fade-in-up">
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex items-center justify-center gap-2 w-full text-white font-bold bg-slate-900 rounded-md p-3 hover:bg-slate-800 cursor-pointer disabled:cursor-not-allowed disabled:bg-slate-400"
-              >
-                {loading && <Spinner />}
-                {loading ? "Validando..." : "Iniciar sesión"}
-              </button>
-            </div>
-
-            <SelectorTipoUsuario tipoActivo="superadmin" />
-          </form>
+        <div className="animate-fade-in-up">
+          <label htmlFor="usuario" className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-gray-700">
+            <UserIconLabel />
+            Usuario
+          </label>
+          <div className="bg-white rounded-lg border border-gray-300 hover:border-gray-400 focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-200">
+            <InputField
+              id="usuario"
+              type="text"
+              placeholder="administrador"
+              value={usuario}
+              onChange={(v) => { setUsuario(v); setFieldErrors((p) => ({ ...p, usuario: undefined })); setError(null); }}
+              autoComplete="username"
+              disabled={loading}
+            />
+          </div>
+          {mostrarErrorUsuario && (
+            <p className="mt-1 inline-flex items-center gap-1 text-xs text-red-600">
+              <ExclamationCircleIcon strokeWidth="1.8" />
+              {fieldErrors.usuario}
+            </p>
+          )}
         </div>
-      </div>
-    </div>
-  );
-}
 
-function SelectorTipoUsuario({
-  tipoActivo,
-}: {
-  tipoActivo?: string;
-}) {
-  const tipos = [
-    { nombre: "Superadmin", rutaLogin: "/superadmin/login", tipo: "superadmin", icono: <FacultyUserShieldIcon size={40} color="currentColor" /> },
-    { nombre: "Posgrados", rutaLogin: "/posgrados/login", tipo: "posgrados", icono: <FacultyUserCheckIcon size={40} color="currentColor" /> },
-    { nombre: "Director de programa", rutaLogin: "/programa/login", tipo: "programa", icono: <FacultyUserIcon size={40} color="currentColor" /> },
-  ] as const;
+        <div className="animate-fade-in-up">
+          <label htmlFor="sa-password" className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-gray-700">
+            <LockBoxIcon />
+            Contraseña
+          </label>
+          <div className="bg-white rounded-lg border border-gray-300 hover:border-gray-400 focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-200">
+            <InputField
+              id="sa-password"
+              type="password"
+              placeholder="tu.contraseña"
+              value={password}
+              onChange={(v) => { setPassword(v); setFieldErrors((p) => ({ ...p, password: undefined })); setError(null); }}
+              autoComplete="current-password"
+              disabled={loading}
+            />
+          </div>
+          {mostrarErrorPassword && (
+            <p className="mt-1 inline-flex items-center gap-1 text-xs text-red-600">
+              <ExclamationCircleIcon strokeWidth="1.8" />
+              {fieldErrors.password}
+            </p>
+          )}
+        </div>
 
-  return (
-    <section className="mt-2 border-t border-slate-200 pt-4">
-      <div className="flex items-center justify-around gap-5">
-        {tipos.map((tipo) => {
-          const esActivo = tipo.tipo === tipoActivo;
+        {/* ¿Olvidaste tu contraseña? — navega sin recargar la página (SPA) */}
+        <div className="text-right -mt-1 -mb-2">
+          <button
+            type="button"
+            className="text-xs text-slate-600 hover:text-slate-900 hover:underline transition-colors"
+            onClick={() =>
+              navigate(
+                "/recuperar-password?loginRuta=/superadmin/login&rol=Superadmin"
+              )
+            }
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
+        </div>
 
-          return (
-            <Link
-              key={tipo.tipo}
-              to={tipo.rutaLogin}
-              aria-label={`Login ${tipo.nombre}`}
-              title={`Login ${tipo.nombre}`}
-              aria-current={esActivo ? "page" : undefined}
-              className={[
-                "group inline-flex items-center justify-center rounded-full p-2 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2",
-                esActivo
-                  ? "bg-slate-100 text-slate-900 shadow-sm"
-                  : "text-slate-500 hover:-translate-y-0.5 hover:bg-slate-100 hover:text-slate-900",
-              ].join(" ")}
-            >
-              {tipo.icono}
-            </Link>
-          );
-        })}
-      </div>
-    </section>
+        <div className="mt-1 animate-fade-in-up">
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex items-center justify-center gap-2 w-full text-white font-bold bg-slate-900 rounded-md p-3 hover:bg-slate-800 cursor-pointer disabled:cursor-not-allowed disabled:bg-slate-400"
+          >
+            {loading && <SpinnerIcon className="animate-spin h-4 w-4 text-white" />}
+            {loading ? "Validando..." : "Iniciar sesión"}
+          </button>
+        </div>
+
+        <SelectorTipoUsuario tipoActivo="superadmin" tema="oscuro" />
+      </form>
+    </PaginaAuth>
   );
 }

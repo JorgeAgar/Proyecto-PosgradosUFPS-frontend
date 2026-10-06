@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router';
-import { Modal } from './components/Modal';
+import { Modal } from '../../components/Modal';
 import type { SuperadminOutletContext } from '../../layouts/SuperadminLayout';
 import {
   superadminUsuariosService,
@@ -17,75 +17,10 @@ import {
   listarSexosBiologicosRegistro,
   type RegistroSelectOption,
 } from '../../services/registroService';
-import { SelectSA } from './components/SelectSA';
+import { Select } from '../../components/Select';
+import { EyeIcon, EyeSlashIcon, PencilIcon, RefreshIcon, SearchIcon, SpinnerIcon, TrashIcon, UserPlusIcon } from "../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
-
-function Spinner({ className = 'h-4 w-4' }: { className?: string }) {
-  return (
-    <svg className={`animate-spin shrink-0 ${className}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
-
-function UserPlusIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="w-5 h-5 shrink-0" stroke="currentColor" strokeWidth="1.5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
-    </svg>
-  );
-}
-
-function PencilIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="w-4 h-4 shrink-0" stroke="currentColor" strokeWidth="1.5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-    </svg>
-  );
-}
-
-function TrashIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="w-4 h-4 shrink-0" stroke="currentColor" strokeWidth="1.5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="w-5 h-5 shrink-0" stroke="currentColor" strokeWidth="1.5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0016.803 15.803z" />
-    </svg>
-  );
-}
-
-function RefreshIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="w-4 h-4 shrink-0" stroke="currentColor" strokeWidth="1.5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-    </svg>
-  );
-}
-
-function EyeIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="w-4 h-4" stroke="currentColor" strokeWidth="1.5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-    </svg>
-  );
-}
-
-function EyeSlashIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="w-4 h-4" stroke="currentColor" strokeWidth="1.5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
-    </svg>
-  );
-}
 
 // ── Tipos locales ─────────────────────────────────────────────────────────────
 
@@ -577,7 +512,7 @@ export default function SuperadminUsuarios() {
       {loading ? (
         <div className="flex items-center justify-center py-20 animate-fade-in">
           <div className="flex items-center gap-3 text-neutral-400 text-sm">
-            <Spinner className="h-6 w-6 text-slate-700" />
+            <SpinnerIcon className="animate-spin shrink-0 h-6 w-6 text-slate-700" />
             Cargando usuarios...
           </div>
         </div>
@@ -587,7 +522,7 @@ export default function SuperadminUsuarios() {
           <div className="animate-fade-in-up delay-100 mb-5">
             <div className="relative">
               <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                <SearchIcon />
+                <SearchIcon className="w-5 h-5 shrink-0" />
               </span>
               <input
                 type="text"
@@ -668,7 +603,7 @@ export default function SuperadminUsuarios() {
           )}
           {editLoading && (
             <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
-              <Spinner />
+              <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />
               Cargando datos del usuario...
             </div>
           )}
@@ -821,7 +756,7 @@ export default function SuperadminUsuarios() {
                   { field: 'idDiscapacidad', label: 'Discapacidad', options: catalogosPersona.discapacidades },
                   { field: 'idCapacidadexepcional', label: 'Capacidad excepcional', options: catalogosPersona.capacidadesExcepcionales },
                 ].map(({ field, label, options }) => (
-                  <SelectSA
+                  <Select tema="oscuro"
                     key={field}
                     id={field}
                     label={<>{label} <span className="text-gray-400 font-normal">(opcional)</span></>}
@@ -838,7 +773,7 @@ export default function SuperadminUsuarios() {
           </div>
 
           {/* Rol */}
-          <SelectSA
+          <Select tema="oscuro"
             id="idRol"
             label="Rol"
             value={String(formData.idRol)}
@@ -848,7 +783,7 @@ export default function SuperadminUsuarios() {
           />
 
           {esDirectorPrograma && (
-            <SelectSA
+            <Select tema="oscuro"
               id="idPrograma"
               label="Programa a dirigir"
               value={formData.idPrograma === '' ? PROGRAMA_NINGUNO_VALUE : String(formData.idPrograma)}
@@ -893,7 +828,7 @@ export default function SuperadminUsuarios() {
               disabled={formBusy}
               className="flex-1 bg-slate-900 text-white px-4 py-2.5 rounded-lg hover:bg-slate-800 transition-colors text-sm font-medium disabled:opacity-60 flex items-center justify-center gap-2"
             >
-              {submitting && <Spinner />}
+              {submitting && <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />}
               {editingUser ? 'Actualizar' : 'Crear'} Usuario
             </button>
             <button
@@ -940,7 +875,7 @@ export default function SuperadminUsuarios() {
               disabled={deleting}
               className="flex-1 px-4 py-2.5 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
             >
-              {deleting && <Spinner />}
+              {deleting && <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />}
               Eliminar
             </button>
           </div>
@@ -949,4 +884,3 @@ export default function SuperadminUsuarios() {
     </div>
   );
 }
-

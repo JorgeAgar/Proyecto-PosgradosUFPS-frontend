@@ -9,7 +9,8 @@
  * hooks propios del rol) y devuelve el objeto de autenticación ya armado.
  */
 
-const BASE_URL = (import.meta.env.VITE_API_URL as string ?? "").replace(/\/$/, "");
+/** URL base del backend (VITE_API_URL sin la barra final). */
+export const API_BASE_URL = (import.meta.env.VITE_API_URL as string ?? "").replace(/\/$/, "");
 
 const HTTP_STATUS_TEXT: Record<number, string> = {
   400: "Solicitud incorrecta",
@@ -127,7 +128,7 @@ export function createAuthService(options: AuthServiceOptions): AuthService {
 
       let data: LoginResponse;
       try {
-        const res = await fetch(`${BASE_URL}/auth/login`, {
+        const res = await fetch(`${API_BASE_URL}/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username: usuario.trim(), password, requestedRole }),
@@ -164,7 +165,7 @@ export function createAuthService(options: AuthServiceOptions): AuthService {
       const rt = localStorage.getItem(refreshTokenKey);
       if (!rt) return false;
       try {
-        const res = await fetch(`${BASE_URL}/auth/refresh`, {
+        const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ refreshToken: rt }),

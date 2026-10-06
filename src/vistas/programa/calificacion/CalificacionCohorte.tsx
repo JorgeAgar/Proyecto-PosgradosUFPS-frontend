@@ -7,75 +7,39 @@ import {
   type AspiranteCalificacion,
 } from "../../../services/programa/programaCalificacionCohorteService";
 import type { ProgramaOutletContext } from "../../../layouts/ProgramaLayout";
-
-// ── Íconos (Heroicons) ────────────────────────────────────────────────────────
-
-function ArrowLeftIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-[18px] w-[18px] shrink-0">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-[18px] w-[18px]">
-      <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 15.803a7.5 7.5 0 0 0 10.607 10.607Z" />
-    </svg>
-  );
-}
-
-function FunnelIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-[18px] w-[18px]">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
-    </svg>
-  );
-}
-
-function ChevronLeftIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-    </svg>
-  );
-}
-
-function ChevronRightIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4">
-      <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-    </svg>
-  );
-}
-
-function Spinner() {
-  return (
-    <svg className="animate-spin h-6 w-6 text-red-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
+import { Badge, type BadgeColor } from "../../../components/Badge";
+import BuscadorConFiltro from "../../../components/BuscadorConFiltro";
+import Cargando from "../../../components/Cargando";
+import EncabezadoVolver from "../../../components/EncabezadoVolver";
+import { TarjetasEstadisticas, TarjetaProgreso } from "../../../components/Estadisticas";
+import Paginacion from "../../../components/Paginacion";
+import Tabla from "../../../components/Tabla";
 
 const POR_PAGINA = 10;
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
+type EstadoCalificacion = "por calificar" | "en progreso" | "calificado";
+
 interface Aspirante {
   id: string;
   nombre: string;
-  estado: "por calificar" | "en progreso" | "calificado";
+  estado: EstadoCalificacion;
   correo: string;
   numerodocumento: number;
   puntaje: number | null;
 }
 
+const ESTADOS: Record<EstadoCalificacion, { label: string; color: BadgeColor }> = {
+  "por calificar": { label: "Por calificar", color: "gris" },
+  "en progreso":   { label: "En progreso",   color: "amarillo" },
+  "calificado":    { label: "Calificado",    color: "verde" },
+};
+
 // ── Helpers de mapeo ──────────────────────────────────────────────────────────
 
-function mapEstado(estado: string): "por calificar" | "en progreso" | "calificado" {
-  const m: Record<string, "por calificar" | "en progreso" | "calificado"> = {
+function mapEstado(estado: string): EstadoCalificacion {
+  const m: Record<string, EstadoCalificacion> = {
     "VALIDADO_CALIFICADO":    "calificado",
     "VALIDADO_EN_PROGRESO":   "en progreso",
     "VALIDADO_POR_CALIFICAR": "por calificar",
@@ -95,30 +59,6 @@ function mapAspirante(a: AspiranteCalificacion): Aspirante {
   };
 }
 
-// ── Helper: badge de estado ───────────────────────────────────────────────────
-
-function EstadoBadge({ estado }: { estado: string }) {
-  if (estado === "calificado") {
-    return (
-      <span className="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-lg">
-        Calificado
-      </span>
-    );
-  }
-  if (estado === "en progreso") {
-    return (
-      <span className="inline-block bg-yellow-100 text-yellow-700 text-xs font-semibold px-3 py-1 rounded-lg">
-        En progreso
-      </span>
-    );
-  }
-  return (
-    <span className="inline-block bg-neutral-200 text-neutral-600 text-xs font-semibold px-3 py-1 rounded-lg">
-      Por calificar
-    </span>
-  );
-}
-
 // ── Componente principal ──────────────────────────────────────────────────────
 
 export default function CalificacionCohorte() {
@@ -128,13 +68,11 @@ export default function CalificacionCohorte() {
   const { mostrarAlerta } = useOutletContext<ProgramaOutletContext>();
 
   const idCohorte = Number(cohorteId);
-  const nombreCohorte = (location.state as { nombreCohorte?: string; activa?: boolean } | null)?.nombreCohorte;
-  const activa        = (location.state as { nombreCohorte?: string; activa?: boolean } | null)?.activa ?? false;
+  const estadoRuta = location.state as { nombreCohorte?: string; activa?: boolean } | null;
+  const nombreCohorte = estadoRuta?.nombreCohorte;
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [filtroEstado, setFiltroEstado] = useState<string>("todos");
-  const [mostrarFiltros, setMostrarFiltros] = useState(false);
-  const [filtroCerrando, setFiltroCerrando] = useState(false);
+  const [filtroEstado, setFiltroEstado] = useState<"todos" | EstadoCalificacion>("todos");
   const [pagina, setPagina] = useState(1);
 
   const [cargando, setCargando] = useState(true);
@@ -142,7 +80,6 @@ export default function CalificacionCohorte() {
   const [countPorCalificar, setCountPorCalificar] = useState(0);
   const [countCalificados, setCountCalificados] = useState(0);
 
-  useEffect(() => { setPagina(1); }, [searchTerm, filtroEstado]);
 
   useEffect(() => {
     if (!idCohorte) {
@@ -170,29 +107,13 @@ export default function CalificacionCohorte() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idCohorte]);
 
-  const cerrarFiltro = (nuevoEstado?: string) => {
-    setFiltroCerrando(true);
-    setTimeout(() => {
-      if (nuevoEstado !== undefined) setFiltroEstado(nuevoEstado);
-      setMostrarFiltros(false);
-      setFiltroCerrando(false);
-    }, 120);
-  };
-
   const totalEnCalificacion = aspirantes.length;
-  const porcentajeCalificados = totalEnCalificacion > 0
-    ? Math.round((countCalificados / totalEnCalificacion) * 100)
-    : 0;
 
   const aspirantesFiltrados = aspirantes.filter(a => {
-    const coincideBusqueda =
-      a.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.correo.toLowerCase().includes(searchTerm.toLowerCase());
-    const coincifeEstado = filtroEstado === "todos" || a.estado === filtroEstado;
-    return coincideBusqueda && coincifeEstado;
+    const termino = searchTerm.toLowerCase();
+    const coincideBusqueda = a.nombre.toLowerCase().includes(termino) || a.correo.toLowerCase().includes(termino);
+    return coincideBusqueda && (filtroEstado === "todos" || a.estado === filtroEstado);
   });
-
-  const totalPaginas = Math.ceil(aspirantesFiltrados.length / POR_PAGINA);
   const aspirantesPagina = aspirantesFiltrados.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA);
 
   const handleSeleccionarAspirante = (aspirante: Aspirante) => {
@@ -203,210 +124,70 @@ export default function CalificacionCohorte() {
 
   return (
     <div className="p-6 bg-gray-100 min-h-full" style={{ fontFamily: "Segoe UI, sans-serif" }}>
-      <div className="">
+      <EncabezadoVolver
+        titulo="Calificación de Aspirantes"
+        onVolver={() => navigate("/programa/admision/calificacion")}
+        nombreCohorte={nombreCohorte}
+        activa={estadoRuta?.activa ?? false}
+      />
 
-        {/* Encabezado */}
-        <div className="flex items-center gap-3 mb-6 animate-fade-in">
-          <button
-            onClick={() => navigate("/programa/admision/calificacion")}
-            className="flex items-center gap-1 text-sm text-neutral-400 hover:text-red-700 transition-colors"
+      {cargando ? (
+        <Cargando texto="Cargando aspirantes..." />
+      ) : (
+        <>
+          <TarjetasEstadisticas
+            items={[
+              { etiqueta: "Total en calificación", valor: totalEnCalificacion },
+              { etiqueta: "Por calificar", valor: countPorCalificar, color: "text-amber-400" },
+              { etiqueta: "Calificados", valor: countCalificados, color: "text-green-700" },
+            ]}
+          />
+
+          <TarjetaProgreso etiqueta="Calificados" actual={countCalificados} total={totalEnCalificacion} />
+
+          <BuscadorConFiltro
+            busqueda={searchTerm}
+            onBusqueda={(v) => { setSearchTerm(v); setPagina(1); }}
+            placeholder="Buscar aspirante por nombre o correo..."
+            tituloFiltro="Estado"
+            filtro={filtroEstado}
+            onFiltro={(v) => { setFiltroEstado(v); setPagina(1); }}
+            opciones={[
+              { value: "todos", label: "Todos" },
+              ...(Object.keys(ESTADOS) as EstadoCalificacion[]).map((e) => ({ value: e, label: ESTADOS[e].label })),
+            ]}
+          />
+
+          <Tabla
+            columnas={["Nombre", "Documento", "Estado", "Correo", "Puntaje"]}
+            vacia={aspirantesPagina.length === 0}
+            mensajeVacio="No se encontraron aspirantes."
+            pie={<Paginacion pagina={pagina} porPagina={POR_PAGINA} totalElementos={aspirantesFiltrados.length} onCambiar={setPagina} />}
           >
-            <ArrowLeftIcon />
-          </button>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">Calificación de Aspirantes</h1>
-            {nombreCohorte && (
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-sm text-neutral-400">Cohorte: {nombreCohorte}</span>
-                {activa && (
-                  <span className="bg-red-700 text-white text-xs font-semibold px-2.5 py-0.5 rounded-lg animate-fade-in">Activa</span>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {cargando ? (
-          <div className="flex items-center justify-center py-20 animate-fade-in">
-            <div className="flex items-center gap-3 text-neutral-400 text-sm">
-              <Spinner />
-              Cargando aspirantes...
-            </div>
-          </div>
-        ) : (
-          <>
-            {/* Tarjetas de estadísticas */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-              <div className="bg-white border border-gray-200 rounded-lg p-4 animate-fade-in-up delay-100">
-                <div className="text-xs text-neutral-400 mb-1">Total en calificación</div>
-                <div className="text-2xl font-semibold text-gray-900">{totalEnCalificacion}</div>
-              </div>
-              <div className="bg-white border border-gray-200 rounded-lg p-4 animate-fade-in-up delay-200">
-                <div className="text-xs text-neutral-400 mb-1">Por calificar</div>
-                <div className="text-2xl font-semibold text-amber-400">{countPorCalificar}</div>
-              </div>
-              <div className="bg-white border border-gray-200 rounded-lg p-4 animate-fade-in-up delay-300">
-                <div className="text-xs text-neutral-400 mb-1">Calificados</div>
-                <div className="text-2xl font-semibold text-green-700">{countCalificados}</div>
-              </div>
-            </div>
-
-            {/* Barra de progreso */}
-            {totalEnCalificacion > 0 && (
-              <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6 animate-fade-in-up delay-300">
-                <div className="flex items-center gap-4">
-                  <span className="text-sm font-semibold text-red-700 whitespace-nowrap">
-                    {porcentajeCalificados}%
-                  </span>
-                  <div className="flex-1 bg-neutral-200 rounded-full h-2">
-                    <div
-                      className="bg-red-700 h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${porcentajeCalificados}%` }}
-                    />
-                  </div>
-                </div>
-                <div className="text-xs text-neutral-400 mt-2">
-                  <span>Calificados: </span>
-                  <span className="font-semibold text-red-700">{countCalificados}</span>
-                  <span> de </span>
-                  <span className="font-semibold text-gray-800">{totalEnCalificacion}</span>
-                </div>
-              </div>
-            )}
-
-            {/* Barra de búsqueda y filtros */}
-            <div className="relative z-10 flex gap-3 mb-6 animate-fade-in-up delay-400">
-              <div className="flex-1 relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none">
-                  <SearchIcon />
-                </span>
-                <input
-                  type="text"
-                  placeholder="Buscar aspirante por nombre o correo..."
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent transition-colors"
-                />
-              </div>
-
-              <div className="relative">
-                <button
-                  onClick={() => mostrarFiltros ? cerrarFiltro() : setMostrarFiltros(true)}
-                  className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-gray-600 bg-white"
-                >
-                  <FunnelIcon />
-                  <span className="text-sm font-medium">Filtrar</span>
-                </button>
-
-                {mostrarFiltros && (
-                  <div className={`absolute right-0 mt-2 w-56 bg-white rounded-lg border border-gray-200 shadow-lg z-50 ${filtroCerrando ? "animate-dropdown-out" : "animate-dropdown-in"}`}>
-                    <div className="p-2">
-                      <div className="text-xs font-semibold text-neutral-400 uppercase px-3 py-2">
-                        Estado
-                      </div>
-                      {[
-                        { value: "todos",         label: "Todos" },
-                        { value: "por calificar", label: "Por calificar" },
-                        { value: "en progreso",   label: "En progreso" },
-                        { value: "calificado",    label: "Calificado" },
-                      ].map(opcion => (
-                        <button
-                          key={opcion.value}
-                          onClick={() => cerrarFiltro(opcion.value)}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                            filtroEstado === opcion.value
-                              ? "bg-red-50 text-red-700 font-medium"
-                              : "text-gray-700 hover:bg-gray-100"
-                          }`}
-                        >
-                          {opcion.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Tabla */}
-            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden animate-fade-in-up delay-500">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[640px]">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="text-left px-6 py-4 text-sm font-semibold text-gray-600">Nombre</th>
-                      <th className="text-left px-6 py-4 text-sm font-semibold text-gray-600">Documento</th>
-                      <th className="text-left px-6 py-4 text-sm font-semibold text-gray-600">Estado</th>
-                      <th className="text-left px-6 py-4 text-sm font-semibold text-gray-600">Correo</th>
-                      <th className="text-left px-6 py-4 text-sm font-semibold text-gray-600">Puntaje</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {aspirantesPagina.length === 0 ? (
-                      <tr>
-                        <td colSpan={5} className="px-6 py-10 text-center text-sm text-neutral-400">
-                          No se encontraron aspirantes.
-                        </td>
-                      </tr>
-                    ) : (
-                      aspirantesPagina.map(aspirante => (
-                        <tr
-                          key={aspirante.id}
-                          onClick={() => handleSeleccionarAspirante(aspirante)}
-                          className="hover:bg-gray-50 transition-colors cursor-pointer"
-                        >
-                          <td className="px-6 py-4 text-sm font-medium text-gray-900">{aspirante.nombre}</td>
-                          <td className="px-6 py-4 text-sm text-gray-600">{aspirante.numerodocumento}</td>
-                          <td className="px-6 py-4 text-sm">
-                            <EstadoBadge estado={aspirante.estado} />
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-600">{aspirante.correo}</td>
-                          <td className="px-6 py-4 text-sm">
-                            {aspirante.puntaje !== null ? (
-                              <span className="font-semibold text-red-700">{aspirante.puntaje.toFixed(1)}</span>
-                            ) : (
-                              <span className="text-neutral-400">—</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-
-              {totalPaginas > 1 && (
-                <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-                  <span className="text-xs text-neutral-400">
-                    {(pagina - 1) * POR_PAGINA + 1}–{Math.min(pagina * POR_PAGINA, aspirantesFiltrados.length)} de {aspirantesFiltrados.length} aspirantes
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setPagina(p => p - 1)}
-                      disabled={pagina === 1}
-                      className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-gray-700"
-                    >
-                      <ChevronLeftIcon />
-                      Anterior
-                    </button>
-                    <span className="text-sm font-medium text-gray-600 px-1">
-                      {pagina} / {totalPaginas}
-                    </span>
-                    <button
-                      onClick={() => setPagina(p => p + 1)}
-                      disabled={pagina === totalPaginas}
-                      className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-gray-700"
-                    >
-                      Siguiente
-                      <ChevronRightIcon />
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </>
-        )}
-      </div>
+            {aspirantesPagina.map(aspirante => (
+              <tr
+                key={aspirante.id}
+                onClick={() => handleSeleccionarAspirante(aspirante)}
+                className="hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                <td className="px-6 py-4 text-sm font-medium text-gray-900">{aspirante.nombre}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{aspirante.numerodocumento}</td>
+                <td className="px-6 py-4 text-sm">
+                  <Badge color={ESTADOS[aspirante.estado].color}>{ESTADOS[aspirante.estado].label}</Badge>
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-600">{aspirante.correo}</td>
+                <td className="px-6 py-4 text-sm">
+                  {aspirante.puntaje !== null ? (
+                    <span className="font-semibold text-red-700">{aspirante.puntaje.toFixed(1)}</span>
+                  ) : (
+                    <span className="text-neutral-400">—</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </Tabla>
+        </>
+      )}
     </div>
   );
 }

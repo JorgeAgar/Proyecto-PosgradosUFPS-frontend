@@ -18,6 +18,8 @@ import {
   type DocumentoAspiranteValidacionApi,
   type DocumentosAspiranteResponse,
 } from "../../../services/programa/validacionAspiranteService";
+import { CheckIcon, SpinnerIcon, XMarkIcon } from "../../../assets/icons";
+import { DialogoConfirmacion } from "../../../components/Dialogo";
 
 interface Documento {
   id: string;
@@ -74,56 +76,6 @@ function VisualizadorDocumento({ url, nombre }: { url: string; nombre: string })
     <div className="flex h-full min-h-0 items-center justify-center text-sm text-gray-500 px-6 text-center">
       Formato no compatible para previsualización.
     </div>
-  );
-}
-
-function Spinner() {
-  return (
-    <svg
-      className="animate-spin h-5 w-5 text-red-700 shrink-0"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-      />
-    </svg>
-  );
-}
-
-function SpinnerSm() {
-  return (
-    <svg
-      className="animate-spin h-4 w-4 shrink-0"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-      />
-    </svg>
   );
 }
 
@@ -312,20 +264,20 @@ export default function ValidacionAspiranteDetalle() {
               <div className="space-y-4">
                 <div className="bg-white border border-gray-200 rounded-lg p-6 flex items-center justify-center min-h-36">
                   <div className="flex items-center gap-3 text-neutral-400 text-sm">
-                    <Spinner />
+                    <SpinnerIcon className="animate-spin h-5 w-5 text-red-700 shrink-0" />
                     Cargando información del aspirante...
                   </div>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-lg p-6 flex items-center justify-center min-h-40">
                   <div className="flex items-center gap-3 text-neutral-400 text-sm">
-                    <Spinner />
+                    <SpinnerIcon className="animate-spin h-5 w-5 text-red-700 shrink-0" />
                     Cargando documentos...
                   </div>
                 </div>
               </div>
               <div className="bg-white border border-gray-200 rounded-lg p-6 flex items-center justify-center min-h-52">
                 <div className="flex items-center gap-3 text-neutral-400 text-sm">
-                  <Spinner />
+                  <SpinnerIcon className="animate-spin h-5 w-5 text-red-700 shrink-0" />
                   Cargando visualizador...
                 </div>
               </div>
@@ -410,30 +362,10 @@ export default function ValidacionAspiranteDetalle() {
                           }`}
                         >
                           {documento.estado === "APROBADO" && (
-                            <svg
-                              className="w-2.5 h-2.5 text-white"
-                              fill="none"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2.5"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path d="M5 13l4 4L19 7" />
-                            </svg>
+                            <CheckIcon className="w-2.5 h-2.5 text-white" />
                           )}
                           {documento.estado === "RECHAZADO" && (
-                            <svg
-                              className="w-2.5 h-2.5 text-white"
-                              fill="none"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2.5"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            <XMarkIcon className="w-2.5 h-2.5 text-white" strokeWidth="2.5" />
                           )}
                         </div>
                       </button>
@@ -486,19 +418,7 @@ export default function ValidacionAspiranteDetalle() {
                     {todosValidados && (
                       <div className="text-center">
                         <span className="inline-flex items-center gap-2 bg-green-100 text-green-700 text-sm font-semibold px-4 py-2 rounded-lg border border-green-200">
-                          <svg
-                            className="w-4 h-4 shrink-0"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
+                          <CheckIcon className="w-4 h-4 shrink-0" strokeWidth="2" />
                           Todos los documentos validados
                         </span>
                       </div>
@@ -537,114 +457,56 @@ export default function ValidacionAspiranteDetalle() {
         </div>
 
         {/* Modal: Confirmar aprobación */}
-        {mostrarConfirmacionAprobar && (
-          <div
-            className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoConfirmacionAprobar ? "animate-overlay-out" : "animate-overlay-in"}`}
-          >
-            <div
-              className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${cerrandoConfirmacionAprobar ? "animate-modal-out" : "animate-modal-in"}`}
-            >
-              <div className="p-6 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Confirmar aprobación
-                </h3>
-              </div>
-              <div className="p-6">
-                <p className="text-sm text-gray-700">
-                  ¿Está seguro de aprobar el documento{" "}
-                  <strong>"{documentoSeleccionado?.nombreTitulo}"</strong>?
-                </p>
-              </div>
-              <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-                <button
-                  type="button"
-                  onClick={cerrarModalAprobar}
-                  disabled={accionEnviando !== null}
-                  className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={confirmarAprobar}
-                  disabled={accionEnviando !== null}
-                  className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {accionEnviando === "APROBAR" ? (
-                    <>
-                      <SpinnerSm />
-                      Aprobando...
-                    </>
-                  ) : (
-                    "Sí, aprobar"
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <DialogoConfirmacion
+          abierto={mostrarConfirmacionAprobar}
+          cerrando={cerrandoConfirmacionAprobar}
+          titulo="Confirmar aprobación"
+          onCancelar={cerrarModalAprobar}
+          onConfirmar={confirmarAprobar}
+          textoConfirmar="Sí, aprobar"
+          textoProcesando="Aprobando..."
+          procesando={accionEnviando !== null}
+        >
+          <p className="text-sm text-gray-700">
+            ¿Está seguro de aprobar el documento{" "}
+            <strong>"{documentoSeleccionado?.nombreTitulo}"</strong>?
+          </p>
+        </DialogoConfirmacion>
 
         {/* Modal: Rechazar documento */}
-        {mostrarDialogoRechazo && (
-          <div
-            className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoDialogoRechazo ? "animate-overlay-out" : "animate-overlay-in"}`}
-          >
-            <div
-              className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-lg w-full mx-4 ${cerrandoDialogoRechazo ? "animate-modal-out" : "animate-modal-in"}`}
-            >
-              <div className="p-6 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Rechazar documento
-                </h3>
-              </div>
-              <div className="p-6 space-y-3">
-                <p className="text-sm text-gray-700">
-                  Está rechazando{" "}
-                  <strong>"{documentoSeleccionado?.nombreTitulo}"</strong>.
-                  Ingrese el motivo:
-                </p>
-                <textarea
-                  value={motivoRechazo}
-                  onChange={(e) => setMotivoRechazo(e.target.value)}
-                  placeholder="Ingrese el motivo del rechazo..."
-                  rows={4}
-                  disabled={accionEnviando !== null}
-                  className="w-full text-sm text-gray-900 border border-gray-200 rounded-lg px-3 py-2 outline-none transition hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-                {!motivoRechazo.trim() && (
-                  <p className="text-xs text-neutral-400">
-                    El motivo es obligatorio para rechazar.
-                  </p>
-                )}
-              </div>
-              <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-                <button
-                  type="button"
-                  onClick={cerrarModalRechazo}
-                  disabled={accionEnviando !== null}
-                  className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={confirmarRechazo}
-                  disabled={!motivoRechazo.trim() || accionEnviando !== null}
-                  className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {accionEnviando === "RECHAZAR" ? (
-                    <>
-                      <SpinnerSm />
-                      Rechazando...
-                    </>
-                  ) : (
-                    "Rechazar documento"
-                  )}
-                </button>
-              </div>
-            </div>
+        <DialogoConfirmacion
+          abierto={mostrarDialogoRechazo}
+          cerrando={cerrandoDialogoRechazo}
+          tamano="lg"
+          titulo="Rechazar documento"
+          onCancelar={cerrarModalRechazo}
+          onConfirmar={confirmarRechazo}
+          textoConfirmar="Rechazar documento"
+          textoProcesando="Rechazando..."
+          procesando={accionEnviando !== null}
+          confirmarDeshabilitado={!motivoRechazo.trim()}
+        >
+          <div className="space-y-3">
+            <p className="text-sm text-gray-700">
+              Está rechazando{" "}
+              <strong>"{documentoSeleccionado?.nombreTitulo}"</strong>.
+              Ingrese el motivo:
+            </p>
+            <textarea
+              value={motivoRechazo}
+              onChange={(e) => setMotivoRechazo(e.target.value)}
+              placeholder="Ingrese el motivo del rechazo..."
+              rows={4}
+              disabled={accionEnviando !== null}
+              className="w-full text-sm text-gray-900 border border-gray-200 rounded-lg px-3 py-2 outline-none transition hover:border-gray-300 focus:border-red-300 focus:ring-2 focus:ring-red-200 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+            {!motivoRechazo.trim() && (
+              <p className="text-xs text-neutral-400">
+                El motivo es obligatorio para rechazar.
+              </p>
+            )}
           </div>
-        )}
+        </DialogoConfirmacion>
       </div>
     </div>
   );

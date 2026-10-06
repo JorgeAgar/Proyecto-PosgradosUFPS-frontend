@@ -9,15 +9,9 @@ import programaDocsService, { type RequiredDoc } from '../../../services/program
 import type { ProgramaOutletContext } from '../../../layouts/ProgramaLayout';
 import { DatePicker } from '../../../components/DatePicker';
 import { Select, type SelectOption } from '../../../components/Select';
-
-function Spinner({ className = 'h-4 w-4' }: { className?: string }) {
-  return (
-    <svg className={`animate-spin shrink-0 ${className}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
+import { SpinnerIcon } from "../../../assets/icons";
+import { DialogoConfirmacion } from '../../../components/Dialogo';
+import { mensajeErrorCohorte } from './mensajeErrorCohorte';
 
 function genLocalId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -45,7 +39,8 @@ function criterionMatchesProgramId(
 
 type LocalDocumento = DocumentoCohorte & { __localId?: string };
 
-type SavePayload = Partial<{
+/** Cambios de una cohorte que se envían al guardar. */
+export type SavePayload = Partial<{
   cupos: number;
   idSemestre: number | string;
   idModalidad: number | string;
@@ -61,36 +56,6 @@ type SavePayload = Partial<{
   documentosPrograma: { idDocrequisito?: string | number; idCohorte?: string | number; nombre?: string }[];
   criteriosCohorte: { id?: string | number; idCriterio?: string | number; pesoSnapshot?: number }[];
 }>;
-
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) {
-    const brandedError = error as Error & { body?: unknown; status?: number };
-    const body = brandedError.body;
-    const status = brandedError.status;
-    if (body && typeof body === 'object') {
-      const bodyRecord = body as Record<string, unknown>;
-      if (status === 415 || bodyRecord.status === 415 || bodyRecord.statusCode === 415) {
-        return 'El criterio no se puede editar ni borrar porque ya tiene calificaciones registradas.';
-      }
-      if (typeof bodyRecord.message === 'string' && bodyRecord.message.trim()) return bodyRecord.message.trim();
-      if (typeof bodyRecord.mensaje === 'string' && bodyRecord.mensaje.trim()) return bodyRecord.mensaje.trim();
-    }
-    if (status === 415) {
-      return 'El criterio no se puede editar ni borrar porque ya tiene calificaciones registradas.';
-    }
-    return error.message.trim() || 'No se pudo guardar la cohorte.';
-  }
-
-  if (typeof error === 'string' && error.trim()) return error.trim();
-
-  if (error && typeof error === 'object') {
-    const record = error as Record<string, unknown>;
-    if (typeof record.message === 'string' && record.message.trim()) return record.message.trim();
-    if (typeof record.mensaje === 'string' && record.mensaje.trim()) return record.mensaje.trim();
-  }
-
-  return 'No se pudo guardar la cohorte.';
-}
 
 export default function EditarCohorte({
   cohorte,
@@ -449,7 +414,9 @@ export default function EditarCohorte({
       setEditClosing(true);
       setTimeout(() => onCancel(), 170);
     } catch (error) {
-      const message = getErrorMessage(error);
+      const message = mensajeErrorCohorte(error, 'No se pudo guardar la cohorte.', {
+        415: 'El criterio no se puede editar ni borrar porque ya tiene calificaciones registradas.',
+      });
       mostrarAlerta(message, 'error');
     } finally {
       setIsSaving(false);
@@ -481,7 +448,7 @@ export default function EditarCohorte({
     <div className={`bg-white rounded-lg border border-gray-200 p-8 animate-fade-in-up delay-150 ${editClosing ? 'animate-modal-out' : ''}`}>
       {isLoading && (
         <div className="mb-6 flex items-center gap-3 rounded-lg border border-gray-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-600">
-          <Spinner className="h-4 w-4 text-red-700" />
+          <SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-red-700" />
           <span>Cargando datos actualizados de la cohorte...</span>
         </div>
       )}
@@ -612,7 +579,7 @@ export default function EditarCohorte({
             <div className="space-y-2 mb-4">
               {isLoadingDocs ? (
                 <div className="flex items-center gap-3 p-3 rounded-lg border border-transparent bg-neutral-50 shadow-sm">
-                  <Spinner className="h-4 w-4 text-neutral-400" />
+                  <SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-neutral-400" />
                   <div className="text-sm text-neutral-500">Cargando documentos del consejo...</div>
                 </div>
               ) : availableConsejoDocs.length > 0 ? (
@@ -633,7 +600,7 @@ export default function EditarCohorte({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {isLoadingDocs ? (
                 <div className="flex items-center gap-3 rounded-lg border border-transparent p-3 bg-neutral-50 shadow-sm md:col-span-2">
-                  <Spinner className="h-4 w-4 text-neutral-400" />
+                  <SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-neutral-400" />
                   <div className="text-sm text-neutral-500">Cargando documentos del programa...</div>
                 </div>
               ) : availableProgramaDocs.length > 0 ? (
@@ -669,7 +636,7 @@ export default function EditarCohorte({
           {isLoadingCriterios ? (
             <div className="space-y-2">
               <div className="flex items-center gap-3 p-3 rounded-lg bg-neutral-50 border border-gray-100">
-                <Spinner className="h-4 w-4 text-neutral-400" />
+                <SpinnerIcon className="animate-spin shrink-0 h-4 w-4 text-neutral-400" />
                 <div className="text-sm text-neutral-500">Cargando criterios...</div>
               </div>
             </div>
@@ -724,42 +691,25 @@ export default function EditarCohorte({
         <div className={`flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200 ${editClosing ? 'animate-modal-out' : 'animate-fade-in-up'}`}>
           <button disabled={disabled} onClick={handleCancelOrBack} className="px-6 py-2 bg-white text-gray-700 text-sm border border-gray-200 rounded-lg hover:bg-neutral-200 transition-colors font-medium disabled:opacity-60 disabled:cursor-not-allowed">Cancelar</button>
           <button disabled={disabled || Boolean(criterioError) || selectedCriteriosCount === 0} onClick={() => setMostrarConfirmarGuardar(true)} className="inline-flex items-center gap-2 px-6 py-2 bg-red-700 text-white text-sm rounded-lg hover:bg-red-800 transition-colors font-medium disabled:opacity-60 disabled:cursor-not-allowed">
-            {isSaving ? <Spinner className="h-4 w-4" /> : null}
+            {isSaving ? <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" /> : null}
             {isSaving ? 'Guardando...' : 'Guardar'}
           </button>
         </div>
       </div>
     </div>
 
-    {mostrarConfirmarGuardar && (
-      <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${cerrandoConfirmarGuardar ? 'animate-overlay-out' : 'animate-overlay-in'}`}>
-        <div className={`bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full mx-4 ${cerrandoConfirmarGuardar ? 'animate-modal-out' : 'animate-modal-in'}`}>
-          <div className="p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Confirmar cambios</h3>
-          </div>
-          <div className="p-6">
-            <p className="text-sm text-gray-700">¿Está seguro de guardar los cambios realizados en la cohorte <strong>"{cohorte.nombre}"</strong>?</p>
-          </div>
-          <div className="p-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-            <button
-              onClick={cerrarModalGuardar}
-              disabled={isSaving}
-              className="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium text-center disabled:opacity-60"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={confirmarGuardar}
-              disabled={isSaving}
-              className="flex items-center justify-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg text-sm font-medium transition-colors hover:bg-red-800 disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {isSaving ? <Spinner className="h-4 w-4" /> : null}
-              {isSaving ? 'Guardando...' : 'Sí, guardar'}
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
+    <DialogoConfirmacion
+      abierto={mostrarConfirmarGuardar}
+      cerrando={cerrandoConfirmarGuardar}
+      titulo="Confirmar cambios"
+      onCancelar={cerrarModalGuardar}
+      onConfirmar={confirmarGuardar}
+      textoConfirmar="Sí, guardar"
+      textoProcesando="Guardando..."
+      procesando={isSaving}
+    >
+      <p className="text-sm text-gray-700">¿Está seguro de guardar los cambios realizados en la cohorte <strong>"{cohorte.nombre}"</strong>?</p>
+    </DialogoConfirmacion>
     </>
   );
 }
