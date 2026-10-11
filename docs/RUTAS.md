@@ -9,6 +9,8 @@ Este documento describe todas las rutas activas de la aplicación. Está basado 
 | Ruta | Rol | Auth | Componente |
 |---|---|:---:|---|
 | `/` | — | No | Redirige a `/programa/login` |
+| `/404` | Público | No | `NoEncontrado` |
+| `*` (rutas inexistentes) | Público | No | Redirige a `/404` |
 | `/registro` | Público | No | `Registro` |
 | `/recuperar-password` | Todos los roles | No | `RecuperarPassword` |
 | `/cambiar-password` | Todos los roles | No | `CambiarPassword` |
@@ -61,6 +63,12 @@ Este documento describe todas las rutas activas de la aplicación. Está basado 
 
 - **`/`**
     - Redirige automáticamente a `/programa/login`.
+
+- **`/404`**
+    - Página no encontrada con un enlace para volver al inicio.
+    - Las rutas inexistentes, incluidas las de los módulos de cada rol, redirigen a esta vista sin requerir sesión.
+    - La redirección reemplaza la entrada del historial para evitar volver a la dirección inválida.
+    - Componente: [src/vistas/NoEncontrado.tsx](src/vistas/NoEncontrado.tsx)
 
 - **`/registro`**
     - Formulario de inscripción para nuevos aspirantes.

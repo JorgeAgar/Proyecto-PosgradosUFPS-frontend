@@ -16,6 +16,7 @@ import AspiranteCriterios from "./vistas/aspirante/AspiranteCriterios.tsx";
 import AspirantePagos from "./vistas/aspirante/pagos/AspirantePagos.tsx";
 import AspirantePagoDetalle from "./vistas/aspirante/pagos/AspirantePagoDetalle.tsx";
 import Registro from "./vistas/Registro.tsx";
+import NoEncontrado from "./vistas/NoEncontrado.tsx";
 
 // Vistas del superadmin
 import LoginSuperAdmin from "./vistas/superadmin/SuperadminLogin.tsx";
@@ -62,6 +63,8 @@ import PosgradosLayout from "./layouts/PosgradosLayout.tsx";
  *
  * Rutas:
  *   /                     → redirige a /programa/login
+ *   /404                  → página no encontrada (pública)
+ *   Cualquier ruta inexistente → redirige a /404
  *   /registro             → formulario de inscripción (público)
  *   /aspirante/registro   → redirige a /registro
  *   /recuperar-password, /cambiar-password → recuperación de contraseña (todos los roles)
@@ -80,6 +83,7 @@ createRoot(document.getElementById("root")!).render(
         {/* ── Raíz: redirige al login del director de programa ── */}
         <Route path="/" element={<Navigate to="/programa/login" replace />} />
         {/* ── Rutas públicas ── */}
+        <Route path="404" element={<NoEncontrado />} />
         <Route path="aspirante/login" element={<AspiranteLogin />} />
         <Route path="registro" element={<Registro />} />
         <Route path="aspirante/registro" element={<Navigate to="/registro" replace />} />
@@ -147,6 +151,9 @@ createRoot(document.getElementById("root")!).render(
         <Route path="posgrados" element={<PosgradosLayout />}>
           <Route index element={<Posgrados />} />
         </Route>
+
+        {/* Rutas inexistentes, incluidas las de los módulos de cada rol */}
+        <Route path="*" element={<Navigate to="/404" replace />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
