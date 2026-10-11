@@ -63,6 +63,8 @@ import PosgradosLayout from "./layouts/PosgradosLayout.tsx";
  *
  * Rutas:
  *   /                     → redirige a /programa/login
+ *   /404                  → página no encontrada (pública)
+ *   Cualquier ruta inexistente → redirige a /404
  *   /registro             → formulario de inscripción (público)
  *   /recuperar-password, /cambiar-password → recuperación de contraseña (todos los roles)
  *
@@ -147,6 +149,9 @@ createRoot(document.getElementById("root")!).render(
         <Route path="posgrados" element={<PosgradosLayout />}>
           <Route index element={<Posgrados />} />
         </Route>
+
+        {/* Rutas inexistentes, incluidas las de los módulos de cada rol */}
+        <Route path="*" element={<Navigate to="/404" replace />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
