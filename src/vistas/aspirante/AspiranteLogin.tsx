@@ -1,4 +1,5 @@
 import LoginForm from "../../components/auth/LoginForm";
+import EnlaceRegistro from "../../components/auth/EnlaceRegistro";
 import PaginaAuth from "../../components/auth/PaginaAuth";
 import { aspiranteAuthService } from "../../services/aspirante/aspiranteService";
 
@@ -25,6 +26,7 @@ export default function AspiranteLogin() {
         onLogin={async (usuario, password) => { await aspiranteAuthService.login(usuario, password); }}
         rutaExito="/aspirante/inicio"
         rutaRecuperar="/recuperar-password?loginRuta=/aspirante/login&rol=Aspirante"
+        pie={<EnlaceRegistro />}
       />
     </PaginaAuth>
   );
