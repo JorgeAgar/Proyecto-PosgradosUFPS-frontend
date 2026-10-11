@@ -63,6 +63,7 @@ import PosgradosLayout from "./layouts/PosgradosLayout.tsx";
  * Rutas:
  *   /                     → redirige a /programa/login
  *   /registro             → formulario de inscripción (público)
+ *   /aspirante/registro   → redirige a /registro
  *   /recuperar-password, /cambiar-password → recuperación de contraseña (todos los roles)
  *
  *   /aspirante/login, /aspirante/*       → panel del aspirante (AspiranteLayout)
@@ -81,6 +82,7 @@ createRoot(document.getElementById("root")!).render(
         {/* ── Rutas públicas ── */}
         <Route path="aspirante/login" element={<AspiranteLogin />} />
         <Route path="registro" element={<Registro />} />
+        <Route path="aspirante/registro" element={<Navigate to="/registro" replace />} />
         {/* Recuperación de contraseña — ruta compartida por todos los roles        */}
         {/* Recibe query params: ?loginRuta=/ruta-del-login&rol=NombreRol            */}
         {/* Ejemplo: /recuperar-password?loginRuta=/comite/login&rol=... */}
