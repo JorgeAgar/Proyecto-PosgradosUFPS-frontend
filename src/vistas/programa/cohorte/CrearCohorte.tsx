@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router';
 import { ArrowLeftIcon, DocumentTextIcon, SparklesIcon } from '@heroicons/react/24/outline';
-import { createCohorte, fetchSemestresDisponibles, fetchModalidadesDisponibles, type NuevaCohortePayload, type SemestreItem, type ModalidadItem } from '../../../services/programa/programaCohorteService';
+import { createCohorte, fetchSemestresDisponibles, fetchModalidadesDisponibles, type CrearCohortePayload, type SemestreItem, type ModalidadItem } from '../../../services/programa/programaCohorteService';
 import { fetchCriteriosPrograma, type CriterioEvaluacion } from '../../../services/programa/programaCriteriosService';
 import programaDocsService, { type RequiredDoc } from '../../../services/programa/programaDocsService';
 import type { ProgramaOutletContext } from '../../../layouts/ProgramaLayout';
@@ -30,13 +30,9 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
   const [idModalidad, setIdModalidad] = useState<string>('');
   const [selectedProgramaDocIds, setSelectedProgramaDocIds] = useState<string[]>([]);
   const [selectedCriterios, setSelectedCriterios] = useState<Array<{ id?: string | number; nombre: string; peso: number | undefined }>>([]);
-  // Nuevos campos de fechas
-  const [fechaInicioDocumentacion, setFechaInicioDocumentacion] = useState('');
-  const [fechaFinDocumentacion, setFechaFinDocumentacion] = useState('');
-  const [fechaInicioInscripcion, setFechaInicioInscripcion] = useState('');
-  const [fechaFinInscripcion, setFechaFinInscripcion] = useState('');
-  const [fechaInicioPago, setFechaInicioPago] = useState('');
-  const [fechaFinPago, setFechaFinPago] = useState('');
+  const [fechaInicio, setFechaInicio] = useState('');
+  const [fechaLimiteDocumentos, setFechaLimiteDocumentos] = useState('');
+  const [fechaLimitePago, setFechaLimitePago] = useState('');
 
   useEffect(() => {
     let mounted = true;
@@ -140,6 +136,10 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
       mostrarAlerta('Selecciona una modalidad para la cohorte.', 'advertencia');
       return;
     }
+    if (!fechaInicio || !fechaLimiteDocumentos || !fechaLimitePago) {
+      mostrarAlerta('Completa la fecha de inicio, la fecha límite de documentos y la fecha límite de pago.', 'advertencia');
+      return;
+    }
     if (selectedCriterios.length === 0) {
       mostrarAlerta('Selecciona al menos un criterio para continuar.', 'advertencia');
       return;
@@ -159,17 +159,14 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
     cerrarModalCrear();
     setSaving(true);
     try {
-      const body: NuevaCohortePayload = {
+      const body: CrearCohortePayload = {
         nombre: nombre.trim(),
-        idSemestre,
-        idModalidad,
+        idSemestre: Number(idSemestre),
+        idModalidad: Number(idModalidad),
         cupos: cuposStr === '' ? 0 : parseInt(cuposStr, 10),
-        fechaInicioDocumentacion: fechaInicioDocumentacion || undefined,
-        fechaFinDocumentacion: fechaFinDocumentacion || undefined,
-        fechaInicioInscripcion: fechaInicioInscripcion || undefined,
-        fechaFinInscripcion: fechaFinInscripcion || undefined,
-        fechaInicioPago: fechaInicioPago || undefined,
-        fechaFinPago: fechaFinPago || undefined,
+        fechaInicio,
+        fechaLimiteDocumentos,
+        fechaLimitePago,
         documentosConsejo: consejoDocs.map((doc) => ({ idDocrequisito: doc.id, nombre: doc.nombre })),
         documentosPrograma: programaDocs
           .filter((doc) => selectedProgramaDocIds.includes(String(doc.id)))
@@ -258,58 +255,25 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
             <h2 className="text-sm font-semibold text-gray-800 mb-4">Fechas</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-6">
 
-              <div className="col-span-full">
-                <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wide">Inscripción</p>
-              </div>
-
               <DatePicker
-                id="fechaInicioInscripcion"
-                label="Fecha inicio de inscripción"
-                value={fechaInicioInscripcion}
-                onChange={setFechaInicioInscripcion}
+                id="fechaInicio"
+                label="Fecha de inicio"
+                value={fechaInicio}
+                onChange={setFechaInicio}
               />
 
               <DatePicker
-                id="fechaFinInscripcion"
-                label="Fecha límite de inscripción"
-                value={fechaFinInscripcion}
-                onChange={setFechaFinInscripcion}
-              />
-
-              <div className="col-span-full mt-2">
-                <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wide">Documentos</p>
-              </div>
-
-              <DatePicker
-                id="fechaInicioDocumentacion"
-                label="Fecha inicio de cargue de documentos"
-                value={fechaInicioDocumentacion}
-                onChange={setFechaInicioDocumentacion}
-              />
-
-              <DatePicker
-                id="fechaFinDocumentacion"
+                id="fechaLimiteDocumentos"
                 label="Fecha límite de cargue de documentos"
-                value={fechaFinDocumentacion}
-                onChange={setFechaFinDocumentacion}
-              />
-
-              <div className="col-span-full mt-2">
-                <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wide">Pago</p>
-              </div>
-
-              <DatePicker
-                id="fechaInicioPago"
-                label="Fecha inicio de pago de inscripción"
-                value={fechaInicioPago}
-                onChange={setFechaInicioPago}
+                value={fechaLimiteDocumentos}
+                onChange={setFechaLimiteDocumentos}
               />
 
               <DatePicker
-                id="fechaFinPago"
+                id="fechaLimitePago"
                 label="Fecha límite de pago de inscripción"
-                value={fechaFinPago}
-                onChange={setFechaFinPago}
+                value={fechaLimitePago}
+                onChange={setFechaLimitePago}
               />
             </div>
           </div>
