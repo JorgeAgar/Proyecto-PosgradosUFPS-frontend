@@ -140,6 +140,14 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
       mostrarAlerta('Completa la fecha de inicio, la fecha límite de documentos y la fecha límite de pago.', 'advertencia');
       return;
     }
+    if (fechaLimiteDocumentos <= fechaInicio) {
+      mostrarAlerta('La fecha límite de documentos debe ser posterior a la fecha de inicio.', 'advertencia');
+      return;
+    }
+    if (fechaLimitePago <= fechaInicio) {
+      mostrarAlerta('La fecha límite de pago debe ser posterior a la fecha de inicio.', 'advertencia');
+      return;
+    }
     if (selectedCriterios.length === 0) {
       mostrarAlerta('Selecciona al menos un criterio para continuar.', 'advertencia');
       return;
