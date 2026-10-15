@@ -88,6 +88,19 @@ export interface NuevaCohortePayload {
   criteriosCohorte?: { idCriterio?: number | string; idCohorte?: number | string; pesoSnapshot?: number }[];
 }
 
+export interface CrearCohortePayload {
+  nombre: string;
+  cupos: number;
+  idSemestre: number;
+  idModalidad: number;
+  fechaInicio: string;
+  fechaLimiteDocumentos: string;
+  fechaLimitePago: string;
+  documentosConsejo?: { idDocrequisito?: number | string; idCohorte?: number | string; nombre?: string }[];
+  documentosPrograma?: { idDocrequisito?: number | string; idCohorte?: number | string; nombre?: string }[];
+  criteriosCohorte?: { idCriterio?: number | string; idCohorte?: number | string; pesoSnapshot?: number }[];
+}
+
 export interface SemestreItem {
   id: number | string;
   nombre: string;
@@ -193,7 +206,7 @@ export async function fetchCohortes(): Promise<CohorteItem[]> {
   return normalized;
 }
 
-export async function createCohorte(payload: NuevaCohortePayload): Promise<CohorteItem> {
+export async function createCohorte(payload: CrearCohortePayload): Promise<CohorteItem> {
   const programaId = await getProgramaRealId();
   const path = `/api/application/case/director-programa/programa/${programaId}/cohortes`;
   return programaApiClient.fetch<CohorteItem>(path, { method: 'POST', body: JSON.stringify(payload) });
