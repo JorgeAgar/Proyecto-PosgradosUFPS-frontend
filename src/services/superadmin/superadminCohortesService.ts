@@ -127,10 +127,7 @@ export const superadminProgramasService = {
     superadminApiClient.fetch<ProgramaOutput[]>('/api/dev/endpoint/programa/listall', { method: 'GET' }),
 
   listarPorFacultad: (idFacultad: number) =>
-    superadminApiClient.fetch<ProgramaOutput[]>('/api/dev/endpoint/programa/listbyfacultad', {
-      method: 'POST',
-      body: JSON.stringify({ id: idFacultad }),
-    }),
+    superadminApiClient.fetch<ProgramaOutput[]>(`/api/dev/endpoint/programa/byfacultad/${idFacultad}`, { method: 'GET' }),
 
   listarFacultades: () =>
     superadminApiClient.fetch<FacultadOutput[]>('/api/dev/endpoint/facultad/listall', { method: 'GET' }),
