@@ -19,7 +19,6 @@ export interface CohorteValidacionApi {
   totalPazysalvo: number;
   totalValidados: number;
   totalAdmitidos: number | null;
-  documentos: DocumentoRequerido[];
 }
 
 export async function obtenerCohortesPorPrograma(): Promise<CohorteValidacionApi[]> {

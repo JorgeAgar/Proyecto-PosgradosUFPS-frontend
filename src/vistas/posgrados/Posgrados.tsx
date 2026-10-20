@@ -21,7 +21,7 @@ function getProgramaNombre(programa: ProgramaOutput): string {
 }
 
 function getProgramaCodigo(programa: ProgramaOutput): string {
-  return Number.isFinite(programa.codigo) && programa.codigo !== 0 ? String(programa.codigo) : `ID ${programa.id}`;
+  return programa.codigo?.trim() ? programa.codigo : `ID ${programa.id}`;
 }
 
 function getProgramaSede(programa: ProgramaOutput): string {
@@ -149,10 +149,6 @@ export default function Posgrados() {
 
     for (const facultad of facultades) {
       const programasDeFacultad = new Map<number, ProgramaOutput>();
-
-      for (const programa of facultad.programaList ?? []) {
-        programasDeFacultad.set(programa.id, programa);
-      }
 
       for (const programa of programas.filter((item) => item.idFacultad === facultad.id)) {
         programasDeFacultad.set(programa.id, programa);

@@ -13,6 +13,7 @@ import {
   superadminPlazosService,
   superadminSedesService,
   superadminOtrosValoresService,
+  superadminAdministrativosService,
   type FacultadOutput,
   type ProgramaOutput,
   type CohorteOutput,
@@ -22,6 +23,7 @@ import {
   type PlazoOutput,
   type SedeOutput,
   type OtrosValoresOutput,
+  type AdministrativoOutput,
 } from '../../services/superadmin/superadminCohortesService';
 import { superadminDocumentosService } from '../../services/superadmin/superadminDocumentosService';
 import { leerErrorApi, mensajePorCodigo } from '../../services/erroresApi';
@@ -34,10 +36,11 @@ import { AcademicCapIcon, BuildingLibraryIcon, ChevronRightIcon, CohorteUsersIco
 type FacultadForm = {
   nombre: string;
   correo: string;
+  idAdministrativo: number | '';
 };
 
 type ProgramaForm = {
-  codigo: number | '';
+  codigo: string;
   nombre: string;
   duracion: number | '';
   correo: string;
@@ -68,7 +71,7 @@ type CohorteForm = {
   plazopago: PlazoDates;
 };
 
-const EMPTY_FAC: FacultadForm = { nombre: '', correo: '' };
+const EMPTY_FAC: FacultadForm = { nombre: '', correo: '', idAdministrativo: '' };
 const EMPTY_PROG: ProgramaForm = {
   codigo: '', nombre: '', duracion: '', correo: '', registrosnies: '',
   nivelformacion: '', titulo: '', rcmineducacion: '', creditos: '',
@@ -382,6 +385,7 @@ export default function SuperadminCohortes() {
   const [plazos, setPlazos]               = useState<PlazoOutput[]>([]);
   const [sedes, setSedes]                 = useState<SedeOutput[]>([]);
   const [otrosValores, setOtrosValores]   = useState<OtrosValoresOutput[]>([]);
+  const [administrativos, setAdministrativos] = useState<AdministrativoOutput[]>([]);
   const [loading, setLoading] = useState(true);
 
   const tiporegistros = useMemo(() => {
@@ -442,7 +446,7 @@ export default function SuperadminCohortes() {
   const cargar = useCallback(async () => {
     setLoading(true);
     try {
-      const [facs, progs, cohs, ests, sems, mods, plzs, sds, otros] = await Promise.all([
+      const [facs, progs, cohs, ests, sems, mods, plzs, sds, otros, admins] = await Promise.all([
         superadminFacultadesService.listar(),
         superadminProgramasService.listar(),
         superadminCohortesService.listar(),
@@ -452,6 +456,7 @@ export default function SuperadminCohortes() {
         superadminPlazosService.listar(),
         superadminSedesService.listar(),
         superadminOtrosValoresService.listar(),
+        superadminAdministrativosService.listar(),
       ]);
       setFacultades(facs);
       setProgramas(progs);
@@ -462,6 +467,7 @@ export default function SuperadminCohortes() {
       setPlazos(plzs);
       setSedes(sds);
       setOtrosValores(otros);
+      setAdministrativos(admins);
     } catch (err) {
       mostrarAlerta(err instanceof Error ? err.message : 'Error al cargar datos del servidor.');
     } finally {
@@ -541,7 +547,7 @@ export default function SuperadminCohortes() {
   const openEditFac = (f: FacultadOutput, e: React.MouseEvent) => {
     e.stopPropagation();
     setEditingFac(f);
-    setFacForm({ nombre: f.nombre, correo: f.correo });
+    setFacForm({ nombre: f.nombre, correo: f.correo, idAdministrativo: administrativos.find((a) => a.cargo?.facultad?.id === f.id)?.id ?? '' });
     setFacFormError(null);
     setFacNombreInvalido(false);
     setShowFacModal(true);
@@ -553,6 +559,7 @@ export default function SuperadminCohortes() {
     setFacNombreInvalido(false);
     const nombre = normalizarEspacios(facForm.nombre);
     if (!nombre) { setFacFormError('El nombre es obligatorio.'); setFacNombreInvalido(true); return; }
+    if (facForm.idAdministrativo === '') { setFacFormError('Selecciona un administrativo responsable.'); return; }
     if (!facForm.correo.trim()) { setFacFormError('El correo es obligatorio.'); return; }
     const duplicada = facultades.find((f) => f.id !== editingFac?.id && claveComparacion(f.nombre) === claveComparacion(nombre));
     if (duplicada) {
@@ -565,6 +572,7 @@ export default function SuperadminCohortes() {
       const payload = {
         nombre,
         correo: facForm.correo.trim(),
+        idAdministrativo: facForm.idAdministrativo,
       };
       if (editingFac) {
         await superadminFacultadesService.actualizar({ id: editingFac.id, ...payload });
@@ -669,7 +677,7 @@ export default function SuperadminCohortes() {
       setProgCodigoInvalido(true);
       return;
     }
-    if (hasNegativeNumber(progForm.codigo, progForm.duracion, progForm.creditos, progForm.valormatricula)) {
+    if (hasNegativeNumber(progForm.duracion, progForm.creditos, progForm.valormatricula)) {
       setProgFormError('Los campos numéricos no pueden ser negativos.');
       return;
     }
@@ -685,7 +693,7 @@ export default function SuperadminCohortes() {
         : (progForm.idModalidad as number) || 0;
 
       const payload = {
-        codigo: progForm.codigo as number,
+        codigo: progForm.codigo.trim(),
         nombre: progForm.nombre.trim(),
         duracion: (progForm.duracion as number) || 0,
         correo: progForm.correo.trim(),
@@ -796,15 +804,18 @@ export default function SuperadminCohortes() {
     if (!cohForm.nombre.trim())  { setCohFormError('El nombre es obligatorio.'); return; }
     if (hasNegativeNumber(cohForm.cupos)) { setCohFormError('Los cupos no pueden ser negativos.'); return; }
     if (cohForm.cupos === '' || (cohForm.cupos as number) <= 0) { setCohFormError('Los cupos deben ser mayor a 0.'); return; }
-    if (cohForm.idEstado === '')  { setCohFormError('Selecciona un estado.'); return; }
+    if (editingCoh && cohForm.idEstado === '')  { setCohFormError('Selecciona un estado.'); return; }
     if (cohForm.idSemestre === '') { setCohFormError('Selecciona un semestre.'); return; }
     if (cohForm.idModalidad === '') { setCohFormError('Selecciona una modalidad.'); return; }
-    if (!cohForm.plazodocumentacion.fechainicio || !cohForm.plazodocumentacion.fechafin)
-      { setCohFormError('Completa las fechas del plazo de documentación.'); return; }
-    if (!cohForm.plazoinscripcion.fechainicio || !cohForm.plazoinscripcion.fechafin)
-      { setCohFormError('Completa las fechas del plazo de inscripción.'); return; }
-    if (!cohForm.plazopago.fechainicio || !cohForm.plazopago.fechafin)
-      { setCohFormError('Completa las fechas del plazo de pago.'); return; }
+    if (editingCoh) {
+      for (const plazo of [cohForm.plazodocumentacion, cohForm.plazoinscripcion, cohForm.plazopago]) {
+        if (!plazo.fechainicio || !plazo.fechafin || plazo.fechainicio > plazo.fechafin) {
+          setCohFormError('Completa cada plazo con una fecha de fin igual o posterior a su inicio.'); return;
+        }
+      }
+    } else if (!cohForm.plazodocumentacion.fechainicio || !cohForm.plazodocumentacion.fechafin || !cohForm.plazopago.fechafin) {
+      setCohFormError('Completa las fechas de inicio, documentos y pago.'); return;
+    }
 
     const idProg = editingCoh ? editingCoh.idPrograma : cohContextProgId;
     if (!idProg) { setCohFormError('Error interno: programa no definido.'); return; }
@@ -838,12 +849,9 @@ export default function SuperadminCohortes() {
           cupos: cohForm.cupos as number,
           idSemestre: cohForm.idSemestre as number,
           idModalidad: cohForm.idModalidad as number,
-          fechaInicioDocumentacion: cohForm.plazodocumentacion.fechainicio,
-          fechaFinDocumentacion: cohForm.plazodocumentacion.fechafin,
-          fechaInicioInscripcion: cohForm.plazoinscripcion.fechainicio,
-          fechaFinInscripcion: cohForm.plazoinscripcion.fechafin,
-          fechaInicioPago: cohForm.plazopago.fechainicio,
-          fechaFinPago: cohForm.plazopago.fechafin,
+          fechaInicio: cohForm.plazodocumentacion.fechainicio,
+          fechaLimiteDocumentos: cohForm.plazodocumentacion.fechafin,
+          fechaLimitePago: cohForm.plazopago.fechafin,
           documentosConsejo: documentosConsejo.map((documento) => ({
             id: 0,
             idDocrequisito: documento.id,
@@ -977,6 +985,18 @@ export default function SuperadminCohortes() {
               className="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition hover:border-gray-300 focus:border-slate-400 focus:ring-2 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>
+          <Select tema="oscuro"
+            id="facAdministrativo"
+            label="Administrativo responsable"
+            value={String(facForm.idAdministrativo)}
+            onChange={(value) => setFacForm((form) => ({ ...form, idAdministrativo: value ? Number(value) : '' }))}
+            options={administrativos.map((admin) => ({
+              value: String(admin.id),
+              label: `${admin.persona?.nombres ?? ''} ${admin.persona?.apellidos ?? ''}`.trim() || `Administrativo #${admin.id}`,
+            }))}
+            disabled={facSubmitting}
+          />
+
           <div className="flex gap-3 pt-1">
             <button
               type="submit"
@@ -1039,8 +1059,8 @@ export default function SuperadminCohortes() {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Código</label>
-              <input type="number" min="0" placeholder="12345" value={progForm.codigo}
-                onChange={(e) => { setP('codigo', numVal(e.target.value)); setProgCodigoInvalido(false); }}
+              <input type="text" placeholder="12345" value={progForm.codigo}
+                onChange={(e) => { setP('codigo', e.target.value); setProgCodigoInvalido(false); }}
                 disabled={progSubmitting}
                 aria-invalid={progCodigoInvalido}
                 className={`mt-1 block w-full rounded-lg border ${progCodigoInvalido ? INPUT_ERROR : 'border-gray-200 hover:border-gray-300'} bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-50`} />
@@ -1267,6 +1287,7 @@ export default function SuperadminCohortes() {
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {editingCoh && (
             <Select tema="oscuro"
               id="cohEstado"
               label="Estado"
@@ -1278,6 +1299,7 @@ export default function SuperadminCohortes() {
               }))}
               disabled={cohSubmitting}
             />
+            )}
             <Select tema="oscuro"
               id="cohSemestre"
               label="Semestre"
@@ -1297,6 +1319,7 @@ export default function SuperadminCohortes() {
             disabled={cohSubmitting}
           />
 
+          {editingCoh ? <>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <DatePicker tema="oscuro" id="docInicio" label="Inicio documentación"
               value={cohForm.plazodocumentacion.fechainicio}
@@ -1329,6 +1352,20 @@ export default function SuperadminCohortes() {
               onChange={(v) => setPlazo('plazopago', 'fechafin', v)}
               disabled={cohSubmitting} />
           </div>
+
+          </> : (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <DatePicker tema="oscuro" id="cohInicio" label="Fecha de inicio de la cohorte"
+                value={cohForm.plazodocumentacion.fechainicio}
+                onChange={(v) => setPlazo('plazodocumentacion', 'fechainicio', v)} disabled={cohSubmitting} />
+              <DatePicker tema="oscuro" id="cohDocumentos" label="Fecha límite de documentos"
+                value={cohForm.plazodocumentacion.fechafin}
+                onChange={(v) => setPlazo('plazodocumentacion', 'fechafin', v)} disabled={cohSubmitting} />
+              <DatePicker tema="oscuro" id="cohPago" label="Fecha límite de pago"
+                value={cohForm.plazopago.fechafin}
+                onChange={(v) => setPlazo('plazopago', 'fechafin', v)} disabled={cohSubmitting} />
+            </div>
+          )}
 
           <div className="flex gap-3 pt-1 sticky bottom-0 bg-white pb-1">
             <button type="submit" disabled={cohSubmitting}

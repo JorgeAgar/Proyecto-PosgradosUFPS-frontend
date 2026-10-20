@@ -77,7 +77,7 @@ export async function aceptarEntrevista(idEntrevista: string): Promise<void> {
 export async function solicitarCambioEntrevista(idEntrevista: string, motivocambio: string): Promise<void> {
   return aspiranteApiClient.fetch<void>(
     `/api/application/case/aspirantes/entrevistas/${idEntrevista}/solicitar-cambio`,
-    { method: "PATCH", body: JSON.stringify({ motivocambio }) }
+    { method: "PATCH", body: JSON.stringify({ id: Number(idEntrevista), motivocambio }) }
   );
 }
 
