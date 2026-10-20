@@ -95,19 +95,10 @@ export default function Cohortes() {
 
   const handleToggleEstadoDetalle = async (nextActiva: boolean) => {
     if (!selectedCohorteId || !selectedDetalle) return;
-    try {
-      if (nextActiva) {
-        const updated = await abrirCohorte(selectedCohorteId);
-        setCohortes((prev) => prev.map((c) => (c.id === selectedCohorteId ? { ...c, ...updated } : c)));
-        setSelectedDetalle((prev) => (prev ? { ...prev, ...updated } as CohorteDetalle : updated as CohorteDetalle));
-        return;
-      }
-      const updated = await cerrarCohorte(selectedCohorteId);
-      setCohortes((prev) => prev.map((c) => (c.id === selectedCohorteId ? { ...c, ...updated } : c)));
-      setSelectedDetalle((prev) => (prev ? { ...prev, ...updated } as CohorteDetalle : updated as CohorteDetalle));
-    } catch (err) {
-      mostrarAlerta(err instanceof Error ? err.message : 'No se pudo cambiar el estado de la cohorte.', 'error');
-    }
+    if (nextActiva) await abrirCohorte(selectedCohorteId);
+    else await cerrarCohorte(selectedCohorteId);
+    await refreshList();
+    setSelectedDetalle(await fetchCohorteDetalle(selectedCohorteId));
   };
 
   if (view === 'new') {

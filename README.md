@@ -21,6 +21,7 @@ La aplicación comprende módulos para 4 roles: Aspirante, Director de programa,
 
 ```bash
 npm install
+cp .env.example .env
 npm run dev
 ```
 
@@ -34,3 +35,14 @@ npm run dev
 ## Estado del proyecto
 
 El proyecto está en evolución y varias pantallas muestran estados pendientes o placeholders. La base actual ya cubre la navegación principal y la separación de responsabilidades por módulo.
+
+## Comprobaciones
+
+```bash
+npm test
+npm run lint
+npm run build
+```
+
+Las pruebas de contrato usan respuestas sanitizadas y no escriben en el backend.
+Las rutas, cuerpos y tipos se basan en el [OpenAPI publicado](https://projectposgradosufps-ingsoft-production.up.railway.app/posgrados-project/api-docs).

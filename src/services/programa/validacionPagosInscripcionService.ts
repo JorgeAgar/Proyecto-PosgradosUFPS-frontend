@@ -1,18 +1,7 @@
 import { programaApiClient } from './programaService';
+import { obtenerPagosPorCohorte, type PagoReciboDirector } from './validacionPagosService';
 
-export interface PagoInscripcionApi {
-  id: number;
-  idPago: number;
-  idAspirante: number;
-  aspirante: string;
-  fechavencimiento: string;
-  urlrecibo: string;
-  urlfactura: string;
-  referenciapago: string;
-  valorpago: number;
-  idEstado: number;
-  estado: string;
-}
+export type PagoInscripcionApi = PagoReciboDirector;
 
 export interface AccionPagoInscripcionResponse {
   id: number;
@@ -20,8 +9,8 @@ export interface AccionPagoInscripcionResponse {
   idEstado: number;
   idPagoconcepto: number;
   valorPagoPesos: number;
-  aspirante: string;
-  estado: string;
+  aspirante: unknown;
+  estado: unknown;
   pagoconcepto: {
     id: number;
     tipo: string;
@@ -29,10 +18,7 @@ export interface AccionPagoInscripcionResponse {
 }
 
 export async function obtenerPagosInscripcion(idCohorte: number): Promise<PagoInscripcionApi[]> {
-  return programaApiClient.fetch<PagoInscripcionApi[]>(
-    `/api/application/case/director-programa/pagos/${idCohorte}/inscripcion`,
-    { method: 'GET' },
-  );
+  return obtenerPagosPorCohorte('inscripcion', idCohorte);
 }
 
 export async function aprobarPagoInscripcion(idRecibo: number): Promise<AccionPagoInscripcionResponse> {
@@ -42,8 +28,8 @@ export async function aprobarPagoInscripcion(idRecibo: number): Promise<AccionPa
   );
 }
 
-export async function rechazarPagoInscripcion(idRecibo: number): Promise<AccionPagoInscripcionResponse> {
-  return programaApiClient.fetch<AccionPagoInscripcionResponse>(
+export async function rechazarPagoInscripcion(idRecibo: number): Promise<PagoReciboDirector> {
+  return programaApiClient.fetch<PagoReciboDirector>(
     `/api/application/case/director-programa/pagos/inscripcion/${idRecibo}/estado`,
     { method: 'PATCH' },
   );

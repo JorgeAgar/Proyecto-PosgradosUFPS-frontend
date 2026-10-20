@@ -150,8 +150,7 @@ export default function ProgramaInicio() {
               </div>
               <h3 className="text-sm font-semibold text-gray-900">Fecha límite documentos</h3>
             </div>
-            <div className="text-xl font-bold text-red-700">{cohorteActual.fechaFinDocumentacion || cohorteActual.fechaLimiteDocumentos}</div>
-            {cohorteActual.fechaInicioDocumentacion && <div className="text-xs text-neutral-500 mt-1">Desde {cohorteActual.fechaInicioDocumentacion}</div>}
+            <div className="text-xl font-bold text-red-700">{cohorteActual.fechaLimiteDocumentos}</div>
           </div>
 
           <div className="rounded-lg border border-gray-200 p-4 bg-neutral-50">
@@ -161,8 +160,7 @@ export default function ProgramaInicio() {
               </div>
               <h3 className="text-sm font-semibold text-gray-900">Fecha límite pago</h3>
             </div>
-            <div className="text-xl font-bold text-red-700">{cohorteActual.fechaFinPago || cohorteActual.fechaLimitePago}</div>
-            {cohorteActual.fechaInicioPago && <div className="text-xs text-neutral-500 mt-1">Desde {cohorteActual.fechaInicioPago}</div>}
+            <div className="text-xl font-bold text-red-700">{cohorteActual.fechaLimitePago}</div>
           </div>
         </div>
 
@@ -235,8 +233,7 @@ export default function ProgramaInicio() {
                   </div>
                   <h2 className="text-sm font-semibold text-gray-900">Fecha límite cargue de documentos</h2>
                 </div>
-                <div className="text-2xl font-bold text-red-700">{cohorteActual.fechaFinDocumentacion || cohorteActual.fechaLimiteDocumentos}</div>
-                {cohorteActual.fechaInicioDocumentacion && <div className="text-xs text-neutral-500 mt-1">Desde {cohorteActual.fechaInicioDocumentacion}</div>}
+                <div className="text-2xl font-bold text-red-700">{cohorteActual.fechaLimiteDocumentos}</div>
               </div>
 
               <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-gray-300 transition-all animate-fade-in-up delay-200">
@@ -246,8 +243,7 @@ export default function ProgramaInicio() {
                   </div>
                   <h2 className="text-sm font-semibold text-gray-900">Fecha límite pago de inscripción</h2>
                 </div>
-                <div className="text-2xl font-bold text-red-700">{cohorteActual.fechaFinPago || cohorteActual.fechaLimitePago}</div>
-                {cohorteActual.fechaInicioPago && <div className="text-xs text-neutral-500 mt-1">Desde {cohorteActual.fechaInicioPago}</div>}
+                <div className="text-2xl font-bold text-red-700">{cohorteActual.fechaLimitePago}</div>
               </div>
             </div>
 

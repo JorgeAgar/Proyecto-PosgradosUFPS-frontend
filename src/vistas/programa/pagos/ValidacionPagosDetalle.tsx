@@ -287,7 +287,7 @@ export default function ValidacionPagosDetalle({ tipo }: { tipo: TipoPago }) {
 													type="button"
 													onClick={() => {
 														setDownloadingId(pago.id);
-														window.open(pago.urlrecibo, "_blank");
+														window.open(pago.urlrecibo ?? undefined, "_blank");
 														setTimeout(() => setDownloadingId(null), 800);
 													}}
 													disabled={downloadingId === pago.id}
@@ -325,7 +325,7 @@ export default function ValidacionPagosDetalle({ tipo }: { tipo: TipoPago }) {
 												</div>
 												<button
 													type="button"
-													onClick={() => window.open(pago.urlfactura, "_blank")}
+													onClick={() => window.open(pago.urlfactura ?? undefined, "_blank")}
 													className={`shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 font-semibold text-sm rounded-lg transition-colors ${estilo.botonVer}`}
 												>
 													<DocumentTextIcon className="w-4 h-4 shrink-0" /> Ver Factura

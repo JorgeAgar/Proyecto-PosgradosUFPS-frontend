@@ -23,7 +23,6 @@ type DocumentoForm = {
 	tamanomaximo: string;
 	formato: File | null;
 	formatoActualUrl: string | null;
-	formatoEliminado: boolean;
 };
 
 const EMPTY_FORM: DocumentoForm = {
@@ -32,7 +31,6 @@ const EMPTY_FORM: DocumentoForm = {
 	tamanomaximo: '',
 	formato: null,
 	formatoActualUrl: null,
-	formatoEliminado: false,
 };
 
 function sortDocumentos(items: DocumentoConsejoOutput[]) {
@@ -118,7 +116,6 @@ export default function SuperadminDocumentos() {
 			tamanomaximo: String(documento.tamanomaximo),
 			formato: null,
 			formatoActualUrl: documento.urlformato ?? null,
-			formatoEliminado: false,
 		});
 		setFormError(null);
 		if (formatoInputRef.current) {
@@ -171,7 +168,6 @@ export default function SuperadminDocumentos() {
 					{
 						...payload,
 						id: editingDocumento.id,
-						...(selectedFormat ? {} : { urlformato: formData.formatoEliminado ? null : formData.formatoActualUrl ?? undefined }),
 					},
 					selectedFormat,
 				);
@@ -363,12 +359,12 @@ export default function SuperadminDocumentos() {
 							type="file"
 							accept="application/pdf,.pdf"
 								ref={formatoInputRef}
-								onChange={(e) => setFormData((current) => ({ ...current, formato: e.target.files?.[0] ?? null, formatoEliminado: false }))}
+								onChange={(e) => setFormData((current) => ({ ...current, formato: e.target.files?.[0] ?? null }))}
 							disabled={submitting}
 							className="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition file:mr-4 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-slate-700 hover:border-gray-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
 						/>
 						<p className="mt-1 text-xs text-gray-400">Opcional. Este archivo se envía aparte del tamaño máximo.</p>
-							{editingDocumento && formData.formatoActualUrl && !formData.formato && !formData.formatoEliminado && (
+							{editingDocumento && formData.formatoActualUrl && !formData.formato && (
 							<div className="mt-2 flex items-center justify-between gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
 								<div>
 									<p className="font-medium">Este documento ya tiene un formato cargado.</p>
@@ -382,27 +378,11 @@ export default function SuperadminDocumentos() {
 										>
 											Ver formato
 										</button>
-										<button
-											type="button"
-											onClick={() => {
-												setFormData((current) => ({ ...current, formato: null, formatoEliminado: true }));
-												if (formatoInputRef.current) {
-													formatoInputRef.current.value = '';
-												}
-											}}
-											className="rounded-md border border-red-200 bg-white px-3 py-1.5 font-medium text-red-700 transition-colors hover:bg-red-50"
-										>
-											Eliminar formato
-										</button>
+
 									</div>
 							</div>
 						)}
-							{editingDocumento && formData.formatoEliminado && !formData.formato && (
-								<div className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800">
-									<p className="font-medium">El formato se eliminará al guardar.</p>
-									<p className="text-red-700/80">Si no seleccionas un archivo nuevo, el documento quedará sin formato.</p>
-								</div>
-							)}
+
 						{formData.formato && (
 							<p className="mt-1 text-xs font-medium text-slate-600">Archivo seleccionado: {formData.formato.name}</p>
 						)}

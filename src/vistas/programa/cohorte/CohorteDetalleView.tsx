@@ -212,65 +212,16 @@ export default function CohorteDetalleView({
             <h2 className="text-sm font-semibold text-gray-800 mb-4">Fechas</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-6">
 
-              {(editedData.fechaInicioInscripcion || editedData.fechaFinInscripcion) && (
-                <div className="col-span-full">
-                  <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wide">Inscripción</p>
+              {([
+                ['fechaInicio', 'Fecha de inicio de la cohorte'],
+                ['fechaLimiteDocumentos', 'Fecha límite de documentos'],
+                ['fechaLimitePago', 'Fecha límite de pago'],
+              ] as const).map(([campo, etiqueta]) => (
+                <div key={campo}>
+                  <div className="text-xs font-semibold text-neutral-400 uppercase tracking-wide mb-2">{etiqueta}</div>
+                  <div className="text-sm text-gray-900">{editedData[campo] || 'Sin fecha'}</div>
                 </div>
-              )}
-
-              {editedData.fechaInicioInscripcion && (
-                <div>
-                  <div className="text-xs font-semibold text-neutral-400 uppercase tracking-wide mb-2">Fecha inicio de inscripción</div>
-                  <div className="text-sm text-gray-900">{editedData.fechaInicioInscripcion}</div>
-                </div>
-              )}
-
-              {editedData.fechaFinInscripcion && (
-                <div>
-                  <div className="text-xs font-semibold text-neutral-400 uppercase tracking-wide mb-2">Fecha límite de inscripción</div>
-                  <div className="text-sm text-gray-900">{editedData.fechaFinInscripcion}</div>
-                </div>
-              )}
-
-              {(editedData.fechaInicioDocumentacion || editedData.fechaFinDocumentacion) && (
-                <div className="col-span-full mt-2">
-                  <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wide">Documentos</p>
-                </div>
-              )}
-
-              {editedData.fechaInicioDocumentacion && (
-                <div>
-                  <div className="text-xs font-semibold text-neutral-400 uppercase tracking-wide mb-2">Fecha inicio de cargue de documentos</div>
-                  <div className="text-sm text-gray-900">{editedData.fechaInicioDocumentacion}</div>
-                </div>
-              )}
-
-              {editedData.fechaFinDocumentacion && (
-                <div>
-                  <div className="text-xs font-semibold text-neutral-400 uppercase tracking-wide mb-2">Fecha límite de cargue de documentos</div>
-                  <div className="text-sm text-gray-900">{editedData.fechaFinDocumentacion}</div>
-                </div>
-              )}
-
-              {(editedData.fechaInicioPago || editedData.fechaFinPago) && (
-                <div className="col-span-full mt-2">
-                  <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wide">Pago</p>
-                </div>
-              )}
-
-              {editedData.fechaInicioPago && (
-                <div>
-                  <div className="text-xs font-semibold text-neutral-400 uppercase tracking-wide mb-2">Fecha inicio de pago de inscripción</div>
-                  <div className="text-sm text-gray-900">{editedData.fechaInicioPago}</div>
-                </div>
-              )}
-
-              {editedData.fechaFinPago && (
-                <div>
-                  <div className="text-xs font-semibold text-neutral-400 uppercase tracking-wide mb-2">Fecha límite de pago de inscripción</div>
-                  <div className="text-sm text-gray-900">{editedData.fechaFinPago}</div>
-                </div>
-              )}
+              ))}
             </div>
           </div>
 
