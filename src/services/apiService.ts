@@ -1,4 +1,5 @@
 import { API_BASE_URL, extractErrorMessage, type AuthService } from "./authService";
+import { leerCuerpoError, type ErrorHttp } from "./erroresApi";
 
 export interface ApiClient {
   /** Petición autenticada; la respuesta se interpreta como JSON (o texto si no lo es). */
@@ -45,10 +46,13 @@ export function createApiClient(authService: AuthService): ApiClient {
 
       const error = new Error(
         extractErrorMessage(body, response.status, response.statusText),
-      ) as Error & { body?: unknown; status?: number; statusText?: string };
+      ) as ErrorHttp;
+      const { code, param } = leerCuerpoError(body);
       error.body = body;
       error.status = response.status;
       error.statusText = response.statusText;
+      error.code = code;
+      error.param = param;
       throw error;
     }
 

@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "./authService";
+import { leerCuerpoError, mensajePorCodigo, type ErrorHttp } from "./erroresApi";
 
 export type RegistroSelectOption = {
 	value: string;
@@ -96,16 +97,21 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
 	});
 
 	if (!response.ok) {
-		let message = `No se pudieron cargar los datos (${response.status})`;
+		let body: unknown;
 		try {
-			const body = await response.json() as Record<string, unknown>;
-			if (typeof body.message === "string" && body.message) {
-				message = body.message;
-			}
+			body = await response.json();
 		} catch {
 			// ignore — use generic message
 		}
-		throw new Error(message);
+		const { code, message, param } = leerCuerpoError(body);
+		const error = new Error(
+			mensajePorCodigo(code, param) ?? message ?? `No se pudieron cargar los datos (${response.status})`,
+		) as ErrorHttp;
+		error.body = body;
+		error.status = response.status;
+		error.code = code;
+		error.param = param;
+		throw error;
 	}
 
 	if (response.status === 204) {

@@ -16,6 +16,7 @@ import { Select } from "../components/Select.tsx";
 import { DatePicker } from "../components/DatePicker.tsx";
 import { useNavigate } from "react-router";
 import ufpsLogo from "../assets/logoufps.png";
+import { leerErrorApi } from "../services/erroresApi.ts";
 import { listarCapacidadesExcepcionalesRegistro, listarCohortesRegistro, listarDepartamentosPorPaisRegistro, listarDepartamentosExpedicionRegistro, listarDiscapacidadesRegistro, listarDocumentosRegistro, listarEstadosCivilesRegistro, listarGruposEtnicosRegistro, listarMunicipiosPorDepartamentoRegistro, listarPaisesRegistro, listarPueblosIndigenasRegistro, listarProgramasInscripcionRegistro, listarSiNoRegistro, listarSexosBiologicosRegistro, listarVinculacionesProgramaRegistro, listarZonasResidenciaRegistro, registrarAspiranteCompleto, type RegistroFormularioData, type RegistroSelectOption, type RegistroSelectOptions } from "../services/registroService.ts";
 import { SpinnerIcon } from "../assets/icons";
 
@@ -149,6 +150,12 @@ const TABS: Array<{
 		fields: ["usuarioRegistro", "contrasenaRegistro", "confirmarContrasena"],
 	},
 ];
+
+/** Campo del formulario que provoca cada conflicto del backend. */
+const CAMPO_POR_CODIGO_ERROR: Record<string, keyof FormState> = {
+	PERSONA_INSCRIPCION_YA_EXISTE_CONFLICT: "numeroDocumento",
+	USUARIO_YA_EXISTE_CONFLICT: "usuarioRegistro",
+};
 
 const INITIAL_FORM: FormState = {
 	nombres: "",
@@ -852,7 +859,15 @@ export default function Registro() {
 		} catch (error) {
 			console.error("No se pudo completar el registro del aspirante:", error);
 			setSubmitted(false);
-			setSubmitError(error instanceof Error ? error.message : "No se pudo completar el registro del aspirante.");
+			const mensaje = error instanceof Error ? error.message : "No se pudo completar el registro del aspirante.";
+			setSubmitError(mensaje);
+			// Los conflictos conocidos se marcan junto al campo que los provoca.
+			const campo = CAMPO_POR_CODIGO_ERROR[leerErrorApi(error).code ?? ""];
+			if (campo) {
+				setErrors((current) => ({ ...current, [campo]: mensaje }));
+				const tab = TABS.find((t) => t.fields.includes(campo));
+				if (tab) setActiveTab(tab.id);
+			}
 		} finally {
 			setSubmitting(false);
 		}

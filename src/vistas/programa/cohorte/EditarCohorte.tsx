@@ -12,6 +12,7 @@ import { Select, type SelectOption } from '../../../components/Select';
 import { SpinnerIcon } from "../../../assets/icons";
 import { DialogoConfirmacion } from '../../../components/Dialogo';
 import { mensajeErrorCohorte } from './mensajeErrorCohorte';
+import { CAMPOS_FECHA_COHORTE, erroresFechasDesdeApi, validarFechasCohorte, ventanaInicioDocumentacion, type CampoFechaCohorte, type ErroresFechasCohorte } from './fechasCohorte';
 
 function genLocalId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -89,6 +90,7 @@ export default function EditarCohorte({
   const [isLoadingSemestres, setIsLoadingSemestres] = useState(false);
   const [isLoadingModalidades, setIsLoadingModalidades] = useState(false);
   const [criterioError, setCriterioError] = useState<string | null>(null);
+  const [erroresFechas, setErroresFechas] = useState<ErroresFechasCohorte>({});
   const criterioIdMapRef = useRef<Record<string, string | number>>({});
   const onSavedConfirmedRef = useRef(onSavedConfirmed);
   onSavedConfirmedRef.current = onSavedConfirmed;
@@ -111,6 +113,7 @@ export default function EditarCohorte({
     setIsLoadingSemestres(true);
     setIsLoadingModalidades(true);
     setCriterioError(null);
+    setErroresFechas({});
     setAvailableCriteriosState(parentCriterios && parentCriterios.length > 0 ? parentCriterios : undefined);
     setAvailableConsejoDocs([]);
     setAvailableProgramaDocs([]);
@@ -322,6 +325,14 @@ export default function EditarCohorte({
     } as CohorteDetalle));
   };
 
+  const fechaInicioSemestre = availableSemestres.find((s) => String(s.id) === String(editedData.idSemestre ?? ''))?.fechainicio;
+  const ventanaDocumentacion = ventanaInicioDocumentacion(fechaInicioSemestre);
+
+  const cambiarFecha = (campo: CampoFechaCohorte) => (valor: string) => {
+    setEditedData((prev) => ({ ...prev, [campo]: valor }));
+    setErroresFechas((prev) => ({ ...prev, [campo]: undefined }));
+  };
+
   const isLoading = isLoadingInitialData || isLoadingDocs || isLoadingCriterios || isLoadingSemestres || isLoadingModalidades;
   const disabled = isSaving || isLoading;
 
@@ -344,6 +355,10 @@ export default function EditarCohorte({
         nombre: doc.nombre,
       }));
 
+    if (!(editedData.nombre ?? '').trim()) {
+      mostrarAlerta('Ingresa el nombre de la cohorte.', 'advertencia');
+      return;
+    }
     if (Number(editedData.cupos) < 0) {
       mostrarAlerta('Los cupos no pueden ser negativos.', 'advertencia');
       return;
@@ -356,6 +371,23 @@ export default function EditarCohorte({
       mostrarAlerta('Selecciona una modalidad para la cohorte.', 'advertencia');
       return;
     }
+    // El PUT solo aplica las fechas que se envían: se mandan únicamente las modificadas.
+    const fechaCambio = (campo: CampoFechaCohorte) => (editedData[campo] ?? '') !== (cohorte[campo] ?? '');
+    const erroresFecha = validarFechasCohorte(editedData, {
+      fechaInicioSemestre,
+      validarSemestre: fechaCambio('fechaInicioDocumentacion') || String(editedData.idSemestre) !== String(cohorte.idSemestre ?? ''),
+    });
+    for (const campo of CAMPOS_FECHA_COHORTE) {
+      if (cohorte[campo] && !editedData[campo]) erroresFecha[campo] = 'Selecciona la fecha.';
+    }
+    setErroresFechas(erroresFecha);
+    if (Object.keys(erroresFecha).length > 0) {
+      mostrarAlerta('Revisa las fechas de documentación, inscripción y pago.', 'advertencia');
+      return;
+    }
+    const fechasModificadas = Object.fromEntries(
+      CAMPOS_FECHA_COHORTE.filter((campo) => fechaCambio(campo) && editedData[campo]).map((campo) => [campo, editedData[campo]]),
+    ) as Partial<Record<CampoFechaCohorte, string>>;
     if (documentosSincronizados.some((doc) => !doc.nombre.trim())) {
       mostrarAlerta('Todos los documentos deben tener nombre.', 'advertencia');
       return;
@@ -386,14 +418,9 @@ export default function EditarCohorte({
         id: cohorte.id,
         idSemestre: editedData.idSemestre,
         idModalidad: editedData.idModalidad,
-        cupos: editedData.cupos,
-        nombre: editedData.nombre,
-        fechaInicioDocumentacion: editedData.fechaInicioDocumentacion,
-        fechaFinDocumentacion: editedData.fechaFinDocumentacion,
-        fechaInicioInscripcion: editedData.fechaInicioInscripcion,
-        fechaFinInscripcion: editedData.fechaFinInscripcion,
-        fechaInicioPago: editedData.fechaInicioPago,
-        fechaFinPago: editedData.fechaFinPago,
+        cupos: editedData.cupos ?? 0,
+        nombre: (editedData.nombre ?? '').trim(),
+        ...fechasModificadas,
         documentosConsejo,
         documentosPrograma,
         criteriosCohorte: (editedData.criterios ?? []).map((criterio) => ({
@@ -414,6 +441,7 @@ export default function EditarCohorte({
       setEditClosing(true);
       setTimeout(() => onCancel(), 170);
     } catch (error) {
+      setErroresFechas(erroresFechasDesdeApi(error));
       const message = mensajeErrorCohorte(error, 'No se pudo guardar la cohorte.', {
         415: 'El criterio no se puede editar ni borrar porque ya tiene calificaciones registradas.',
       });
@@ -421,7 +449,7 @@ export default function EditarCohorte({
     } finally {
       setIsSaving(false);
     }
-  }, [editedData, onSaved, onCancel, mostrarAlerta, availableConsejoDocs, availableProgramaDocs, cohorte.id, cohorte.documentosAsignados?.documentosConsejo, cohorte.documentosAsignados?.documentosPrograma]);
+  }, [editedData, onSaved, onCancel, mostrarAlerta, availableConsejoDocs, availableProgramaDocs, cohorte, fechaInicioSemestre]);
 
   const handleCancelOrBack = () => {
     setEditClosing(true);
@@ -517,14 +545,17 @@ export default function EditarCohorte({
             id="fechaInicioInscripcion"
             label="Fecha inicio de inscripción"
             value={editedData.fechaInicioInscripcion ?? ''}
-            onChange={(value) => setEditedData({ ...editedData, fechaInicioInscripcion: value })}
+            onChange={cambiarFecha('fechaInicioInscripcion')}
+            error={erroresFechas.fechaInicioInscripcion}
           />
 
           <DatePicker
             id="fechaFinInscripcion"
             label="Fecha límite de inscripción"
             value={editedData.fechaFinInscripcion ?? ''}
-            onChange={(value) => setEditedData({ ...editedData, fechaFinInscripcion: value })}
+            onChange={cambiarFecha('fechaFinInscripcion')}
+            error={erroresFechas.fechaFinInscripcion}
+            minDate={editedData.fechaInicioInscripcion || undefined}
           />
 
           <div className="col-span-full mt-2">
@@ -535,14 +566,19 @@ export default function EditarCohorte({
             id="fechaInicioDocumentacion"
             label="Fecha inicio de cargue de documentos"
             value={editedData.fechaInicioDocumentacion ?? ''}
-            onChange={(value) => setEditedData({ ...editedData, fechaInicioDocumentacion: value })}
+            onChange={cambiarFecha('fechaInicioDocumentacion')}
+            error={erroresFechas.fechaInicioDocumentacion}
+            minDate={ventanaDocumentacion?.min}
+            maxDate={ventanaDocumentacion?.max}
           />
 
           <DatePicker
             id="fechaFinDocumentacion"
             label="Fecha límite de cargue de documentos"
             value={editedData.fechaFinDocumentacion ?? ''}
-            onChange={(value) => setEditedData({ ...editedData, fechaFinDocumentacion: value })}
+            onChange={cambiarFecha('fechaFinDocumentacion')}
+            error={erroresFechas.fechaFinDocumentacion}
+            minDate={editedData.fechaInicioDocumentacion || undefined}
           />
 
           <div className="col-span-full mt-2">
@@ -553,14 +589,17 @@ export default function EditarCohorte({
             id="fechaInicioPago"
             label="Fecha inicio de pago de inscripción"
             value={editedData.fechaInicioPago ?? ''}
-            onChange={(value) => setEditedData({ ...editedData, fechaInicioPago: value })}
+            onChange={cambiarFecha('fechaInicioPago')}
+            error={erroresFechas.fechaInicioPago}
           />
 
           <DatePicker
             id="fechaFinPago"
             label="Fecha límite de pago de inscripción"
             value={editedData.fechaFinPago ?? ''}
-            onChange={(value) => setEditedData({ ...editedData, fechaFinPago: value })}
+            onChange={cambiarFecha('fechaFinPago')}
+            error={erroresFechas.fechaFinPago}
+            minDate={editedData.fechaInicioPago || undefined}
           />
         </div>
       </div>
