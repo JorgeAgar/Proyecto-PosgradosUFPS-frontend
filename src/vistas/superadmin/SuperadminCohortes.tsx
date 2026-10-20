@@ -24,6 +24,7 @@ import {
   type OtrosValoresOutput,
 } from '../../services/superadmin/superadminCohortesService';
 import { superadminDocumentosService } from '../../services/superadmin/superadminDocumentosService';
+import { leerErrorApi, mensajePorCodigo } from '../../services/erroresApi';
 import { AcademicCapIcon, BuildingLibraryIcon, ChevronRightIcon, CohorteUsersIcon, FolderPlusIcon, PencilIcon, PlusIcon, SpinnerIcon, TrashIcon } from "../../assets/icons";
 
 // ── Íconos ────────────────────────────────────────────────────────────────────
@@ -83,6 +84,42 @@ const EMPTY_COH: CohorteForm = {
   plazoinscripcion:   { ...EMPTY_PLAZO },
   plazopago:          { ...EMPTY_PLAZO },
 };
+
+// ── Normalización y errores del backend ───────────────────────────────────────
+
+/** Igual que el backend: recorta extremos y colapsa espacios internos repetidos. */
+const normalizarEspacios = (texto: string) => texto.trim().replace(/\s+/g, ' ');
+
+/** Clave de comparación sin mayúsculas ni tildes (como la collation de la base). */
+const claveComparacion = (texto: string) =>
+  normalizarEspacios(texto).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+const CODIGOS_CONFLICTO_PROGRAMA = [
+  'PROGRAMA_CON_ESTUDIANTES_CONFLICT',
+  'PROGRAMA_CON_COHORTES_CONFLICT',
+  'PROGRAMA_CON_DIRECTOR_CONFLICT',
+  'PROGRAMA_REFERENCIADO_CONFLICT',
+];
+
+/**
+ * Mensajes de un 409 al eliminar un programa: uno por cada código de
+ * `param.conflictos` (o deducido de los conteos si la lista viene vacía).
+ */
+function conflictosEliminarPrograma(code: string, param: unknown): string[] {
+  const detalle = (typeof param === 'object' && param !== null ? param : {}) as Record<string, unknown>;
+  let codigos = (Array.isArray(detalle.conflictos) ? detalle.conflictos : [])
+    .map((c) => (typeof c === 'string' ? c : (c as { code?: unknown } | null)?.code))
+    .filter((c): c is string => typeof c === 'string');
+  if (codigos.length === 0) {
+    if (Number(detalle.estudiantes) > 0) codigos.push('PROGRAMA_CON_ESTUDIANTES_CONFLICT');
+    if (Number(detalle.cohortes) > 0) codigos.push('PROGRAMA_CON_COHORTES_CONFLICT');
+    if (detalle.directorAsignado === true || Number(detalle.administrativos) > 0) codigos.push('PROGRAMA_CON_DIRECTOR_CONFLICT');
+  }
+  if (codigos.length === 0) codigos = [code];
+  return codigos.map((c) => mensajePorCodigo(c, param) ?? c);
+}
+
+const INPUT_ERROR = 'border-red-300 hover:border-red-300';
 
 // ── CohorteCard ───────────────────────────────────────────────────────────────
 
@@ -359,6 +396,7 @@ export default function SuperadminCohortes() {
   const [facForm, setFacForm]               = useState<FacultadForm>(EMPTY_FAC);
   const [facSubmitting, setFacSubmitting]   = useState(false);
   const [facFormError, setFacFormError]     = useState<string | null>(null);
+  const [facNombreInvalido, setFacNombreInvalido] = useState(false);
 
   const [showDelFacModal, setShowDelFacModal] = useState(false);
   const [facToDelete, setFacToDelete]         = useState<FacultadOutput | null>(null);
@@ -370,6 +408,7 @@ export default function SuperadminCohortes() {
   const [progForm, setProgForm]               = useState<ProgramaForm>(EMPTY_PROG);
   const [progSubmitting, setProgSubmitting]   = useState(false);
   const [progFormError, setProgFormError]     = useState<string | null>(null);
+  const [progCodigoInvalido, setProgCodigoInvalido] = useState(false);
 
   const programaRequiereSeleccionModalidad = useMemo(() => {
     const tiporegistro = tiporegistros.find((t) => t.id === progForm.idTiporegistro);
@@ -384,6 +423,7 @@ export default function SuperadminCohortes() {
   const [showDelProgModal, setShowDelProgModal] = useState(false);
   const [progToDelete, setProgToDelete]         = useState<ProgramaOutput | null>(null);
   const [delProgming, setDelProgming]           = useState(false);
+  const [progDelConflictos, setProgDelConflictos] = useState<string[]>([]);
 
   // ── Modal: Cohorte ────────────────────────────────────────────────────────
   const [showCohModal, setShowCohModal]     = useState(false);
@@ -494,6 +534,7 @@ export default function SuperadminCohortes() {
     setEditingFac(null);
     setFacForm(EMPTY_FAC);
     setFacFormError(null);
+    setFacNombreInvalido(false);
     setShowFacModal(true);
   };
 
@@ -502,18 +543,27 @@ export default function SuperadminCohortes() {
     setEditingFac(f);
     setFacForm({ nombre: f.nombre, correo: f.correo });
     setFacFormError(null);
+    setFacNombreInvalido(false);
     setShowFacModal(true);
   };
 
   const handleSaveFac = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFacFormError(null);
-    if (!facForm.nombre.trim()) { setFacFormError('El nombre es obligatorio.'); return; }
+    setFacNombreInvalido(false);
+    const nombre = normalizarEspacios(facForm.nombre);
+    if (!nombre) { setFacFormError('El nombre es obligatorio.'); setFacNombreInvalido(true); return; }
     if (!facForm.correo.trim()) { setFacFormError('El correo es obligatorio.'); return; }
+    const duplicada = facultades.find((f) => f.id !== editingFac?.id && claveComparacion(f.nombre) === claveComparacion(nombre));
+    if (duplicada) {
+      setFacFormError(`Ya existe una facultad llamada "${duplicada.nombre}".`);
+      setFacNombreInvalido(true);
+      return;
+    }
     setFacSubmitting(true);
     try {
       const payload = {
-        nombre: facForm.nombre.trim(),
+        nombre,
         correo: facForm.correo.trim(),
       };
       if (editingFac) {
@@ -525,7 +575,18 @@ export default function SuperadminCohortes() {
       await cargar();
       mostrarConfirm(editingFac ? 'Facultad actualizada con éxito.' : 'Facultad creada con éxito.');
     } catch (err) {
-      mostrarAlerta(err instanceof Error ? err.message : 'Error al guardar la facultad.');
+      const mensaje = err instanceof Error ? err.message : 'Error al guardar la facultad.';
+      const { code } = leerErrorApi(err);
+      if (code === 'FACULTAD_NOMBRE_DUPLICADO') {
+        setFacFormError(mensaje);
+        setFacNombreInvalido(true);
+      } else if (code === 'FACULTAD_NOT_FOUND') {
+        setShowFacModal(false);
+        mostrarAlerta(mensaje);
+        await cargar();
+      } else {
+        mostrarAlerta(mensaje);
+      }
     } finally {
       setFacSubmitting(false);
     }
@@ -547,8 +608,14 @@ export default function SuperadminCohortes() {
       await cargar();
       mostrarConfirm('Facultad eliminada con éxito.');
     } catch (err) {
-      mostrarAlerta(err instanceof Error ? err.message : 'Error al eliminar la facultad.');
+      const { code } = leerErrorApi(err);
+      if (code === 'REGISTRO_EN_USO_CONFLICT') {
+        mostrarAlerta('La facultad tiene programas o cargos asociados y no se puede eliminar.');
+      } else {
+        mostrarAlerta(err instanceof Error ? err.message : 'Error al eliminar la facultad.');
+      }
       setShowDelFacModal(false);
+      if (code === 'FACULTAD_NOT_FOUND') await cargar();
     } finally {
       setDelFacming(false);
     }
@@ -561,6 +628,7 @@ export default function SuperadminCohortes() {
     setEditingProg(null);
     setProgForm({ ...EMPTY_PROG, idFacultad: facultadId });
     setProgFormError(null);
+    setProgCodigoInvalido(false);
     setShowProgModal(true);
   };
 
@@ -586,14 +654,21 @@ export default function SuperadminCohortes() {
       idOtros: p.idOtros ?? '',
     });
     setProgFormError(null);
+    setProgCodigoInvalido(false);
     setShowProgModal(true);
   };
 
   const handleSaveProg = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setProgFormError(null);
+    setProgCodigoInvalido(false);
     if (!progForm.nombre.trim()) { setProgFormError('El nombre es obligatorio.'); return; }
-    if (progForm.codigo === '')   { setProgFormError('El código es obligatorio.'); return; }
+    if (progForm.codigo === '')   { setProgFormError('El código es obligatorio.'); setProgCodigoInvalido(true); return; }
+    if (programas.some((p) => p.id !== editingProg?.id && String(p.codigo).trim() === String(progForm.codigo))) {
+      setProgFormError(`Ya existe un programa con el código ${progForm.codigo}.`);
+      setProgCodigoInvalido(true);
+      return;
+    }
     if (hasNegativeNumber(progForm.codigo, progForm.duracion, progForm.creditos, progForm.valormatricula)) {
       setProgFormError('Los campos numéricos no pueden ser negativos.');
       return;
@@ -638,7 +713,14 @@ export default function SuperadminCohortes() {
       if (advertencia) mostrarAlerta(advertencia, 'advertencia');
       else mostrarConfirm(editingProg ? 'Programa actualizado con éxito.' : 'Programa creado con éxito.');
     } catch (err) {
-      mostrarAlerta(err instanceof Error ? err.message : 'Error al guardar el programa.');
+      const { code } = leerErrorApi(err);
+      if (code === 'PROGRAMA_CODIGO_DUPLICADO' || code === 'REGISTRO_DUPLICADO_CONFLICT') {
+        // REGISTRO_DUPLICADO_CONFLICT no indica el campo; en programa corresponde al código.
+        setProgFormError(code === 'PROGRAMA_CODIGO_DUPLICADO' && err instanceof Error ? err.message : 'Ya existe un programa con ese código.');
+        setProgCodigoInvalido(true);
+      } else {
+        mostrarAlerta(err instanceof Error ? err.message : 'Error al guardar el programa.');
+      }
     } finally {
       setProgSubmitting(false);
     }
@@ -647,6 +729,7 @@ export default function SuperadminCohortes() {
   const openDeleteProg = (p: ProgramaOutput, e: React.MouseEvent) => {
     e.stopPropagation();
     setProgToDelete(p);
+    setProgDelConflictos([]);
     setShowDelProgModal(true);
   };
 
@@ -660,8 +743,15 @@ export default function SuperadminCohortes() {
       await cargar();
       mostrarConfirm('Programa eliminado con éxito.');
     } catch (err) {
+      const { code, param } = leerErrorApi(err);
+      if (code && CODIGOS_CONFLICTO_PROGRAMA.includes(code)) {
+        // El modal sigue abierto y lista todos los motivos que impiden eliminarlo.
+        setProgDelConflictos(conflictosEliminarPrograma(code, param));
+        return;
+      }
       mostrarAlerta(err instanceof Error ? err.message : 'Error al eliminar el programa.');
       setShowDelProgModal(false);
+      if (code === 'PROGRAMA_NOT_FOUND') await cargar();
     } finally {
       setDelProgming(false);
     }
@@ -869,9 +959,10 @@ export default function SuperadminCohortes() {
               type="text"
               placeholder="Facultad de Ingeniería"
               value={facForm.nombre}
-              onChange={(e) => setFacForm({ ...facForm, nombre: e.target.value })}
+              onChange={(e) => { setFacForm({ ...facForm, nombre: e.target.value }); setFacNombreInvalido(false); }}
               disabled={facSubmitting}
-              className="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition hover:border-gray-300 focus:border-slate-400 focus:ring-2 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+              aria-invalid={facNombreInvalido}
+              className={`mt-1 block w-full rounded-lg border ${facNombreInvalido ? INPUT_ERROR : 'border-gray-200 hover:border-gray-300'} bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-50`}
               autoFocus
             />
           </div>
@@ -916,7 +1007,7 @@ export default function SuperadminCohortes() {
             </div>
             <p className="text-sm text-gray-500 pt-1">
               ¿Eliminar la facultad <span className="font-semibold text-gray-800">{facToDelete?.nombre}</span>?
-              Esta acción también eliminará sus programas y cohortes asociadas.
+              Solo se puede eliminar si no tiene programas ni cargos asociados.
             </p>
           </div>
           <div className="flex gap-3">
@@ -949,9 +1040,10 @@ export default function SuperadminCohortes() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Código</label>
               <input type="number" min="0" placeholder="12345" value={progForm.codigo}
-                onChange={(e) => setP('codigo', numVal(e.target.value))}
+                onChange={(e) => { setP('codigo', numVal(e.target.value)); setProgCodigoInvalido(false); }}
                 disabled={progSubmitting}
-                className="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition hover:border-gray-300 focus:border-slate-400 focus:ring-2 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-50" />
+                aria-invalid={progCodigoInvalido}
+                className={`mt-1 block w-full rounded-lg border ${progCodigoInvalido ? INPUT_ERROR : 'border-gray-200 hover:border-gray-300'} bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-50`} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Duración (semestres)</label>
@@ -1110,15 +1202,23 @@ export default function SuperadminCohortes() {
             </div>
             <p className="text-sm text-gray-500 pt-1">
               ¿Eliminar el programa <span className="font-semibold text-gray-800">{progToDelete?.nombre}</span>?
-              Sus cohortes asociadas también serán eliminadas.
+              Solo se puede eliminar si no tiene cohortes, estudiantes ni director asignado.
             </p>
           </div>
+          {progDelConflictos.length > 0 && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+              <p className="font-medium mb-1">No se puede eliminar el programa:</p>
+              <ul className="list-disc pl-5 space-y-0.5">
+                {progDelConflictos.map((mensaje) => <li key={mensaje}>{mensaje}</li>)}
+              </ul>
+            </div>
+          )}
           <div className="flex gap-3">
             <button onClick={() => setShowDelProgModal(false)} disabled={delProgming}
               className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors disabled:cursor-not-allowed disabled:opacity-60">
               Cancelar
             </button>
-            <button onClick={confirmDeleteProg} disabled={delProgming}
+            <button onClick={confirmDeleteProg} disabled={delProgming || progDelConflictos.length > 0}
               className="flex-1 px-4 py-2.5 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
               {delProgming && <SpinnerIcon className="animate-spin shrink-0 h-4 w-4" />}
               Eliminar

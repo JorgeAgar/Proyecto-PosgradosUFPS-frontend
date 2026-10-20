@@ -14,6 +14,13 @@ export interface CohorteActual {
   activa: boolean;
   fechaLimiteDocumentos: string; // formato DD/MM/YYYY para UI
   fechaLimitePago: string; // formato DD/MM/YYYY para UI
+  // Plazos completos (inicio y fin) de documentación, inscripción y pago.
+  fechaInicioDocumentacion?: string;
+  fechaFinDocumentacion?: string;
+  fechaInicioInscripcion?: string;
+  fechaFinInscripcion?: string;
+  fechaInicioPago?: string;
+  fechaFinPago?: string;
 }
 
 export interface ValidacionStats {

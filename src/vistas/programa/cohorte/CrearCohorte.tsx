@@ -10,6 +10,16 @@ import { Select, type SelectOption } from '../../../components/Select';
 import { SpinnerIcon } from "../../../assets/icons";
 import { DialogoConfirmacion } from '../../../components/Dialogo';
 import { mensajeErrorCohorte } from './mensajeErrorCohorte';
+import { erroresFechasDesdeApi, validarFechasCohorte, ventanaInicioDocumentacion, type CampoFechaCohorte, type ErroresFechasCohorte } from './fechasCohorte';
+
+const FECHAS_VACIAS: Record<CampoFechaCohorte, string> = {
+  fechaInicioDocumentacion: '',
+  fechaFinDocumentacion: '',
+  fechaInicioInscripcion: '',
+  fechaFinInscripcion: '',
+  fechaInicioPago: '',
+  fechaFinPago: '',
+};
 
 export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void; onBack?: () => void | Promise<void> }) {
   const navigate = useNavigate();
@@ -30,13 +40,9 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
   const [idModalidad, setIdModalidad] = useState<string>('');
   const [selectedProgramaDocIds, setSelectedProgramaDocIds] = useState<string[]>([]);
   const [selectedCriterios, setSelectedCriterios] = useState<Array<{ id?: string | number; nombre: string; peso: number | undefined }>>([]);
-  // Nuevos campos de fechas
-  const [fechaInicioDocumentacion, setFechaInicioDocumentacion] = useState('');
-  const [fechaFinDocumentacion, setFechaFinDocumentacion] = useState('');
-  const [fechaInicioInscripcion, setFechaInicioInscripcion] = useState('');
-  const [fechaFinInscripcion, setFechaFinInscripcion] = useState('');
-  const [fechaInicioPago, setFechaInicioPago] = useState('');
-  const [fechaFinPago, setFechaFinPago] = useState('');
+  // Tres plazos independientes (documentación, inscripción y pago), todos obligatorios.
+  const [fechas, setFechas] = useState(FECHAS_VACIAS);
+  const [erroresFechas, setErroresFechas] = useState<ErroresFechasCohorte>({});
 
   useEffect(() => {
     let mounted = true;
@@ -92,6 +98,14 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
 
   const disabled = loading || saving;
 
+  const fechaInicioSemestre = semestres.find((s) => String(s.id) === idSemestre)?.fechainicio;
+  const ventanaDocumentacion = ventanaInicioDocumentacion(fechaInicioSemestre);
+
+  const cambiarFecha = (campo: CampoFechaCohorte) => (valor: string) => {
+    setFechas((prev) => ({ ...prev, [campo]: valor }));
+    setErroresFechas((prev) => ({ ...prev, [campo]: undefined }));
+  };
+
   const toggleProgramaDoc = (docId: string, checked: boolean) => {
     setSelectedProgramaDocIds((prev) => {
       if (checked) return prev.includes(docId) ? prev : [...prev, docId];
@@ -140,6 +154,12 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
       mostrarAlerta('Selecciona una modalidad para la cohorte.', 'advertencia');
       return;
     }
+    const errores = validarFechasCohorte(fechas, { requeridas: true, fechaInicioSemestre });
+    setErroresFechas(errores);
+    if (Object.keys(errores).length > 0) {
+      mostrarAlerta('Revisa las fechas de documentación, inscripción y pago.', 'advertencia');
+      return;
+    }
     if (selectedCriterios.length === 0) {
       mostrarAlerta('Selecciona al menos un criterio para continuar.', 'advertencia');
       return;
@@ -164,12 +184,7 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
         idSemestre,
         idModalidad,
         cupos: cuposStr === '' ? 0 : parseInt(cuposStr, 10),
-        fechaInicioDocumentacion: fechaInicioDocumentacion || undefined,
-        fechaFinDocumentacion: fechaFinDocumentacion || undefined,
-        fechaInicioInscripcion: fechaInicioInscripcion || undefined,
-        fechaFinInscripcion: fechaFinInscripcion || undefined,
-        fechaInicioPago: fechaInicioPago || undefined,
-        fechaFinPago: fechaFinPago || undefined,
+        ...fechas,
         documentosConsejo: consejoDocs.map((doc) => ({ idDocrequisito: doc.id, nombre: doc.nombre })),
         documentosPrograma: programaDocs
           .filter((doc) => selectedProgramaDocIds.includes(String(doc.id)))
@@ -183,6 +198,7 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
       else navigate('/programa/cohortes');
     } catch (err) {
       console.error(err);
+      setErroresFechas(erroresFechasDesdeApi(err));
       mostrarAlerta(mensajeErrorCohorte(err, 'No se pudo crear la cohorte.'), 'error');
     } finally {
       setSaving(false);
@@ -265,15 +281,20 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
               <DatePicker
                 id="fechaInicioInscripcion"
                 label="Fecha inicio de inscripción"
-                value={fechaInicioInscripcion}
-                onChange={setFechaInicioInscripcion}
+                value={fechas.fechaInicioInscripcion}
+                onChange={cambiarFecha('fechaInicioInscripcion')}
+                error={erroresFechas.fechaInicioInscripcion}
+                disabled={disabled}
               />
 
               <DatePicker
                 id="fechaFinInscripcion"
                 label="Fecha límite de inscripción"
-                value={fechaFinInscripcion}
-                onChange={setFechaFinInscripcion}
+                value={fechas.fechaFinInscripcion}
+                onChange={cambiarFecha('fechaFinInscripcion')}
+                error={erroresFechas.fechaFinInscripcion}
+                minDate={fechas.fechaInicioInscripcion || undefined}
+                disabled={disabled}
               />
 
               <div className="col-span-full mt-2">
@@ -283,15 +304,22 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
               <DatePicker
                 id="fechaInicioDocumentacion"
                 label="Fecha inicio de cargue de documentos"
-                value={fechaInicioDocumentacion}
-                onChange={setFechaInicioDocumentacion}
+                value={fechas.fechaInicioDocumentacion}
+                onChange={cambiarFecha('fechaInicioDocumentacion')}
+                error={erroresFechas.fechaInicioDocumentacion}
+                minDate={ventanaDocumentacion?.min}
+                maxDate={ventanaDocumentacion?.max}
+                disabled={disabled}
               />
 
               <DatePicker
                 id="fechaFinDocumentacion"
                 label="Fecha límite de cargue de documentos"
-                value={fechaFinDocumentacion}
-                onChange={setFechaFinDocumentacion}
+                value={fechas.fechaFinDocumentacion}
+                onChange={cambiarFecha('fechaFinDocumentacion')}
+                error={erroresFechas.fechaFinDocumentacion}
+                minDate={fechas.fechaInicioDocumentacion || undefined}
+                disabled={disabled}
               />
 
               <div className="col-span-full mt-2">
@@ -301,15 +329,20 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
               <DatePicker
                 id="fechaInicioPago"
                 label="Fecha inicio de pago de inscripción"
-                value={fechaInicioPago}
-                onChange={setFechaInicioPago}
+                value={fechas.fechaInicioPago}
+                onChange={cambiarFecha('fechaInicioPago')}
+                error={erroresFechas.fechaInicioPago}
+                disabled={disabled}
               />
 
               <DatePicker
                 id="fechaFinPago"
                 label="Fecha límite de pago de inscripción"
-                value={fechaFinPago}
-                onChange={setFechaFinPago}
+                value={fechas.fechaFinPago}
+                onChange={cambiarFecha('fechaFinPago')}
+                error={erroresFechas.fechaFinPago}
+                minDate={fechas.fechaInicioPago || undefined}
+                disabled={disabled}
               />
             </div>
           </div>

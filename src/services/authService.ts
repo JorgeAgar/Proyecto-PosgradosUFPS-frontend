@@ -9,6 +9,8 @@
  * hooks propios del rol) y devuelve el objeto de autenticación ya armado.
  */
 
+import { leerCuerpoError, mensajePorCodigo } from "./erroresApi";
+
 /** URL base del backend (VITE_API_URL sin la barra final). */
 export const API_BASE_URL = (import.meta.env.VITE_API_URL as string ?? "").replace(/\/$/, "");
 
@@ -31,6 +33,10 @@ export function extractErrorMessage(body: unknown, status: number, statusText: s
   }
   if (body && typeof body === "object") {
     const obj = body as Record<string, unknown>;
+    // Contrato de errores del backend: se prioriza el `code` sobre el estado HTTP.
+    const { code, param } = leerCuerpoError(body);
+    const porCodigo = mensajePorCodigo(code, param);
+    if (porCodigo) return porCodigo;
     if (typeof obj.message === "string" && obj.message) return obj.message;
     if (typeof obj.mensaje === "string" && obj.mensaje) return obj.mensaje;
     const skip = new Set(["timestamp", "path", "trace", "error", "status"]);
