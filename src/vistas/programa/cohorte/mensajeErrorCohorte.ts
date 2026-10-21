@@ -1,3 +1,5 @@
+import { leerCuerpoError, mensajePorCodigo } from '../../../services/erroresApi';
+
 function primerTexto(...valores: unknown[]): string | undefined {
   for (const valor of valores) {
     if (typeof valor === 'string' && valor.trim()) return valor.trim();
@@ -7,7 +9,8 @@ function primerTexto(...valores: unknown[]): string | undefined {
 
 /**
  * Mensaje legible para un error al crear o guardar una cohorte.
- * `mensajesPorEstado` permite fijar el texto para ciertos códigos HTTP.
+ * `mensajesPorEstado` permite fijar el texto para ciertos códigos HTTP; después
+ * se usa el texto del `code` del backend y, por último, su `message`.
  */
 export function mensajeErrorCohorte(error: unknown, porDefecto: string, mensajesPorEstado: Record<number, string> = {}): string {
   if (error instanceof Error) {
@@ -18,6 +21,9 @@ export function mensajeErrorCohorte(error: unknown, porDefecto: string, mensajes
         (codigo): codigo is number => typeof codigo === 'number' && codigo in mensajesPorEstado,
       );
       if (estado !== undefined) return mensajesPorEstado[estado];
+      const { code, param } = leerCuerpoError(registro);
+      const porCodigo = mensajePorCodigo(code, param);
+      if (porCodigo) return porCodigo;
       const texto = primerTexto(registro.message, registro.mensaje, status === 409 ? registro.error : undefined);
       if (texto) return texto;
     }
