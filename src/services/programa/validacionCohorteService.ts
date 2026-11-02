@@ -11,19 +11,19 @@ export interface AspiranteValidacionApi {
 }
 
 /** Forma en que Spring serializa un Page<T>. */
-interface PaginaApi<T> {
+export interface PaginaApi<T> {
   content: T[];
   totalElements: number;
+  totalPages: number;
 }
 
-/** Tamaño de página alto para traer toda la cohorte; la vista pagina y calcula estadísticas en el cliente. */
-const TAMANO_MAXIMO = 1000;
-
-export async function obtenerAspirantesPorCohorte(idCohorte: number): Promise<AspiranteValidacionApi[]> {
-  const respuesta = await programaApiClient.fetch<PaginaApi<AspiranteValidacionApi> | AspiranteValidacionApi[]>(
-    `/api/application/case/director-programa/cohorte/${idCohorte}/aspirantes-a-validar?page=0&size=${TAMANO_MAXIMO}`
+/** `pagina` empieza en 1, como en `Paginacion`; el backend cuenta desde 0. */
+export async function obtenerAspirantesPorCohorte(
+  idCohorte: number,
+  pagina: number,
+  tamano: number,
+): Promise<PaginaApi<AspiranteValidacionApi>> {
+  return programaApiClient.fetch<PaginaApi<AspiranteValidacionApi>>(
+    `/api/application/case/director-programa/cohorte/${idCohorte}/aspirantes-a-validar?page=${pagina - 1}&size=${tamano}`
   );
-
-  if (Array.isArray(respuesta)) return respuesta;
-  return Array.isArray(respuesta?.content) ? respuesta.content : [];
 }
