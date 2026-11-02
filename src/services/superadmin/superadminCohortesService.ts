@@ -22,13 +22,11 @@ export interface FacultadOutput {
   id: number;
   nombre: string;
   correo: string;
-  cargoList?: string[];
-  programaList?: ProgramaOutput[];
 }
 
 export interface ProgramaOutput {
   id: number;
-  codigo: number;
+  codigo: string;
   nombre: string;
   duracion: number;
   correo: string;
@@ -45,7 +43,7 @@ export interface ProgramaOutput {
   idTiporegistro?: number;
   idModalidad?: number;
   sede?: { id: number; nombre: string };
-  facultad?: string;
+  facultad?: FacultadOutput;
   tiporegistro?: { id: number; tipo: string };
   cohorteList?: string[];
 }
@@ -79,21 +77,7 @@ export interface CriterioCohortePayload {
   pesoSnapshot: number;
 }
 
-export interface CrearCohorteProgramaPayload {
-  nombre: string;
-  cupos: number;
-  idSemestre: number;
-  idModalidad: number;
-  fechaInicioDocumentacion: string;
-  fechaFinDocumentacion: string;
-  fechaInicioInscripcion: string;
-  fechaFinInscripcion: string;
-  fechaInicioPago: string;
-  fechaFinPago: string;
-  documentosConsejo: DocumentoCohortePayload[];
-  documentosPrograma: DocumentoCohortePayload[];
-  criteriosCohorte: CriterioCohortePayload[];
-}
+export type CrearCohorteProgramaPayload = import('../programa/programaCohorteService').NuevaCohortePayload;
 
 // ── Facultades ────────────────────────────────────────────────────────────────
 
@@ -101,13 +85,13 @@ export const superadminFacultadesService = {
   listar: () =>
     superadminApiClient.fetch<FacultadOutput[]>('/api/dev/endpoint/facultad/listall', { method: 'GET' }),
 
-  crear: (data: { nombre: string; correo: string; idAdministrativo?: number }) =>
+  crear: (data: { nombre: string; correo: string; idAdministrativo: number }) =>
     superadminApiClient.fetch<unknown>('/api/dev/endpoint/facultad/create', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
-  actualizar: (data: { id: number; nombre: string; correo: string; idAdministrativo?: number }) =>
+  actualizar: (data: { id: number; nombre: string; correo: string; idAdministrativo: number }) =>
     superadminApiClient.fetch<unknown>('/api/dev/endpoint/facultad/update', {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -127,13 +111,13 @@ export const superadminProgramasService = {
     superadminApiClient.fetch<ProgramaOutput[]>('/api/dev/endpoint/programa/listall', { method: 'GET' }),
 
   listarPorFacultad: (idFacultad: number) =>
-    superadminApiClient.fetch<ProgramaOutput[]>(`/api/dev/endpoint/programa/byfacultad/${idFacultad}`, { method: 'GET' }),
+    superadminApiClient.fetch<ProgramaOutput[]>('/api/dev/endpoint/programa/listbyfacultad', { method: 'POST', body: JSON.stringify({ id: idFacultad }) }),
 
   listarFacultades: () =>
     superadminApiClient.fetch<FacultadOutput[]>('/api/dev/endpoint/facultad/listall', { method: 'GET' }),
 
   crear: async (data: {
-    codigo: number; nombre: string; duracion: number; correo: string;
+    codigo: string; nombre: string; duracion: number; correo: string;
     registrosnies: string; nivelformacion: string; titulo: string;
     rcmineducacion: string; creditos: number; periodicidad: string;
     valormatricula: number; idSede: number; idTiporegistro: number; idModalidad: number;
@@ -167,7 +151,7 @@ export const superadminProgramasService = {
   },
 
   actualizar: (data: {
-    id: number; codigo: number; nombre: string; duracion: number; correo: string;
+    id: number; codigo: string; nombre: string; duracion: number; correo: string;
     registrosnies: string; nivelformacion: string; titulo: string;
     rcmineducacion: string; creditos: number; periodicidad: string;
     valormatricula: number; idSede: number; idTiporegistro: number; idModalidad: number;
@@ -219,11 +203,34 @@ export const superadminCohortesService = {
       body: JSON.stringify(data),
     }),
 
-  eliminar: (id: number) =>
-    superadminApiClient.fetch<unknown>('/api/dev/endpoint/cohortes/delete', {
-      method: 'DELETE',
-      body: JSON.stringify({ id }),
-    }),
+  eliminar: async (id: number): Promise<void> => {
+    const [detalle, aspirantes] = await Promise.all([
+      superadminApiClient.fetch<{
+        criterios: { id: number }[];
+        documentosAsignados: { documentosConsejo: { id: number }[]; documentosPrograma: { id: number }[] };
+      }>(`/api/application/case/director-programa/cohorte/${id}`),
+      superadminApiClient.fetch<{ id: number }[]>(`/api/application/case/cohortes/${id}/aspirantes`),
+    ]);
+    if (aspirantes.length > 0) throw new Error('No se puede eliminar una cohorte con aspirantes inscritos.');
+
+    // Las asociaciones tienen su propio DELETE y deben retirarse antes de la cohorte.
+    for (const doc of detalle.documentosAsignados.documentosConsejo) {
+      await superadminApiClient.fetch<void>('/api/dev/endpoint/documentosrequisitoconsejocohorte/delete', {
+        method: 'DELETE', body: JSON.stringify({ id: doc.id }),
+      });
+    }
+    for (const doc of detalle.documentosAsignados.documentosPrograma) {
+      await superadminApiClient.fetch<void>('/api/dev/endpoint/documentosrequisitoprogramacohorte/delete', {
+        method: 'DELETE', body: JSON.stringify({ id: doc.id }),
+      });
+    }
+    for (const criterio of detalle.criterios) {
+      await superadminApiClient.fetch<void>(`/api/dev/endpoint/api/v1/criteriocohorte/${criterio.id}`, { method: 'DELETE' });
+    }
+    await superadminApiClient.fetch<void>('/api/dev/endpoint/cohortes/delete', {
+      method: 'DELETE', body: JSON.stringify({ id }),
+    });
+  },
 
   listarEstados: async () => {
     const estados = await superadminApiClient.fetch<EstadoOutput[]>('/api/dev/endpoint/estado/listall', { method: 'GET' });
@@ -263,7 +270,7 @@ export interface AdministrativoOutput {
   id: number;
   idPersona: number;
   persona?: { id: number; nombres: string; apellidos: string; correo: string };
-  cargo?: { id: number; nombre: string };
+  cargo?: { id: number; nombre: string; facultad?: FacultadOutput | null };
 }
 
 export const superadminAdministrativosService = {

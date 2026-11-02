@@ -138,12 +138,6 @@ function buildPersonaPayloadFromForm(persona: PersonaForm) {
     idPoblacionindigena: asOptionalNumber(persona.idPoblacionindigena),
     idDiscapacidad: asOptionalNumber(persona.idDiscapacidad),
     idCapacidadexepcional: asOptionalNumber(persona.idCapacidadexepcional),
-    promediopregrado: null,
-    titulopregrado: null,
-    titulosposgrados: null,
-    empresa: null,
-    experiencialaboral: null,
-    egresadoufps: null,
   };
 }
 
@@ -263,7 +257,7 @@ export default function SuperadminUsuarios() {
       nombreusuario: user.nombreusuario,
       password: '',
       idRol: user.idRol,
-      idPrograma: esUsuarioDirector ? '' : user.idPrograma ?? user.programa?.id ?? '',
+      idPrograma: '',
       persona: {
         nombres: asFormString(persona.nombres),
         apellidos: asFormString(persona.apellidos),
@@ -366,6 +360,7 @@ export default function SuperadminUsuarios() {
       if (editingUser) {
         const editingPersona = (editingUser.persona ?? {}) as Record<string, unknown>;
         await superadminUsuariosService.actualizarPersona({
+          ...editingUser.persona,
           id: editingUser.idPersona,
           idDocumentopersona: getDocumentoPersonaId(editingPersona),
           ...personaPayload,

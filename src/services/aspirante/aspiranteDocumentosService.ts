@@ -3,7 +3,6 @@ import { aspiranteApiClient, getAspiranteRealId } from "./aspiranteService";
 // ── Tipos backend ─────────────────────────────────────────────────────────────
 
 export interface DocumentoRequerido {
-  idDocumento: number;
   idDocumentosrequisitoconsejocohorte: number;
   idDocumentosrequisitoprogramacohorte: number;
   nombre: string;
@@ -15,7 +14,7 @@ export interface DocumentoSubido {
   idDocumento: number;
   idDocumentosrequisitoconsejocohorte: number;
   idDocumentosrequisitoprogramacohorte: number;
-  nombre: string;
+  nombreTitulo: string;
   estado: string;
   motivoRechazo: string | null;
   linkArchivo: string | null;

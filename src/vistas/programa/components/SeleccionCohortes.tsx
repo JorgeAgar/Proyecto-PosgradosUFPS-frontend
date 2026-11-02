@@ -35,7 +35,7 @@ interface SeleccionCohortesProps<T extends CohorteResumen> {
   rutaDetalle: (cohorte: T) => string;
   /** Segunda fila de métricas (por validar, calificados…). */
   metricas: (cohorte: T) => MetricaCohorte[];
-  progreso: (cohorte: T) => ProgresoCohorte;
+  progreso?: (cohorte: T) => ProgresoCohorte;
   /** Contenido adicional bajo las métricas (p. ej. fecha límite). */
   extra?: (cohorte: T) => React.ReactNode;
 }
@@ -107,7 +107,7 @@ export default function SeleccionCohortes<T extends CohorteResumen>({
       ) : (
         <div className="space-y-4 animate-fade-in-up delay-100">
           {cohortes.map((cohorte, idx) => {
-            const p = progreso(cohorte);
+            const p = progreso?.(cohorte);
             return (
               <button
                 key={cohorte.id}
@@ -142,7 +142,7 @@ export default function SeleccionCohortes<T extends CohorteResumen>({
 
                     {extra?.(cohorte)}
 
-                    {p.total > 0 && (
+                    {p && p.total > 0 && (
                       <div>
                         <div className="text-xs text-neutral-400 mb-1">{p.titulo}</div>
                         <BarraProgreso actual={p.actual} total={p.total} />

@@ -182,7 +182,7 @@ export default function RecuperarPassword() {
           <>
             {/* Descripción breve */}
             <p className="text-sm text-gray-600 animate-fade-in-up">
-              Ingresa tu correo electrónico y te enviaremos una nueva contraseña generada.
+              Ingresa tu correo electrónico y te enviaremos un enlace para recuperar tu contraseña.
             </p>
 
             {/* Campo correo */}

@@ -1,0 +1,409 @@
+{
+  "source": "https://projectposgradosufps-ingsoft-production.up.railway.app/posgrados-project/api-docs",
+  "schemas": {
+    "ufps.edu.co.records.input.entity.CohorteInput.COHORTE_DIRECTOR_CREATE": {
+      "type": "object",
+      "properties": {
+        "nombre": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cupos": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idSemestre": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idModalidad": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "fechaInicio": {
+          "type": "string",
+          "format": "date"
+        },
+        "fechaLimiteDocumentos": {
+          "type": "string",
+          "format": "date"
+        },
+        "fechaLimitePago": {
+          "type": "string",
+          "format": "date"
+        },
+        "documentosConsejo": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ufps.edu.co.records.input.entity.CohorteInput.DOCUMENTO_ASIGNADO_CREATE"
+          }
+        },
+        "documentosPrograma": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ufps.edu.co.records.input.entity.CohorteInput.DOCUMENTO_ASIGNADO_CREATE"
+          }
+        },
+        "criteriosCohorte": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ufps.edu.co.records.input.entity.CriteriocohorteInput.CRITERIOCOHORTE_CREATE"
+          }
+        }
+      },
+      "required": [
+        "cupos",
+        "fechaInicio",
+        "fechaLimiteDocumentos",
+        "fechaLimitePago",
+        "idModalidad",
+        "idSemestre",
+        "nombre"
+      ]
+    },
+    "ufps.edu.co.records.input.entity.CohorteInput.DOCUMENTO_ASIGNADO_CREATE": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idDocrequisito": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idCohorte": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "nombre": {
+          "type": "string"
+        }
+      }
+    },
+    "ufps.edu.co.records.input.entity.CriteriocohorteInput.CRITERIOCOHORTE_CREATE": {
+      "type": "object",
+      "properties": {
+        "idCohorte": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idCriterio": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pesoSnapshot": {
+          "type": "number"
+        }
+      }
+    },
+    "ufps.edu.co.records.input.entity.CohorteInput.COHORTE_DIRECTOR_UPDATE": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "nombre": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cupos": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idSemestre": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idModalidad": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "fechaInicio": {
+          "type": "string",
+          "format": "date"
+        },
+        "fechaLimiteDocumentos": {
+          "type": "string",
+          "format": "date"
+        },
+        "fechaLimitePago": {
+          "type": "string",
+          "format": "date"
+        },
+        "documentosConsejo": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ufps.edu.co.records.input.entity.CohorteInput.DOCUMENTO_ASIGNADO_CREATE"
+          }
+        },
+        "documentosPrograma": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ufps.edu.co.records.input.entity.CohorteInput.DOCUMENTO_ASIGNADO_CREATE"
+          }
+        },
+        "criteriosCohorte": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ufps.edu.co.records.input.entity.CohorteInput.CRITERIOCOHORTE_DIRECTOR_UPDATE"
+          }
+        }
+      },
+      "required": [
+        "cupos",
+        "id",
+        "idModalidad",
+        "idSemestre",
+        "nombre"
+      ]
+    },
+    "ufps.edu.co.records.input.entity.CohorteInput.CRITERIOCOHORTE_DIRECTOR_UPDATE": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idCriterio": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pesoSnapshot": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "idCriterio"
+      ]
+    },
+    "ufps.edu.co.records.input.entity.CriteriocohorteInput.CRITERIOCOHORTE_ASSIGN_BODY": {
+      "type": "object",
+      "properties": {
+        "idCriterio": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pesoSnapshot": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "idCriterio"
+      ]
+    },
+    "ufps.edu.co.records.input.entity.EntrevistaInput.ENTREVISTA_REQUEST_CHANGE": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "motivocambio": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "ufps.edu.co.records.input.entity.FacultadInput.FACULTAD_CREATE": {
+      "type": "object",
+      "properties": {
+        "nombre": {
+          "type": "string",
+          "minLength": 1
+        },
+        "correo": {
+          "type": "string"
+        },
+        "idAdministrativo": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "idAdministrativo",
+        "nombre"
+      ]
+    },
+    "ufps.edu.co.records.input.entity.FacultadInput.FACULTAD_UPDATE": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "nombre": {
+          "type": "string",
+          "minLength": 1
+        },
+        "correo": {
+          "type": "string"
+        },
+        "idAdministrativo": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "id",
+        "idAdministrativo",
+        "nombre"
+      ]
+    },
+    "ufps.edu.co.records.input.entity.PersonaInput.PERSONA_CREATE": {
+      "type": "object",
+      "properties": {
+        "nombres": {
+          "type": "string"
+        },
+        "apellidos": {
+          "type": "string"
+        },
+        "correo": {
+          "type": "string"
+        },
+        "fechanacimiento": {
+          "type": "string",
+          "format": "date"
+        },
+        "celular": {
+          "type": "string"
+        },
+        "telefono": {
+          "type": "string"
+        },
+        "idUbicacionvivienda": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idUbicacionnacimiento": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idUbicaciontrabajo": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idGenero": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idEstadocivil": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idGrupoetnico": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idPoblacionindigena": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idDiscapacidad": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idCapacidadexepcional": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idDocumentopersona": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "promediopregrado": {
+          "type": "number"
+        },
+        "titulopregrado": {
+          "type": "string"
+        },
+        "titulosposgrados": {
+          "type": "string"
+        },
+        "empresa": {
+          "type": "string"
+        },
+        "experiencialaboral": {
+          "type": "string"
+        },
+        "egresadoufps": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ufps.edu.co.records.input.entity.ProgramaInput.PROGRAMA_CREATE": {
+      "type": "object",
+      "properties": {
+        "codigo": {
+          "type": "string"
+        },
+        "nombre": {
+          "type": "string",
+          "minLength": 1
+        },
+        "duracion": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "correo": {
+          "type": "string"
+        },
+        "registrosnies": {
+          "type": "string"
+        },
+        "nivelformacion": {
+          "type": "string"
+        },
+        "titulo": {
+          "type": "string"
+        },
+        "rcmineducacion": {
+          "type": "string"
+        },
+        "creditos": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "periodicidad": {
+          "type": "string"
+        },
+        "valormatricula": {
+          "type": "number"
+        },
+        "idSede": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idFacultad": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idTiporegistro": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idModalidad": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idOtros": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "duracion",
+        "idFacultad",
+        "idOtros",
+        "idSede",
+        "idTiporegistro",
+        "nombre"
+      ]
+    }
+  }
+}

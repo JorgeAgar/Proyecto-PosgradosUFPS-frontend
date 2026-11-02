@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import AppSidebar, { type AppNavItem } from "../../../components/AppSidebar";
 import { superadminAuthService } from "../../../services/superadmin/superadminService";
-import { CalendarIcon, CouncilDocumentsIcon, HashtagIcon as CodesIcon, HomeIcon, SuperadminCohorteIcon, UsersIcon, ValuesIcon } from "../../../assets/icons";
+import { CalendarIcon, CouncilDocumentsIcon, HomeIcon, SuperadminCohorteIcon, UsersIcon, ValuesIcon } from "../../../assets/icons";
 
 // ── Navegación ────────────────────────────────────────────────────────────────
 
@@ -13,7 +13,6 @@ const NAV_ITEMS: AppNavItem[] = [
   { label: "Programas", to: `${BASE}/programas`, Icon: SuperadminCohorteIcon },
   { label: "Semestres", to: `${BASE}/semestres`, Icon: CalendarIcon, iconClassName: "size-6" },
   { label: "Valores globales", to: `${BASE}/valores-globales`, Icon: ValuesIcon },
-  { label: "Últimos códigos", to: `${BASE}/ultimos-codigos`, Icon: CodesIcon },
   { label: "Documentos consejo", to: `${BASE}/documentos-consejo`, Icon: CouncilDocumentsIcon },
 ];
 

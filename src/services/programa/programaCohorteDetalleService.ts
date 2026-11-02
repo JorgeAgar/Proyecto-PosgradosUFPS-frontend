@@ -6,7 +6,7 @@
 */
 
 import { programaApiClient } from './programaService';
-import { normalizeCohorte, type AspiranteItem, type CohorteItem, type CohorteDetalle, type NuevaCohortePayload, type DocumentoCohorte, type DocumentAssignItem, type CriterioItem } from './programaCohorteService';
+import { normalizeCohorte, type AspiranteItem, type CohorteItem, type CohorteDetalle, type NuevaCohortePayload, type EditarCohortePayload, type DocumentoCohorte, type DocumentAssignItem, type CriterioItem } from './programaCohorteService';
 
 export type { CohorteItem, CohorteDetalle, NuevaCohortePayload, DocumentoCohorte, DocumentAssignItem, CriterioItem };
 
@@ -72,17 +72,41 @@ export async function fetchCohorteDetalle(cohorteId: string): Promise<CohorteDet
   };
 }
 
-export async function updateCohorte(cohorteId: string, payload: Partial<NuevaCohortePayload & { cupos: number; activa: boolean }>): Promise<CohorteItem> {
-  const path = `/api/application/case/director-programa/cohorte/${cohorteId}`;
-  return programaApiClient.fetch<CohorteItem>(path, { method: 'PUT', body: JSON.stringify(payload) });
+export async function updateCohorte(cohorteId: string, payload: EditarCohortePayload): Promise<CohorteItem> {
+  // El PUT exige el id de cada asociación; el POST solo necesita idCriterio y peso.
+  // Consultar las asociaciones existentes permite reintentar tras un fallo parcial.
+  const base = `/api/application/case/director-programa/cohorte/${cohorteId}`;
+  const asignados = await programaApiClient.fetch<{ id: number; idCriterio: number }[]>(`${base}/criteriocohorte`);
+  const criteriosCohorte: { id: number; idCriterio: number; pesoSnapshot?: number }[] = [];
+  for (const criterio of payload.criteriosCohorte) {
+    let id = criterio.id ?? asignados.find((item) => item.idCriterio === criterio.idCriterio)?.id;
+    if (id === undefined) {
+      const creado = await programaApiClient.fetch<{ id: number }>(`${base}/criteriocohorte`, {
+        method: 'POST',
+        // La cohorte puede sumar ya 100: reservar la asociación con peso 0
+        // y aplicar todos los pesos juntos en el PUT.
+        body: JSON.stringify({ idCriterio: criterio.idCriterio, pesoSnapshot: 0 }),
+      });
+      id = creado.id;
+    }
+    criteriosCohorte.push({ ...criterio, id });
+  }
+  const data = await programaApiClient.fetch<Record<string, unknown>>(base, {
+    method: 'PUT', body: JSON.stringify({ ...payload, id: Number(cohorteId), criteriosCohorte }),
+  });
+  return normalizeCohorte(data);
 }
 
 export async function abrirCohorte(cohorteId: string): Promise<CohorteItem> {
-  const path = `/api/application/case/director-programa/cohorte/${cohorteId}/abrir`;
-  return programaApiClient.fetch<CohorteItem>(path, { method: 'POST' });
+  const data = await programaApiClient.fetch<Record<string, unknown>>(
+    `/api/application/case/director-programa/cohorte/${cohorteId}/abrir`, { method: 'POST' },
+  );
+  return normalizeCohorte(data);
 }
 
 export async function cerrarCohorte(cohorteId: string): Promise<CohorteItem> {
-  const path = `/api/application/case/director-programa/cohorte/${cohorteId}/cerrar`;
-  return programaApiClient.fetch<CohorteItem>(path, { method: 'POST' });
+  const data = await programaApiClient.fetch<Record<string, unknown>>(
+    `/api/application/case/director-programa/cohorte/${cohorteId}/cerrar`, { method: 'POST' },
+  );
+  return normalizeCohorte(data);
 }
