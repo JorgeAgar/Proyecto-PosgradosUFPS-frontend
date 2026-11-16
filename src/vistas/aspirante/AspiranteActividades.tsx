@@ -150,21 +150,31 @@ export default function AspiranteActividades({ tipo }: { tipo: TipoActividad }) 
 
   // ── Carga de datos ────────────────────────────────────────────────────────
 
-  const cargarActividades = useCallback(async () => {
+  // Trae las actividades sin activar el indicador de carga: en la carga inicial
+  // `cargando` ya arranca en true.
+  const obtenerActividades = useCallback(async () => {
     if (soloInscrito !== false) return;
-    setCargando(true);
     try {
-      setActividades(await cfg.obtener());
-    } catch (err) {
-      mostrarAlerta(err instanceof Error ? err.message : `No se pudieron cargar las ${cfg.plural}.`);
+      try {
+        setActividades(await cfg.obtener());
+      } catch (err) {
+        mostrarAlerta(err instanceof Error ? err.message : `No se pudieron cargar las ${cfg.plural}.`);
+      }
     } finally {
       setCargando(false);
     }
   }, [mostrarAlerta, soloInscrito, cfg]);
 
+  // Recarga mostrando el indicador (después de aceptar, cambiar o cancelar).
+  const cargarActividades = useCallback(async () => {
+    if (soloInscrito !== false) return;
+    setCargando(true);
+    await obtenerActividades();
+  }, [soloInscrito, obtenerActividades]);
+
   useEffect(() => {
-    cargarActividades();
-  }, [cargarActividades]);
+    void obtenerActividades();
+  }, [obtenerActividades]);
 
   // ── Cierre animado de modales ─────────────────────────────────────────────
 

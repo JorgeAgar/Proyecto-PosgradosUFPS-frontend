@@ -7,7 +7,7 @@ import {
   DocumentCheckIcon,
   ClipboardDocumentListIcon,
   AcademicCapIcon,
-  FunnelIcon,
+  CheckBadgeIcon,
 } from '@heroicons/react/24/outline';
 import {
   fetchProgramaInicioData,
@@ -17,50 +17,38 @@ import {
 import type { ProgramaOutletContext } from '../../layouts/ProgramaLayout';
 import { SpinnerIcon } from "../../assets/icons";
 
-function LoadingCardSkeleton() {
-  return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
-      <div className="flex items-center justify-between gap-3 mb-4">
-        <div className="h-5 w-56 bg-neutral-200 rounded" />
-        <div className="h-4 w-14 bg-neutral-200 rounded" />
-      </div>
+// ── Utilidades ────────────────────────────────────────────────────────────────
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div className="rounded-lg border border-gray-200 p-4 bg-neutral-50">
-          <div className="h-4 w-40 bg-neutral-200 rounded mb-3" />
-          <div className="h-8 w-32 bg-neutral-200 rounded" />
-        </div>
-        <div className="rounded-lg border border-gray-200 p-4 bg-neutral-50">
-          <div className="h-4 w-28 bg-neutral-200 rounded mb-3" />
-          <div className="h-8 w-32 bg-neutral-200 rounded" />
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-gray-200 p-4 space-y-4">
-        <div className="h-4 w-40 bg-neutral-200 rounded" />
-        {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="h-3 w-full bg-neutral-200 rounded-full" />
-        ))}
-      </div>
-    </div>
-  );
+/** "2027-07-31" → "31/07/2027". Si no viene en formato ISO se deja tal cual. */
+function formatearFecha(fecha?: string) {
+  if (!fecha) return '';
+  const iso = /^(\d{4})-(\d{2})-(\d{2})/.exec(fecha);
+  return iso ? `${iso[3]}/${iso[2]}/${iso[1]}` : fecha;
 }
 
-function ProgressBar({ value }: { value: number }) {
-  return (
-    <div className="flex items-center gap-4">
-      <span className="text-sm font-semibold text-red-700 whitespace-nowrap w-11 text-right">{value}%</span>
-      <div className="flex-1 bg-neutral-200 rounded-full h-3">
-        <div className="bg-red-700 h-3 rounded-full transition-all" style={{ width: `${value}%` }} />
-      </div>
-    </div>
-  );
+/**
+ * Rango de fechas. Cada fecha va en un bloque que no se parte, pero el rango sí
+ * puede pasar a otra línea entre las dos fechas cuando no cabe (celulares).
+ */
+function RangoFechas({ inicio, fin }: { inicio?: string; fin?: string }) {
+  if (inicio && fin) {
+    return (
+      <>
+        <span className="whitespace-nowrap">{formatearFecha(inicio)} –</span>{' '}
+        <span className="whitespace-nowrap">{formatearFecha(fin)}</span>
+      </>
+    );
+  }
+  if (fin) return <span className="whitespace-nowrap">Hasta {formatearFecha(fin)}</span>;
+  return <>Sin fecha</>;
 }
 
 function porcentaje(valor: number, base: number) {
   if (base <= 0) return 0;
   return Math.min(100, Math.round((valor / base) * 100));
 }
+
+// ── Etapas del embudo ─────────────────────────────────────────────────────────
 
 type Icono = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -70,6 +58,7 @@ interface EtapaEmbudo {
   valor: number;
   Icon: Icono;
   iconClass: string;
+  /** Etapa anterior sobre la que se calcula el porcentaje (inscritos no tiene). */
   base?: { valor: number; etiqueta: string };
 }
 
@@ -115,69 +104,130 @@ function construirEtapas(item: ProgramaInicioData): EtapaEmbudo[] {
       iconClass: 'bg-blue-100 border-blue-200 text-blue-700',
       base: { valor: e.calificados, etiqueta: 'calificados' },
     },
+    {
+      etiqueta: 'Legalizados',
+      descripcion: 'Pagaron la matrícula',
+      valor: e.legalizados,
+      Icon: CheckBadgeIcon,
+      iconClass: 'bg-emerald-100 border-emerald-200 text-emerald-700',
+      base: { valor: e.admitidos, etiqueta: 'admitidos' },
+    },
   ];
 }
 
-function EmbudoAspirantes({ item, compacto = false }: { item: ProgramaInicioData; compacto?: boolean }) {
-  const etapas = construirEtapas(item);
+// ── Componentes ───────────────────────────────────────────────────────────────
+
+/** Mini tarjeta de una etapa: nombre, cantidad, % sobre la etapa anterior y barra. */
+function EtapaCard({ etapa, conDescripcion }: { etapa: EtapaEmbudo; conDescripcion: boolean }) {
+  const { etiqueta, descripcion, valor, Icon, iconClass, base } = etapa;
+  const pct = base ? porcentaje(valor, base.valor) : null;
 
   return (
-    <div className={compacto ? 'space-y-3' : 'space-y-5'}>
-      {etapas.map(({ etiqueta, descripcion, valor, Icon, iconClass, base }) => (
-        <div key={etiqueta} className="grid grid-cols-1 md:grid-cols-[minmax(0,16rem)_1fr] gap-2 md:gap-6 md:items-center">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className={`p-2 rounded-lg border shrink-0 ${iconClass}`}>
-              <Icon className="w-5 h-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-sm font-semibold text-gray-900">{etiqueta}</div>
-              {!compacto && <div className="text-xs text-neutral-400 truncate">{descripcion}</div>}
-            </div>
-            <div className={`${compacto ? 'text-lg' : 'text-xl'} font-semibold text-gray-900 tabular-nums`}>{valor}</div>
-          </div>
-
-          {base ? (
-            <div>
-              <ProgressBar value={porcentaje(valor, base.valor)} />
-              <div className="text-xs text-neutral-400 mt-1 md:pl-15">
-                {valor} de {base.valor} {base.etiqueta}
-              </div>
-            </div>
-          ) : (
-            <div className="text-xs text-neutral-400 md:pl-15">Base del proceso</div>
-          )}
+    <div className="rounded-lg border border-gray-200 p-3 flex flex-col gap-2 min-w-0" title={descripcion}>
+      <div className="flex items-center gap-2 min-w-0">
+        {/* En pantallas pequeñas se oculta el ícono para que el nombre quepa completo. */}
+        <div className={`hidden sm:block p-1 rounded-md border shrink-0 ${iconClass}`}>
+          <Icon className="w-4 h-4" />
         </div>
-      ))}
+        <span className="text-xs font-semibold text-gray-900 leading-tight">{etiqueta}</span>
+      </div>
+
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="text-2xl font-bold text-gray-900 tabular-nums leading-none">{valor}</span>
+        {pct !== null && <span className="text-xs font-semibold text-red-700 tabular-nums">{pct}%</span>}
+      </div>
+
+      <div className="h-1.5 rounded-full bg-neutral-200">
+        <div
+          className={`h-1.5 rounded-full transition-all ${base ? 'bg-red-700' : 'bg-neutral-400'}`}
+          style={{ width: `${pct ?? 100}%` }}
+        />
+      </div>
+
+      <div className="text-[11px] leading-tight text-neutral-400">
+        {base ? `${valor} de ${base.valor} ${base.etiqueta}` : 'Total del proceso'}
+        {conDescripcion && <div className="mt-0.5">{descripcion}</div>}
+      </div>
     </div>
   );
 }
 
-function FechaCard({
-  titulo,
-  fin,
-  inicio,
-  iconClass,
-  grande = false,
-}: {
-  titulo: string;
-  fin?: string;
-  inicio?: string;
-  iconClass: string;
-  grande?: boolean;
-}) {
+function FechaChip({ titulo, inicio, fin }: { titulo: string; inicio?: string; fin?: string }) {
   return (
-    <>
-      <div className="flex items-center gap-3 mb-2">
-        <div className={`p-2 rounded-lg border ${iconClass}`}>
-          <CalendarDaysIcon className="w-5 h-5" />
-        </div>
-        <h3 className="text-sm font-semibold text-gray-900">{titulo}</h3>
-      </div>
-      <div className={`${grande ? 'text-2xl' : 'text-xl'} font-bold text-red-700`}>{fin || '—'}</div>
-      {inicio && <div className="text-xs text-neutral-500 mt-1">Desde {inicio}</div>}
-    </>
+    // max-w-full + texto que puede partirse: en pantallas angostas la etiqueta
+    // crece hacia abajo en lugar de salirse de la tarjeta.
+    <div className="inline-flex max-w-full items-start gap-1.5 rounded-md bg-neutral-50 border border-gray-200 px-2.5 py-1 text-xs leading-5">
+      <CalendarDaysIcon className="w-4 h-4 mt-0.5 text-red-700 shrink-0" />
+      <span className="min-w-0">
+        <span className="text-neutral-500 whitespace-nowrap">{titulo}:</span>{' '}
+        {/* inline-block: el rango baja completo a la línea siguiente y solo se
+            parte entre las dos fechas si ni así cabe. */}
+        <span className="inline-block font-semibold text-gray-900">
+          <RangoFechas inicio={inicio} fin={fin} />
+        </span>
+      </span>
+    </div>
   );
 }
+
+/**
+ * Tarjeta de una cohorte. `amplia` se usa cuando es la única cohorte: las 6 etapas
+ * caben en una fila en pantallas grandes y se muestra la descripción de cada una.
+ */
+function CohorteCard({ item, amplia }: { item: ProgramaInicioData; amplia: boolean }) {
+  const { cohorteActual } = item;
+  const etapas = construirEtapas(item);
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg p-5 hover:border-gray-300 transition-all animate-fade-in-up">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mb-3">
+        <h2 className="text-base font-bold text-gray-900">{cohorteActual.nombre}</h2>
+        {cohorteActual.activa && (
+          <span className="bg-red-700 text-white text-xs font-semibold px-2.5 py-0.5 rounded-lg">Activa</span>
+        )}
+      </div>
+
+      <div className="flex flex-wrap gap-2 mb-4">
+        <FechaChip
+          titulo="Documentos"
+          inicio={cohorteActual.fechaInicioDocumentacion}
+          fin={cohorteActual.fechaFinDocumentacion || cohorteActual.fechaLimiteDocumentos}
+        />
+        <FechaChip
+          titulo="Pago de inscripción"
+          inicio={cohorteActual.fechaInicioPago}
+          fin={cohorteActual.fechaFinPago || cohorteActual.fechaLimitePago}
+        />
+      </div>
+
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-neutral-400 mb-2">Avance de aspirantes</h3>
+      <div className={`grid gap-2 grid-cols-2 sm:grid-cols-3 ${amplia ? 'lg:grid-cols-6' : ''}`}>
+        {etapas.map((etapa) => (
+          <EtapaCard key={etapa.etiqueta} etapa={etapa} conDescripcion={amplia} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function LoadingCardSkeleton() {
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg p-5 animate-pulse">
+      <div className="h-5 w-56 bg-neutral-200 rounded mb-3" />
+      <div className="flex gap-2 mb-4">
+        <div className="h-6 w-52 bg-neutral-200 rounded" />
+        <div className="h-6 w-60 bg-neutral-200 rounded" />
+      </div>
+      <div className="grid gap-2 grid-cols-2 sm:grid-cols-3">
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="h-24 bg-neutral-200 rounded-lg" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Vista ─────────────────────────────────────────────────────────────────────
 
 export default function ProgramaInicio() {
   const { mostrarAlerta } = useOutletContext<ProgramaOutletContext>();
@@ -206,15 +256,13 @@ export default function ProgramaInicio() {
   if (loading) {
     return (
       <div className="p-6 bg-gray-100 min-h-full" style={{ fontFamily: 'Segoe UI, sans-serif' }}>
-        <div className="">
-          <div className="bg-white border border-gray-200 rounded-lg p-6 flex items-center gap-3 text-neutral-400 text-sm mb-6 animate-fade-in">
-            <SpinnerIcon className="animate-spin shrink-0 h-5 w-5 text-red-700" />
-            <span>Cargando información del programa...</span>
-          </div>
-          <div className="space-y-4">
-            <LoadingCardSkeleton />
-            <LoadingCardSkeleton />
-          </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4 flex items-center gap-3 text-neutral-400 text-sm mb-4 animate-fade-in">
+          <SpinnerIcon className="animate-spin shrink-0 h-5 w-5 text-red-700" />
+          <span>Cargando información del programa...</span>
+        </div>
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          <LoadingCardSkeleton />
+          <LoadingCardSkeleton />
         </div>
       </div>
     );
@@ -223,115 +271,28 @@ export default function ProgramaInicio() {
   if (!data.length) {
     return (
       <div className="p-6 bg-gray-100 min-h-full" style={{ fontFamily: 'Segoe UI, sans-serif' }}>
-        <div className="">
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center animate-fade-in">
-            <p className="text-sm text-neutral-400">No hay cohortes activas para mostrar.</p>
-          </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center animate-fade-in">
+          <p className="text-sm text-neutral-400">No hay cohortes activas para mostrar.</p>
         </div>
       </div>
     );
   }
 
-  const renderCohorteCard = (item: ProgramaInicioData) => {
-    const { cohorteActual } = item;
-
-    return (
-      <div key={cohorteActual.id} className="bg-white border border-gray-200 rounded-lg p-6 hover:border-gray-300 transition-all animate-fade-in-up">
-        <div className="flex items-center justify-between gap-3 mb-4">
-          <div className="flex items-center gap-3">
-            <h2 className="text-lg font-bold text-gray-900">{cohorteActual.nombre}</h2>
-            {cohorteActual.activa && (
-              <span className="bg-red-700 text-white text-xs font-semibold px-2.5 py-0.5 rounded-lg">Activa</span>
-            )}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div className="rounded-lg border border-gray-200 p-4 bg-neutral-50">
-            <FechaCard
-              titulo="Fecha límite documentos"
-              fin={cohorteActual.fechaFinDocumentacion || cohorteActual.fechaLimiteDocumentos}
-              inicio={cohorteActual.fechaInicioDocumentacion}
-              iconClass="bg-red-100 border-red-200 text-red-700"
-            />
-          </div>
-          <div className="rounded-lg border border-gray-200 p-4 bg-neutral-50">
-            <FechaCard
-              titulo="Fecha límite pago"
-              fin={cohorteActual.fechaFinPago || cohorteActual.fechaLimitePago}
-              inicio={cohorteActual.fechaInicioPago}
-              iconClass="bg-green-100 border-green-200 text-green-700"
-            />
-          </div>
-        </div>
-
-        <div className="rounded-lg border border-gray-200 p-4">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">Avance de aspirantes</h3>
-          <EmbudoAspirantes item={item} compacto />
-        </div>
-      </div>
-    );
-  };
-
-  const [firstItem] = data;
-  const hasMultiple = data.length > 1;
-  const { cohorteActual } = firstItem;
+  const varias = data.length > 1;
 
   return (
     <div className="p-6 bg-gray-100 min-h-full" style={{ fontFamily: 'Segoe UI, sans-serif' }}>
-      <div className="">
-        {!hasMultiple ? (
-          <>
-            <div className="flex items-center gap-3 mb-6 animate-fade-in">
-              <h1 className="text-xl font-bold text-gray-900">{cohorteActual.nombre}</h1>
-              {cohorteActual.activa && (
-                <span className="bg-red-700 text-white text-xs font-semibold px-2.5 py-0.5 rounded-lg">Activa</span>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-gray-300 transition-all animate-fade-in-up delay-100">
-                <FechaCard
-                  titulo="Fecha límite cargue de documentos"
-                  fin={cohorteActual.fechaFinDocumentacion || cohorteActual.fechaLimiteDocumentos}
-                  inicio={cohorteActual.fechaInicioDocumentacion}
-                  iconClass="bg-red-100 border-red-200 text-red-700"
-                  grande
-                />
-              </div>
-
-              <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-gray-300 transition-all animate-fade-in-up delay-200">
-                <FechaCard
-                  titulo="Fecha límite pago de inscripción"
-                  fin={cohorteActual.fechaFinPago || cohorteActual.fechaLimitePago}
-                  inicio={cohorteActual.fechaInicioPago}
-                  iconClass="bg-green-100 border-green-200 text-green-700"
-                  grande
-                />
-              </div>
-            </div>
-
-            <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-gray-300 transition-all animate-fade-in-up delay-300">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="p-2 bg-red-100 border border-red-200 rounded-lg">
-                  <FunnelIcon className="text-red-700 w-5 h-5" />
-                </div>
-                <h2 className="text-base font-semibold text-gray-900">Avance de aspirantes</h2>
-              </div>
-              <EmbudoAspirantes item={firstItem} />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="flex items-center gap-3 mb-4 animate-fade-in">
-              <h1 className="text-xl font-bold text-gray-900">Cohortes activas del programa</h1>
-              <span className="bg-red-700 text-white text-xs font-semibold px-2.5 py-0.5 rounded-lg">{data.length}</span>
-            </div>
-            <div className="space-y-4">
-              {data.map(renderCohorteCard)}
-            </div>
-          </>
+      <div className="flex items-center gap-3 mb-4 animate-fade-in">
+        <h1 className="text-xl font-bold text-gray-900">{varias ? 'Cohortes activas del programa' : 'Cohorte activa del programa'}</h1>
+        {varias && (
+          <span className="bg-red-700 text-white text-xs font-semibold px-2.5 py-0.5 rounded-lg">{data.length}</span>
         )}
+      </div>
+
+      <div className={varias ? 'grid grid-cols-1 xl:grid-cols-2 gap-4' : ''}>
+        {data.map((item) => (
+          <CohorteCard key={item.cohorteActual.id} item={item} amplia={!varias} />
+        ))}
       </div>
     </div>
   );

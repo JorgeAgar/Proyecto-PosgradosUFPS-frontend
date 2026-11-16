@@ -44,14 +44,17 @@ export default function ProgramaDocumentos() {
 
   // ── Carga de datos ────────────────────────────────────────────────────────
 
+  // Solo se usa en la carga inicial (`sessionProgramaId` no cambia): `cargando`
+  // ya arranca en true, así que el estado solo cambia cuando llega la respuesta.
   const cargarDocumentos = async () => {
-    setCargando(true);
     try {
-      const payload = await programaDocsService.fetchRequiredDocuments();
-      setDocsPrograma(payload.documentosPrograma ?? []);
-      setDocsConsejo(payload.documentosConsejo ?? []);
-    } catch (err) {
-      mostrarAlerta(err instanceof Error ? err.message : 'Error al cargar los documentos. Intenta de nuevo.', 'error');
+      try {
+        const payload = await programaDocsService.fetchRequiredDocuments();
+        setDocsPrograma(payload.documentosPrograma ?? []);
+        setDocsConsejo(payload.documentosConsejo ?? []);
+      } catch (err) {
+        mostrarAlerta(err instanceof Error ? err.message : 'Error al cargar los documentos. Intenta de nuevo.', 'error');
+      }
     } finally {
       setCargando(false);
     }

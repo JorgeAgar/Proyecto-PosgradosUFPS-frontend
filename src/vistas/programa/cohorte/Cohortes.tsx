@@ -40,8 +40,9 @@ export default function Cohortes() {
   }, []);
 
   useEffect(() => {
+    // El detalle anterior se limpia en los handlers que abren la vista de detalle
+    // (handleSelectCohorte / handleSaveDetalleConfirmed), no aquí.
     if (!selectedCohorteId || view !== 'detail') return;
-    setSelectedDetalle(null);
     (async () => {
       try {
         const detail = await fetchCohorteDetalle(selectedCohorteId);
@@ -205,6 +206,8 @@ export default function Cohortes() {
                       <div className="flex gap-6 flex-wrap">
                         <div className="text-sm"><span className="text-neutral-400">Inscritos: </span><span className="font-semibold text-red-700">{cohorte.totalInscritos ?? cohorte.inscritos ?? 0}</span></div>
                         <div className="text-sm"><span className="text-neutral-400">Cupos: </span><span className="font-semibold text-red-700">{cohorte.cupos}</span></div>
+                        <div className="text-sm"><span className="text-neutral-400">Admitidos: </span><span className="font-semibold text-red-700">{cohorte.totalAdmitidos}</span></div>
+                        <div className="text-sm"><span className="text-neutral-400">Legalizados: </span><span className="font-semibold text-red-700">{cohorte.totalLegalizados}</span><span className="text-neutral-400"> de {cohorte.totalAdmitidos} admitidos</span></div>
                       </div>
                     </div>
                   </div>

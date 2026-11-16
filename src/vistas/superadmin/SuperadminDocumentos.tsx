@@ -50,7 +50,7 @@ function abrirFormato(url: string) {
 export default function SuperadminDocumentos() {
 	const { mostrarAlerta, mostrarConfirm } = useOutletContext<SuperadminOutletContext>();
 
-	const [documentos, setDocumentos] = useState<DocumentoConsejoOutput[]>(() => superadminDocumentosService.getCachedDocumentos());
+	const [documentos, setDocumentos] = useState<DocumentoConsejoOutput[]>(() => sortDocumentos(superadminDocumentosService.getCachedDocumentos()));
 	const [loading, setLoading] = useState(() => !superadminDocumentosService.hasCachedDocumentos());
 	const [searchTerm, setSearchTerm] = useState('');
 
@@ -65,6 +65,21 @@ export default function SuperadminDocumentos() {
 	const [documentoToDelete, setDocumentoToDelete] = useState<DocumentoConsejoOutput | null>(null);
 	const [deleting, setDeleting] = useState(false);
 
+	// Pide los documentos al backend sin activar el indicador de carga.
+	const obtener = useCallback(async (forceRefresh: boolean) => {
+		try {
+			try {
+				const data = await superadminDocumentosService.listar(forceRefresh);
+				setDocumentos(sortDocumentos(data));
+			} catch (err) {
+				mostrarAlerta(err instanceof Error ? err.message : 'Error al cargar los documentos.');
+			}
+		} finally {
+			setLoading(false);
+		}
+	}, [mostrarAlerta]);
+
+	// Recarga (después de acciones): usa la caché si existe, salvo que se fuerce.
 	const cargar = useCallback(async (forceRefresh = false) => {
 		if (superadminDocumentosService.hasCachedDocumentos()) {
 			if (!forceRefresh) {
@@ -75,19 +90,15 @@ export default function SuperadminDocumentos() {
 		}
 
 		setLoading(true);
-		try {
-			const data = await superadminDocumentosService.listar(forceRefresh);
-			setDocumentos(sortDocumentos(data));
-		} catch (err) {
-			mostrarAlerta(err instanceof Error ? err.message : 'Error al cargar los documentos.');
-		} finally {
-			setLoading(false);
-		}
-	}, [mostrarAlerta]);
+		await obtener(forceRefresh);
+	}, [obtener]);
 
+	// Carga inicial: si hay caché, el estado ya arrancó con ella; si no, `loading`
+	// ya arranca en true y solo se cambia el estado cuando llega la respuesta.
 	useEffect(() => {
-		void cargar();
-	}, [cargar]);
+		if (superadminDocumentosService.hasCachedDocumentos()) return;
+		void obtener(false);
+	}, [obtener]);
 
 	const documentosOrdenados = useMemo(() => sortDocumentos(documentos), [documentos]);
 	const documentosFiltrados = useMemo(() => {

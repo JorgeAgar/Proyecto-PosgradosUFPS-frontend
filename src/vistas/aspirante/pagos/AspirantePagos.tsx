@@ -37,8 +37,9 @@ export default function AspirantePagos() {
   }, []);
 
   useEffect(() => {
+    // `loadingPayments` ya arranca en true y `aspiranteId` solo se asigna una vez,
+    // así que aquí solo se cambia el estado cuando llega la respuesta.
     if (!aspiranteId) return;
-    setLoadingPayments(true);
     (async () => {
       try {
         const pagos = await fetchPayments(aspiranteId);
