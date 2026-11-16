@@ -28,6 +28,7 @@ import type { AspiranteOutletContext } from '../../../layouts/AspiranteLayout';
 import { SpinnerIcon } from "../../../assets/icons";
 import Cargando from "../../../components/Cargando";
 import { DialogoConfirmacion } from "../../../components/Dialogo";
+import { normalizarRedirectUrlWompi } from "../../../utils/wompi";
 
 export type TipoPagoAspirante = 'inscripcion' | 'matricula';
 
@@ -38,7 +39,6 @@ const CONFIG: Record<TipoPagoAspirante, {
   checkout: (aspiranteId: string, montoCentavos: number) => Promise<WompiCheckoutResponse>;
   subirFactura: (aspiranteId: string, file: File) => Promise<void>;
   reemplazarFactura: (aspiranteId: string, file: File) => Promise<void>;
-  redirectUrlPorDefecto: string;
   /** La matrícula permite elegir el monto a pagar (entre valorminimo y valormatricula). */
   conMonto: boolean;
 }> = {
@@ -48,7 +48,6 @@ const CONFIG: Record<TipoPagoAspirante, {
     checkout: (aspiranteId) => fetchInscripcionCheckout(aspiranteId),
     subirFactura: uploadInscripcionFactura,
     reemplazarFactura: patchInscripcionFactura,
-    redirectUrlPorDefecto: '',
     conMonto: false,
   },
   matricula: {
@@ -57,7 +56,6 @@ const CONFIG: Record<TipoPagoAspirante, {
     checkout: fetchMatriculaCheckout,
     subirFactura: uploadMatriculaFactura,
     reemplazarFactura: patchMatriculaFactura,
-    redirectUrlPorDefecto: 'https://transaction-redirect.wompi.co/check',
     conMonto: true,
   },
 };
@@ -109,6 +107,9 @@ export default function AspirantePagoDetalle({ tipo }: { tipo: TipoPagoAspirante
   const [cerrandoConfirmarSubida, setCerrandoConfirmarSubida] = useState(false);
 
   const wompiWidgetRef = useRef<HTMLDivElement | null>(null);
+  // La URL de retorno la define el backend (WOMPI_RETURN_URL); si no hay, se omite y Wompi
+  // muestra el resultado dentro del propio widget.
+  const redirectWompi = wompiCheckout ? normalizarRedirectUrlWompi(wompiCheckout.redirectUrl) : null;
 
   const estadoNorm     = resumen?.estado?.trim().toUpperCase() ?? '';
   const pagoCompletado = estadoNorm === 'COMPLETADO';
@@ -157,7 +158,10 @@ export default function AspirantePagoDetalle({ tipo }: { tipo: TipoPagoAspirante
     if (!receiptGenerated || !wompiWidgetRef.current || pagoCompletado || !wompiCheckout) return;
     const container = wompiWidgetRef.current;
     container.innerHTML = '';
-    const redirectUrl = wompiCheckout.redirectUrl ?? cfg.redirectUrlPorDefecto;
+    if (!redirectWompi?.valida) {
+      console.error('Wompi: URL de redirección inválida recibida del backend:', redirectWompi?.valor);
+      return;
+    }
     const script = document.createElement('script');
     script.src = wompiCheckout.widgetScriptUrl;
     script.setAttribute('data-render', 'button');
@@ -166,7 +170,7 @@ export default function AspirantePagoDetalle({ tipo }: { tipo: TipoPagoAspirante
     script.setAttribute('data-amount-in-cents', String(wompiCheckout.amountInCents));
     script.setAttribute('data-reference', wompiCheckout.reference);
     script.setAttribute('data-signature:integrity', wompiCheckout.signatureIntegrity);
-    script.setAttribute('data-redirect-url', redirectUrl);
+    if (redirectWompi.url) script.setAttribute('data-redirect-url', redirectWompi.url);
     container.appendChild(script);
     return () => { container.innerHTML = ''; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -591,7 +595,12 @@ export default function AspirantePagoDetalle({ tipo }: { tipo: TipoPagoAspirante
                     <p className="text-xs text-neutral-400">Realiza el pago de forma segura</p>
                     {pagoCompletado
                       ? <div className="font-semibold flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg bg-green-700 text-white text-sm"><CheckCircleIcon className="w-4 h-4 shrink-0" /> Pagado</div>
-                      : <form><div ref={wompiWidgetRef} /></form>}
+                      : redirectWompi && !redirectWompi.valida
+                        ? <div role="alert" className="flex items-start gap-2 text-left text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg p-3">
+                            <ExclamationTriangleIcon className="w-4 h-4 shrink-0 mt-0.5" />
+                            <span>El pago en línea no está disponible: la URL de retorno configurada para Wompi no es válida. Comunícate con la oficina de posgrados o descarga el recibo para pagar por otro medio.</span>
+                          </div>
+                        : <form><div ref={wompiWidgetRef} /></form>}
                   </div>
                 )}
               </div>
