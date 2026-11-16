@@ -4,12 +4,12 @@ import { TIPOS_PAGO, type TipoPago } from "./tipoPago";
 
 const METRICAS: Record<TipoPago, (c: CohortePagos) => MetricaCohorte[]> = {
   inscripcion: (c) => [
-    { etiqueta: "Por pagar", valor: c.totalConfirmados },
-    { etiqueta: "Paz y salvo", valor: c.totalPazysalvo, oculta: c.totalPazysalvo === 0 },
+    { etiqueta: "Por pagar", valor: c.totalPorPagar },
+    { etiqueta: "Paz y salvo", valor: c.totalPagados, oculta: c.totalPagados === 0 },
   ],
   matricula: (c) => [
     { etiqueta: "Admitidos", valor: c.totalAdmitidos },
-    { etiqueta: "Legalizados", valor: c.totalLegalizados },
+    { etiqueta: "Legalizados", valor: c.totalPagados },
   ],
 };
 
@@ -17,14 +17,14 @@ const PROGRESO: Record<TipoPago, (c: CohortePagos) => ProgresoCohorte> = {
   inscripcion: (c) => ({
     titulo: "A paz y salvo / Total por pagar",
     etiqueta: "A paz y salvo",
-    actual: c.totalPazysalvo,
-    total: c.totalConfirmados + c.totalPazysalvo,
+    actual: c.totalPagados,
+    total: c.totalPorPagar + c.totalPagados,
   }),
   matricula: (c) => ({
     titulo: "Legalizados / Total por legalizar",
     etiqueta: "Legalizados",
-    actual: c.totalLegalizados,
-    total: c.totalAdmitidos,
+    actual: c.totalPagados,
+    total: Math.max(c.totalAdmitidos, c.totalPagados),
   }),
 };
 
@@ -35,7 +35,7 @@ export default function ValidacionCohortesPagos({ tipo }: { tipo: TipoPago }) {
       titulo="Validación de Pagos"
       subtitulo={`${nombre} — Cohortes`}
       descripcion={`Selecciona una cohorte para gestionar la validación de pagos de ${nombre.toLowerCase()}.`}
-      cargar={getCohortesPagos}
+      cargar={() => getCohortesPagos(tipo)}
       rutaDetalle={(c) => `${ruta}/cohorte/${c.id}`}
       metricas={METRICAS[tipo]}
       progreso={PROGRESO[tipo]}
