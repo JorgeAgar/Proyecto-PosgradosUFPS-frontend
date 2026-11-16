@@ -24,7 +24,7 @@ const CAMPO = 'mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3
 type ModalMode = 'create' | 'edit';
 
 type DeleteConfirmState = {
-  criterioId: string;
+  criterioId: number;
   criterioNombre: string;
 } | null;
 
@@ -53,7 +53,7 @@ export default function Criterios() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalClosing, setModalClosing] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>('create');
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<CriterioPayload>(EMPTY_FORM);
   const [modalError, setModalError] = useState<string | null>(null);
   const [modalSubmitting, setModalSubmitting] = useState(false);
@@ -118,7 +118,7 @@ export default function Criterios() {
     }, 170);
   };
 
-  const handleDelete = async (criterioId: string) => {
+  const handleDelete = async (criterioId: number) => {
     const target = criterios.find((c) => c.id === criterioId);
     if (!target) return;
     setDeleteConfirm({ criterioId, criterioNombre: target.nombre });

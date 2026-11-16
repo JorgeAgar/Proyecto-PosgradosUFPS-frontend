@@ -10,15 +10,10 @@ import { Select, type SelectOption } from '../../../components/Select';
 import { SpinnerIcon } from "../../../assets/icons";
 import { DialogoConfirmacion } from '../../../components/Dialogo';
 import { mensajeErrorCohorte } from './mensajeErrorCohorte';
-import { erroresFechasDesdeApi, validarFechasCohorte, ventanaInicioDocumentacion, type CampoFechaCohorte, type ErroresFechasCohorte } from './fechasCohorte';
+import { erroresFechasDesdeApi, validarFechasCohorte, ventanaInicioCohorte, type CampoFechaCohorte, type ErroresFechasCohorte } from './fechasCohorte';
 
 const FECHAS_VACIAS: Record<CampoFechaCohorte, string> = {
-  fechaInicioDocumentacion: '',
-  fechaFinDocumentacion: '',
-  fechaInicioInscripcion: '',
-  fechaFinInscripcion: '',
-  fechaInicioPago: '',
-  fechaFinPago: '',
+  fechaInicio: '', fechaLimiteDocumentos: '', fechaLimitePago: '',
 };
 
 export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void; onBack?: () => void | Promise<void> }) {
@@ -40,7 +35,7 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
   const [idModalidad, setIdModalidad] = useState<string>('');
   const [selectedProgramaDocIds, setSelectedProgramaDocIds] = useState<string[]>([]);
   const [selectedCriterios, setSelectedCriterios] = useState<Array<{ id?: string | number; nombre: string; peso: number | undefined }>>([]);
-  // Tres plazos independientes (documentación, inscripción y pago), todos obligatorios.
+  // Tres plazos independientes (inicio, documentos y pago), todos obligatorios.
   const [fechas, setFechas] = useState(FECHAS_VACIAS);
   const [erroresFechas, setErroresFechas] = useState<ErroresFechasCohorte>({});
 
@@ -99,7 +94,7 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
   const disabled = loading || saving;
 
   const fechaInicioSemestre = semestres.find((s) => String(s.id) === idSemestre)?.fechainicio;
-  const ventanaDocumentacion = ventanaInicioDocumentacion(fechaInicioSemestre);
+  const ventanaDocumentacion = ventanaInicioCohorte(fechaInicioSemestre);
 
   const cambiarFecha = (campo: CampoFechaCohorte) => (valor: string) => {
     setFechas((prev) => ({ ...prev, [campo]: valor }));
@@ -157,7 +152,7 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
     const errores = validarFechasCohorte(fechas, { requeridas: true, fechaInicioSemestre });
     setErroresFechas(errores);
     if (Object.keys(errores).length > 0) {
-      mostrarAlerta('Revisa las fechas de documentación, inscripción y pago.', 'advertencia');
+      mostrarAlerta('Revisa las fechas de inicio, documentos y pago.', 'advertencia');
       return;
     }
     if (selectedCriterios.length === 0) {
@@ -181,15 +176,15 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
     try {
       const body: NuevaCohortePayload = {
         nombre: nombre.trim(),
-        idSemestre,
-        idModalidad,
+        idSemestre: Number(idSemestre),
+        idModalidad: Number(idModalidad),
         cupos: cuposStr === '' ? 0 : parseInt(cuposStr, 10),
         ...fechas,
-        documentosConsejo: consejoDocs.map((doc) => ({ idDocrequisito: doc.id, nombre: doc.nombre })),
+        documentosConsejo: consejoDocs.map((doc) => ({ idDocrequisito: Number(doc.id), nombre: doc.nombre })),
         documentosPrograma: programaDocs
           .filter((doc) => selectedProgramaDocIds.includes(String(doc.id)))
-          .map((doc) => ({ idDocrequisito: doc.id, nombre: doc.nombre })),
-        criteriosCohorte: selectedCriterios.map((criterio) => ({ idCriterio: criterio.id, pesoSnapshot: criterio.peso ?? 0, idCohorte: 0 })),
+          .map((doc) => ({ idDocrequisito: Number(doc.id), nombre: doc.nombre })),
+        criteriosCohorte: selectedCriterios.map((criterio) => ({ idCriterio: Number(criterio.id), pesoSnapshot: criterio.peso ?? 0, idCohorte: 0 })),
       };
 
       await createCohorte(body);
@@ -274,74 +269,34 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
             <h2 className="text-sm font-semibold text-gray-800 mb-4">Fechas</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-6">
 
-              <div className="col-span-full">
-                <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wide">Inscripción</p>
-              </div>
-
               <DatePicker
-                id="fechaInicioInscripcion"
-                label="Fecha inicio de inscripción"
-                value={fechas.fechaInicioInscripcion}
-                onChange={cambiarFecha('fechaInicioInscripcion')}
-                error={erroresFechas.fechaInicioInscripcion}
-                disabled={disabled}
-              />
-
-              <DatePicker
-                id="fechaFinInscripcion"
-                label="Fecha límite de inscripción"
-                value={fechas.fechaFinInscripcion}
-                onChange={cambiarFecha('fechaFinInscripcion')}
-                error={erroresFechas.fechaFinInscripcion}
-                minDate={fechas.fechaInicioInscripcion || undefined}
-                disabled={disabled}
-              />
-
-              <div className="col-span-full mt-2">
-                <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wide">Documentos</p>
-              </div>
-
-              <DatePicker
-                id="fechaInicioDocumentacion"
-                label="Fecha inicio de cargue de documentos"
-                value={fechas.fechaInicioDocumentacion}
-                onChange={cambiarFecha('fechaInicioDocumentacion')}
-                error={erroresFechas.fechaInicioDocumentacion}
+                id="fechaInicio"
+                label="Fecha de inicio de la cohorte"
+                value={fechas.fechaInicio}
+                onChange={cambiarFecha('fechaInicio')}
+                error={erroresFechas.fechaInicio}
                 minDate={ventanaDocumentacion?.min}
                 maxDate={ventanaDocumentacion?.max}
                 disabled={disabled}
               />
 
               <DatePicker
-                id="fechaFinDocumentacion"
-                label="Fecha límite de cargue de documentos"
-                value={fechas.fechaFinDocumentacion}
-                onChange={cambiarFecha('fechaFinDocumentacion')}
-                error={erroresFechas.fechaFinDocumentacion}
-                minDate={fechas.fechaInicioDocumentacion || undefined}
-                disabled={disabled}
-              />
-
-              <div className="col-span-full mt-2">
-                <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wide">Pago</p>
-              </div>
-
-              <DatePicker
-                id="fechaInicioPago"
-                label="Fecha inicio de pago de inscripción"
-                value={fechas.fechaInicioPago}
-                onChange={cambiarFecha('fechaInicioPago')}
-                error={erroresFechas.fechaInicioPago}
+                id="fechaLimiteDocumentos"
+                label="Fecha límite de documentos"
+                value={fechas.fechaLimiteDocumentos}
+                onChange={cambiarFecha('fechaLimiteDocumentos')}
+                error={erroresFechas.fechaLimiteDocumentos}
+                minDate={fechas.fechaInicio || undefined}
                 disabled={disabled}
               />
 
               <DatePicker
-                id="fechaFinPago"
-                label="Fecha límite de pago de inscripción"
-                value={fechas.fechaFinPago}
-                onChange={cambiarFecha('fechaFinPago')}
-                error={erroresFechas.fechaFinPago}
-                minDate={fechas.fechaInicioPago || undefined}
+                id="fechaLimitePago"
+                label="Fecha límite de pago"
+                value={fechas.fechaLimitePago}
+                onChange={cambiarFecha('fechaLimitePago')}
+                error={erroresFechas.fechaLimitePago}
+                minDate={fechas.fechaInicio || undefined}
                 disabled={disabled}
               />
             </div>

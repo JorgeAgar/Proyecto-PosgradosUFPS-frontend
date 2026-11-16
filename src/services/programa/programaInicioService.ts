@@ -14,13 +14,7 @@ export interface CohorteActual {
   activa: boolean;
   fechaLimiteDocumentos: string; // formato DD/MM/YYYY para UI
   fechaLimitePago: string; // formato DD/MM/YYYY para UI
-  // Plazos completos (inicio y fin) de documentación, inscripción y pago.
-  fechaInicioDocumentacion?: string;
-  fechaFinDocumentacion?: string;
-  fechaInicioInscripcion?: string;
-  fechaFinInscripcion?: string;
-  fechaInicioPago?: string;
-  fechaFinPago?: string;
+
 }
 
 export interface ValidacionStats {
@@ -71,38 +65,8 @@ function normalizeProgramaInicioResponse(response: unknown): ProgramaInicioData[
 export async function fetchProgramaInicioData(): Promise<ProgramaInicioData[]> {
   const programaId = await getProgramaRealId();
   const inicioPath = `/api/application/case/director-programa/programa/${programaId}/inicio`;
-  const response = await programaApiClient.fetch<unknown>(inicioPath, {
+  const response = await programaApiClient.fetch<ProgramaInicioData[]>(inicioPath, {
     method: 'GET',
   });
   return normalizeProgramaInicioResponse(response);
 }
-
-/*
-  Requisitos de backend para que esta vista funcione:
-
-  1) GET /api/dev/endpoint/programa/:programaId/inicio
-     Respuesta sugerida:
-     {
-       "cohorteActual": {
-         "id": 3,
-         "nombre": "Cohorte-3 2025-1",
-         "activa": true,
-         "fechaLimiteDocumentos": "2026-05-15",
-         "fechaLimitePago": "2026-05-20"
-       },
-       "validacion": {
-         "totalInscritos": 45,
-         "aspirantesValidados": 6
-       },
-       "calificacion": {
-         "totalValidados": 6,
-         "aspirantesCalificados": 2
-       }
-     }
-
-  Notas backend:
-  - Idealmente devolver fechas ISO y en frontend formatearlas. En este mock se usa DD/MM/YYYY para simplicidad.
-  - Validar autenticación por token y permisos de programa.
-  - Recomendado incluir `programaId` derivado del token para evitar fuga entre programas.
-  - Manejar errores con códigos claros: 401, 403, 404, 500.
-*/

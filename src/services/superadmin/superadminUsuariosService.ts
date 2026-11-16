@@ -20,12 +20,10 @@ export interface PersonaBasica {
   empresa?: string | null;
   experiencialaboral?: string | null;
   egresadoufps?: boolean | null;
-  numerodocumento?: number | string | null;
-  idTipodocumento?: number | null;
-  ubicacionvivienda?: UbicacionPersonaPayload | null;
-  ubicacionnacimiento?: UbicacionPersonaPayload | null;
-  ubicaciontrabajo?: UbicacionPersonaPayload | null;
-  lugarexpedicion?: UbicacionPersonaPayload | null;
+  idDocumentopersona?: number | null;
+  idUbicacionvivienda?: number | null;
+  idUbicacionnacimiento?: number | null;
+  idUbicaciontrabajo?: number | null;
 }
 
 export interface RolOutput {
@@ -42,7 +40,7 @@ export interface ProgramaDirigibleOutput {
   id: number;
   nombre: string;
   descripcion: string;
-  idFacultad: unknown;
+  idFacultad: number | null;
   idPrograma: number;
 }
 
@@ -51,18 +49,11 @@ export interface PersonaCreadaOutput {
   [key: string]: unknown;
 }
 
-export interface UbicacionPersonaPayload {
-  direccion: string | null;
-  idMunicipio: number | null;
-}
-
 export interface PersonaCompletaPayload {
-  id?: number;
   nombres: string;
   apellidos: string;
   celular: string;
   correo: string;
-  numerodocumento?: number | string | null;
   fechanacimiento?: string | null;
   telefono?: string | null;
   idGenero?: number | null;
@@ -77,15 +68,10 @@ export interface PersonaCompletaPayload {
   empresa?: string | null;
   experiencialaboral?: string | null;
   egresadoufps?: boolean | null;
-  idTipodocumento?: number | null;
   idDocumentopersona?: number | null;
   idUbicacionvivienda?: number | null;
   idUbicacionnacimiento?: number | null;
   idUbicaciontrabajo?: number | null;
-  ubicacionvivienda?: UbicacionPersonaPayload | null;
-  ubicacionnacimiento?: UbicacionPersonaPayload | null;
-  ubicaciontrabajo?: UbicacionPersonaPayload | null;
-  lugarexpedicion?: UbicacionPersonaPayload | null;
 }
 
 function nullableString(value: string | null | undefined) {
@@ -97,47 +83,8 @@ function nullableNumber(value: number | null | undefined) {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
-function buildUbicacionPayload(value: UbicacionPersonaPayload | null | undefined): UbicacionPersonaPayload | null {
-  const direccion = nullableString(value?.direccion);
-  const idMunicipio = nullableNumber(value?.idMunicipio);
-
-  if (!direccion && idMunicipio === null) return null;
-  return { direccion, idMunicipio };
-}
-
 function buildPersonaPayload(data: PersonaCompletaPayload) {
   return {
-    ...(data.id ? { id: data.id } : {}),
-    nombres: data.nombres.trim(),
-    apellidos: data.apellidos.trim(),
-    correo: data.correo.trim(),
-    fechanacimiento: nullableString(data.fechanacimiento),
-    celular: data.celular.trim(),
-    telefono: nullableString(data.telefono),
-    idGenero: nullableNumber(data.idGenero),
-    idEstadocivil: nullableNumber(data.idEstadocivil),
-    idGrupoetnico: nullableNumber(data.idGrupoetnico),
-    idPoblacionindigena: nullableNumber(data.idPoblacionindigena),
-    idDiscapacidad: nullableNumber(data.idDiscapacidad),
-    idCapacidadexepcional: nullableNumber(data.idCapacidadexepcional),
-    promediopregrado: nullableNumber(data.promediopregrado),
-    titulopregrado: nullableString(data.titulopregrado),
-    titulosposgrados: nullableString(data.titulosposgrados),
-    empresa: nullableString(data.empresa),
-    experiencialaboral: nullableString(data.experiencialaboral),
-    egresadoufps: typeof data.egresadoufps === 'boolean' ? data.egresadoufps : null,
-    ubicacionvivienda: buildUbicacionPayload(data.ubicacionvivienda),
-    ubicacionnacimiento: buildUbicacionPayload(data.ubicacionnacimiento),
-    ubicaciontrabajo: buildUbicacionPayload(data.ubicaciontrabajo),
-    numerodocumento: data.numerodocumento ?? '',
-    idTipodocumento: nullableNumber(data.idTipodocumento),
-    lugarexpedicion: buildUbicacionPayload(data.lugarexpedicion),
-  };
-}
-
-function buildPersonaUpdatePayload(data: PersonaCompletaPayload & { id: number }) {
-  return {
-    id: data.id,
     nombres: data.nombres.trim(),
     apellidos: data.apellidos.trim(),
     correo: data.correo.trim(),
@@ -169,11 +116,9 @@ export interface UsuarioOutput {
   idClave: number;
   idPersona: number;
   idRol: number;
-  idPrograma?: number;
   persona?: PersonaBasica & Record<string, unknown>;
   rol?: RolOutput;
   clave?: ClaveOutput;
-  programa?: { id: number; nombre?: string; [key: string]: unknown };
 }
 
 interface AdministrativoOutput {
@@ -229,7 +174,7 @@ export const superadminUsuariosService = {
   },
 
   crearPersona: (data: PersonaCompletaPayload) =>
-    superadminApiClient.fetch<PersonaCreadaOutput>(`/api/application/case/superadmin/persona/crear-completo`, {
+    superadminApiClient.fetch<PersonaCreadaOutput>(`/api/dev/endpoint/persona/create`, {
       method: 'POST',
       body: JSON.stringify(buildPersonaPayload(data)),
     }),
@@ -237,7 +182,7 @@ export const superadminUsuariosService = {
   actualizarPersona: (data: PersonaCompletaPayload & { id: number }) =>
     superadminApiClient.fetch<PersonaCreadaOutput>(`/api/dev/endpoint/persona/update`, {
       method: 'PUT',
-      body: JSON.stringify(buildPersonaUpdatePayload(data)),
+      body: JSON.stringify({ id: data.id, ...buildPersonaPayload(data) }),
     }),
 
   crearClave: (valor: string) =>

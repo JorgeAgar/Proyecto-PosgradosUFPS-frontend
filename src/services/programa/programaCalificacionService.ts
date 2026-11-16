@@ -23,7 +23,6 @@ export interface CohorteCalificacion {
   totalValidados: number;
   totalCalificados: number;
   totalAdmitidos: number;
-  documentos: DocumentoCohorte[];
 }
 
 export async function getCohortesByPrograma(): Promise<CohorteCalificacion[]> {

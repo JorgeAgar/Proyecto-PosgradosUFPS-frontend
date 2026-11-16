@@ -26,12 +26,9 @@ export interface CohorteItem {
   totalAdmitidos: number;
   inscritos?: number;
   admitidos?: number;
-  fechaInicioDocumentacion?: string;
-  fechaFinDocumentacion?: string;
-  fechaInicioInscripcion?: string;
-  fechaFinInscripcion?: string;
-  fechaInicioPago?: string;
-  fechaFinPago?: string;
+  fechaInicio?: string;
+  fechaLimiteDocumentos?: string;
+  fechaLimitePago?: string;
   documentos?: DocumentoCohorte[];
 }
 
@@ -71,21 +68,34 @@ export interface CohorteDetalle extends CohorteItem {
   };
 }
 
+export interface DocumentoAsignadoPayload {
+  id?: number;
+  idDocrequisito: number;
+  idCohorte?: number;
+  nombre?: string;
+}
+
+/** COHORTE_DIRECTOR_CREATE del contrato OpenAPI. */
 export interface NuevaCohortePayload {
   nombre: string;
-  idSemestre?: number | string;
-  idModalidad?: number | string;
+  idSemestre: number;
+  idModalidad: number;
   cupos: number;
-  fechaInicioDocumentacion?: string;
-  fechaFinDocumentacion?: string;
-  fechaInicioInscripcion?: string;
-  fechaFinInscripcion?: string;
-  fechaInicioPago?: string;
-  fechaFinPago?: string;
-  documentos?: DocumentoCohorte[];
-  documentosConsejo?: { idDocrequisito?: number | string; idCohorte?: number | string; nombre?: string }[];
-  documentosPrograma?: { idDocrequisito?: number | string; idCohorte?: number | string; nombre?: string }[];
-  criteriosCohorte?: { idCriterio?: number | string; idCohorte?: number | string; pesoSnapshot?: number }[];
+  fechaInicio: string;
+  fechaLimiteDocumentos: string;
+  fechaLimitePago: string;
+  documentosConsejo?: DocumentoAsignadoPayload[];
+  documentosPrograma?: DocumentoAsignadoPayload[];
+  criteriosCohorte?: { idCriterio: number; idCohorte?: number; pesoSnapshot?: number }[];
+}
+
+/** Los criterios nuevos se asignan antes del PUT para obtener su id de asociación. */
+export interface EditarCohortePayload extends Omit<NuevaCohortePayload, 'criteriosCohorte' | 'fechaInicio' | 'fechaLimiteDocumentos' | 'fechaLimitePago'> {
+  fechaInicio?: string;
+  fechaLimiteDocumentos?: string;
+  fechaLimitePago?: string;
+  id: number;
+  criteriosCohorte: { id?: number; idCriterio: number; pesoSnapshot?: number }[];
 }
 
 export interface SemestreItem {
@@ -127,17 +137,16 @@ function isObject(v: unknown): v is Record<string, unknown> {
 }
 
 function optionalNumber(value: unknown) {
-  return value !== undefined ? Number(value) : undefined;
+  return value != null ? Number(value) : undefined;
 }
 
 function optionalString(value: unknown) {
-  return value !== undefined ? String(value) : undefined;
+  return value != null ? String(value) : undefined;
 }
 
 /**
- * Convierte una cohorte del backend al formato del frontend. El backend no es
- * uniforme (a veces envía el semestre/modalidad como objeto y otras solo el
- * nombre), así que se aceptan todas las variantes conocidas.
+ * Unifica los DTO de listado y detalle para las vistas de cohortes.
+ * El id se conserva como texto para la selección y la navegación.
  */
 export function normalizeCohorte(cohorte: Record<string, unknown>): CohorteItem {
   const nombreSemestre = String(cohorte.nombreSemestre ?? getNombre(cohorte.semestre, 'nombreSemestre'));
@@ -161,12 +170,9 @@ export function normalizeCohorte(cohorte: Record<string, unknown>): CohorteItem 
     totalAdmitidos: Number(cohorte.totalAdmitidos ?? cohorte.admitidos ?? 0),
     inscritos: optionalNumber(cohorte.inscritos),
     admitidos: optionalNumber(cohorte.admitidos),
-    fechaInicioDocumentacion: optionalString(cohorte.fechaInicioDocumentacion),
-    fechaFinDocumentacion: optionalString(cohorte.fechaFinDocumentacion),
-    fechaInicioInscripcion: optionalString(cohorte.fechaInicioInscripcion),
-    fechaFinInscripcion: optionalString(cohorte.fechaFinInscripcion),
-    fechaInicioPago: optionalString(cohorte.fechaInicioPago),
-    fechaFinPago: optionalString(cohorte.fechaFinPago),
+    fechaInicio: optionalString(cohorte.fechaInicio),
+    fechaLimiteDocumentos: optionalString(cohorte.fechaLimiteDocumentos ?? cohorte.fechaLimiteDocs),
+    fechaLimitePago: optionalString(cohorte.fechaLimitePago),
     documentos: Array.isArray(cohorte.documentos)
       ? cohorte.documentos.map((doc) => {
           const documento = doc as Record<string, unknown>;
@@ -186,8 +192,8 @@ export async function fetchCohortes(): Promise<CohorteItem[]> {
   const normalized = data.map((item) => normalizeCohorte(item as Record<string, unknown>));
   normalized.sort((a, b) => {
     if (a.activa !== b.activa) return a.activa ? -1 : 1;
-    const aDate = a.fechaInicioDocumentacion ? new Date(a.fechaInicioDocumentacion).getTime() : Number.MAX_SAFE_INTEGER;
-    const bDate = b.fechaInicioDocumentacion ? new Date(b.fechaInicioDocumentacion).getTime() : Number.MAX_SAFE_INTEGER;
+    const aDate = a.fechaInicio ? new Date(a.fechaInicio).getTime() : Number.MAX_SAFE_INTEGER;
+    const bDate = b.fechaInicio ? new Date(b.fechaInicio).getTime() : Number.MAX_SAFE_INTEGER;
     return aDate - bDate;
   });
   return normalized;
@@ -196,7 +202,8 @@ export async function fetchCohortes(): Promise<CohorteItem[]> {
 export async function createCohorte(payload: NuevaCohortePayload): Promise<CohorteItem> {
   const programaId = await getProgramaRealId();
   const path = `/api/application/case/director-programa/programa/${programaId}/cohortes`;
-  return programaApiClient.fetch<CohorteItem>(path, { method: 'POST', body: JSON.stringify(payload) });
+  const data = await programaApiClient.fetch<Record<string, unknown>>(path, { method: 'POST', body: JSON.stringify(payload) });
+  return normalizeCohorte(data);
 }
 
 export async function fetchSemestresDisponibles(): Promise<SemestreItem[]> {

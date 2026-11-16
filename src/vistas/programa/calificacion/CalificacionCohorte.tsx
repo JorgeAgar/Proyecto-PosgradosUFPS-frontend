@@ -26,7 +26,7 @@ interface Aspirante {
   nombre: string;
   estado: EstadoCalificacion;
   correo: string;
-  numerodocumento: number;
+  numerodocumento: string;
   puntaje: number | null;
 }
 

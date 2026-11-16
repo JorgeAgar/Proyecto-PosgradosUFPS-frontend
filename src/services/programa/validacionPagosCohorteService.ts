@@ -10,13 +10,10 @@ export interface CohortePagos {
   fechaLimiteDocs: string;
   fechaLimiteInscripcion: string;
   totalInscritos: number;
-  totalNoConfirmados: number;
-  totalConfirmados: number;
   totalPazysalvo: number;
   totalValidados: number;
   totalCalificados: number;
   totalAdmitidos: number;
-  totalLegalizados: number;
 }
 
 export async function getCohortesPagos(): Promise<CohortePagos[]> {

@@ -1,18 +1,7 @@
 import { programaApiClient } from './programaService';
+import { obtenerPagosPorCohorte, type PagoReciboDirector } from './validacionPagosService';
 
-export interface PagoMatriculaApi {
-  id: number;
-  idPago: number;
-  idAspirante: number;
-  aspirante: string;
-  fechavencimiento: string;
-  urlrecibo: string;
-  urlfactura: string;
-  referenciapago: string;
-  valorpago: number;
-  idEstado: number;
-  estado: string;
-}
+export type PagoMatriculaApi = PagoReciboDirector;
 
 export interface AccionPagoMatriculaAprobarResponse {
   id: number;
@@ -20,8 +9,8 @@ export interface AccionPagoMatriculaAprobarResponse {
   idEstado: number;
   idPagoconcepto: number;
   valorPagoPesos: number;
-  aspirante: string;
-  estado: string;
+  aspirante: unknown;
+  estado: unknown;
   pagoconcepto: {
     id: number;
     tipo: string;
@@ -29,9 +18,7 @@ export interface AccionPagoMatriculaAprobarResponse {
 }
 
 export async function obtenerPagosMatricula(idCohorte: number): Promise<PagoMatriculaApi[]> {
-  return programaApiClient.fetch<PagoMatriculaApi[]>(
-    `/api/application/case/director-programa/pagos/${idCohorte}/matricula`,
-  );
+  return obtenerPagosPorCohorte('matricula', idCohorte);
 }
 
 export async function aprobarPagoMatricula(idRecibo: number): Promise<AccionPagoMatriculaAprobarResponse> {

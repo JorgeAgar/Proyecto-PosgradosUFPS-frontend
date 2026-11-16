@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router';
 import type { ComponentType } from 'react';
-import { AcademicCapIcon, CalendarIcon, ClipboardIcon, DashboardDocumentIcon, HashtagIcon, UserPlusIcon } from '../../assets/icons';
+import { AcademicCapIcon, CalendarIcon, ClipboardIcon, DashboardDocumentIcon, UserPlusIcon } from '../../assets/icons';
 
 type ActionCard = {
   title: string;
@@ -47,14 +47,7 @@ const ACTION_CARDS: ActionCard[] = [
     Icon: DashboardDocumentIcon,
     delay: 'delay-500',
   },
-  {
-    title: 'Ultimos codigos',
-    description: 'Actualizar consecutivos de codigo por programa',
-    to: '/superadmin/ultimos-codigos',
-    Icon: HashtagIcon,
-    iconClassName: 'size-6',
-    delay: 'delay-600',
-  },
+
 ];
 
 export default function SuperadminInicio() {

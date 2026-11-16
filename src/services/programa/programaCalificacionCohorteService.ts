@@ -7,7 +7,7 @@ export interface AspiranteCalificacion {
   estado: string;
   correo: string;
   puntajeTotal: number;
-  numerodocumento: number;
+  numerodocumento: string;
 }
 
 export async function getAspirantes(idCohorte: number): Promise<AspiranteCalificacion[]> {
