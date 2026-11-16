@@ -49,7 +49,7 @@ export interface WompiCheckoutResponse {
   currency: string;
   publicKey: string;
   signatureIntegrity: string;
-  redirectUrl: string | null;
+  redirectUrl?: string | null;
   widgetScriptUrl: string;
   checkoutUrl: string;
   simulated: boolean;
