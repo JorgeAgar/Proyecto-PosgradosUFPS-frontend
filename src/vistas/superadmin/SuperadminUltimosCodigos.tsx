@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useOutletContext } from 'react-router';
 import {
 	ExclamationTriangleIcon,
@@ -34,7 +34,7 @@ function sortUltimosCodigos(items: UltimoCodigoProgramaOutput[]) {
 export default function SuperadminUltimosCodigos() {
 	const { mostrarAlerta, mostrarConfirm } = useOutletContext<SuperadminOutletContext>();
 
-	const [codigos, setCodigos] = useState<UltimoCodigoProgramaOutput[]>(() => superadminUltimosCodigosService.getCachedUltimosCodigos());
+	const [codigos, setCodigos] = useState<UltimoCodigoProgramaOutput[]>(() => sortUltimosCodigos(superadminUltimosCodigosService.getCachedUltimosCodigos()));
 	const [loading, setLoading] = useState(() => !superadminUltimosCodigosService.hasCachedUltimosCodigos());
 	const [searchTerm, setSearchTerm] = useState('');
 
@@ -44,27 +44,21 @@ export default function SuperadminUltimosCodigos() {
 	const [submitting, setSubmitting] = useState(false);
 	const [formError, setFormError] = useState<string | null>(null);
 
-	const cargar = useCallback(async (forceRefresh = false) => {
-		if (!forceRefresh && superadminUltimosCodigosService.hasCachedUltimosCodigos()) {
-			setCodigos(sortUltimosCodigos(superadminUltimosCodigosService.getCachedUltimosCodigos()));
-			setLoading(false);
-			return;
-		}
-
-		setLoading(true);
-		try {
-			const data = await superadminUltimosCodigosService.listar(forceRefresh);
-			setCodigos(sortUltimosCodigos(data));
-		} catch (err) {
-			mostrarAlerta(err instanceof Error ? err.message : 'Error al cargar los últimos códigos.');
-		} finally {
-			setLoading(false);
-		}
-	}, [mostrarAlerta]);
-
+	// Carga inicial: si hay caché, el estado ya arrancó con ella; si no, `loading`
+	// ya arranca en true y solo se cambia el estado cuando llega la respuesta.
 	useEffect(() => {
-		void cargar();
-	}, [cargar]);
+		if (superadminUltimosCodigosService.hasCachedUltimosCodigos()) return;
+		(async () => {
+			try {
+				const data = await superadminUltimosCodigosService.listar(false);
+				setCodigos(sortUltimosCodigos(data));
+			} catch (err) {
+				mostrarAlerta(err instanceof Error ? err.message : 'Error al cargar los últimos códigos.');
+			} finally {
+				setLoading(false);
+			}
+		})();
+	}, [mostrarAlerta]);
 
 	const codigosFiltrados = useMemo(() => {
 		const term = searchTerm.trim().toLowerCase();

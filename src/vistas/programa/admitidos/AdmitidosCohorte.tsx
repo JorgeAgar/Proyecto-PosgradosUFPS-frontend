@@ -62,39 +62,53 @@ export default function AdmitidosCohorte() {
 
   // ── Carga inicial del ranking ─────────────────────────────────────────────
 
-  const loadRanking = async (id: string) => {
+  // Si la ruta cambia a otra cohorte, se reinicia el estado de carga durante el
+  // render (en la carga inicial ya arranca así).
+  const [prevCohorteId, setPrevCohorteId] = useState(cohorteId);
+  if (cohorteId !== prevCohorteId) {
+    setPrevCohorteId(cohorteId);
     setRankingLoading(true);
+    setProcesoFinalizado(false);
+  }
+
+  // Trae el ranking sin activar el indicador (lo usa la carga inicial).
+  const obtenerRanking = async (id: string) => {
     try {
-      const data = await fetchRankingAdmitidosByCohorte(id);
-      setCohorteNombre(data.cohorteActual.nombre || nombreCohorteState || "");
-      setCohorteActiva(data.cohorteActual.activa);
-      setCuposDisponibles(data.cohorteActual.cuposDisponibles);
-      setTotalAdmitidos(data.cohorteActual.totalAdmitidos);
-      setAspirantes(data.aspirantes);
-    } catch (err) {
-      mostrarAlerta(err instanceof Error ? err.message : "Error al cargar el ranking de la cohorte. Intenta de nuevo.", "error");
+      try {
+        const data = await fetchRankingAdmitidosByCohorte(id);
+        setCohorteNombre(data.cohorteActual.nombre || nombreCohorteState || "");
+        setCohorteActiva(data.cohorteActual.activa);
+        setCuposDisponibles(data.cohorteActual.cuposDisponibles);
+        setTotalAdmitidos(data.cohorteActual.totalAdmitidos);
+        setAspirantes(data.aspirantes);
+      } catch (err) {
+        mostrarAlerta(err instanceof Error ? err.message : "Error al cargar el ranking de la cohorte. Intenta de nuevo.", "error");
+      }
     } finally {
       setRankingLoading(false);
     }
   };
 
-  const loadEstadoProceso = async (id: string) => {
-    setProcesoFinalizado(false);
-    try {
-      const finalizado = await estaFinalizadoProcesoAdmision(id);
-      setProcesoFinalizado(finalizado);
-    } catch (err) {
-      mostrarAlerta(err instanceof Error ? err.message : "No se pudo verificar el estado del proceso de admisión.", "error");
-    }
+  // Recarga mostrando el indicador (botón de refrescar).
+  const loadRanking = async (id: string) => {
+    setRankingLoading(true);
+    await obtenerRanking(id);
   };
+
+  const loadEstadoProceso = (id: string) =>
+    estaFinalizadoProcesoAdmision(id)
+      .then((finalizado) => setProcesoFinalizado(finalizado))
+      .catch((err) => {
+        mostrarAlerta(err instanceof Error ? err.message : "No se pudo verificar el estado del proceso de admisión.", "error");
+      });
 
   useEffect(() => {
     if (!cohorteId) {
       mostrarAlerta("No se encontró el identificador de la cohorte.", "error");
       return;
     }
-    loadRanking(cohorteId);
-    loadEstadoProceso(cohorteId);
+    void obtenerRanking(cohorteId);
+    void loadEstadoProceso(cohorteId);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cohorteId]);
 

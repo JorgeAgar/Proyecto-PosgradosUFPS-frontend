@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useEffectEvent, useState, type FormEvent, type ReactNode } from "react";
 import {
 	AcademicCapIcon,
 	ArrowLeftIcon,
@@ -543,18 +543,29 @@ export default function Registro() {
 		};
 	}
 
-	useEffect(() => cargarDepartamentosPorPais(
-		form.paisNacimiento, form.departamentoNacimiento, "departamentoNacimiento", "departamentosNacimiento",
+	// Evento de efecto: lee el departamento actual del formulario en el momento de
+	// cargar, sin que un cambio de departamento vuelva a disparar la carga (solo el
+	// cambio de país la dispara).
+	const cargarDepartamentosDelPais = useEffectEvent((
+		pais: string,
+		catalogo: "departamentoNacimiento" | "departamentoTrabajo" | "departamentoResidencia",
+		loadingKey: SelectCatalogKey,
+		descripcionConsola: string,
+		mensajeError: string,
+	) => cargarDepartamentosPorPais(pais, form[catalogo], catalogo, loadingKey, descripcionConsola, mensajeError));
+
+	useEffect(() => cargarDepartamentosDelPais(
+		form.paisNacimiento, "departamentoNacimiento", "departamentosNacimiento",
 		"seleccionado", "No se pudieron cargar los departamentos del país de nacimiento.",
 	), [form.paisNacimiento]);
 
-	useEffect(() => cargarDepartamentosPorPais(
-		form.paisTrabajo, form.departamentoTrabajo, "departamentoTrabajo", "departamentosTrabajo",
+	useEffect(() => cargarDepartamentosDelPais(
+		form.paisTrabajo, "departamentoTrabajo", "departamentosTrabajo",
 		"de trabajo seleccionado", "No se pudieron cargar los departamentos del país donde trabaja.",
 	), [form.paisTrabajo]);
 
-	useEffect(() => cargarDepartamentosPorPais(
-		form.paisResidencia, form.departamentoResidencia, "departamentoResidencia", "departamentosResidencia",
+	useEffect(() => cargarDepartamentosDelPais(
+		form.paisResidencia, "departamentoResidencia", "departamentosResidencia",
 		"de residencia seleccionado", "No se pudieron cargar los departamentos del país de residencia.",
 	), [form.paisResidencia]);
 

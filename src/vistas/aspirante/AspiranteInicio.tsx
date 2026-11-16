@@ -106,38 +106,53 @@ export default function AspiranteInicio() {
   const [mensajeExito, setMensajeExito] = useState<string | null>(null);
   const [mensajeErrorCorreo, setMensajeErrorCorreo] = useState<string | null>(null);
 
+  const [prevNecesitaValidarCorreo, setPrevNecesitaValidarCorreo] = useState(false);
+
+  // Carga inicial: `cargando` ya arranca en true, así que solo se cambia el
+  // estado cuando llega la respuesta.
   const cargar = useCallback(async () => {
-    setCargando(true);
     try {
-      const data = await fetchEstadoProceso();
-      setPasos(data);
-    } catch (err) {
-      mostrarAlerta((err as Error).message ?? "No fue posible cargar la información del proceso.");
+      try {
+        const data = await fetchEstadoProceso();
+        setPasos(data);
+      } catch (err) {
+        mostrarAlerta((err as Error).message ?? "No fue posible cargar la información del proceso.");
+      }
     } finally {
       setCargando(false);
     }
   }, [mostrarAlerta]);
 
+  // El indicador `correoCargando` se activa durante el render cuando aparece la
+  // necesidad de validar el correo (ver abajo); aquí solo se trae el dato.
   const cargarCorreo = useCallback(async () => {
-    setCorreoCargando(true);
     try {
-      const c = await getCorreoAspirante();
-      setCorreo(c);
-    } catch (err) {
-      mostrarAlerta((err as Error).message ?? "No fue posible obtener el correo.");
+      try {
+        const c = await getCorreoAspirante();
+        setCorreo(c);
+      } catch (err) {
+        mostrarAlerta((err as Error).message ?? "No fue posible obtener el correo.");
+      }
     } finally {
       setCorreoCargando(false);
     }
   }, [mostrarAlerta]);
 
   useEffect(() => {
-    cargar();
+    void cargar();
   }, [cargar]);
 
   const necesitaValidarCorreo = pasos.some(p => p.nombre.toLowerCase().includes("inscri") && p.estado === "en-progreso");
 
+  // Al pasar a necesitar validación se muestra el indicador de carga del correo
+  // en el mismo render (antes lo activaba el efecto de abajo).
+  if (necesitaValidarCorreo !== prevNecesitaValidarCorreo) {
+    setPrevNecesitaValidarCorreo(necesitaValidarCorreo);
+    if (necesitaValidarCorreo) setCorreoCargando(true);
+  }
+
   useEffect(() => {
-    if (necesitaValidarCorreo) cargarCorreo();
+    if (necesitaValidarCorreo) void cargarCorreo();
   }, [necesitaValidarCorreo, cargarCorreo]);
 
   const tarjetas = buildTarjetas(pasos);

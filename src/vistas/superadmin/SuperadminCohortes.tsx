@@ -439,37 +439,46 @@ export default function SuperadminCohortes() {
 
   // ── Carga ─────────────────────────────────────────────────────────────────
 
-  const cargar = useCallback(async () => {
-    setLoading(true);
+  // Trae todos los catálogos sin activar el indicador (lo usa la carga inicial,
+  // donde `loading` ya arranca en true).
+  const obtener = useCallback(async () => {
     try {
-      const [facs, progs, cohs, ests, sems, mods, plzs, sds, otros] = await Promise.all([
-        superadminFacultadesService.listar(),
-        superadminProgramasService.listar(),
-        superadminCohortesService.listar(),
-        superadminCohortesService.listarEstados(),
-        superadminSemestresService.listar(),
-        superadminModalidadesService.listar(),
-        superadminPlazosService.listar(),
-        superadminSedesService.listar(),
-        superadminOtrosValoresService.listar(),
-      ]);
-      setFacultades(facs);
-      setProgramas(progs);
-      setCohortes(cohs);
-      setEstados(ests);
-      setSemestres(sems);
-      setModalidades(mods);
-      setPlazos(plzs);
-      setSedes(sds);
-      setOtrosValores(otros);
-    } catch (err) {
-      mostrarAlerta(err instanceof Error ? err.message : 'Error al cargar datos del servidor.');
+      try {
+        const [facs, progs, cohs, ests, sems, mods, plzs, sds, otros] = await Promise.all([
+          superadminFacultadesService.listar(),
+          superadminProgramasService.listar(),
+          superadminCohortesService.listar(),
+          superadminCohortesService.listarEstados(),
+          superadminSemestresService.listar(),
+          superadminModalidadesService.listar(),
+          superadminPlazosService.listar(),
+          superadminSedesService.listar(),
+          superadminOtrosValoresService.listar(),
+        ]);
+        setFacultades(facs);
+        setProgramas(progs);
+        setCohortes(cohs);
+        setEstados(ests);
+        setSemestres(sems);
+        setModalidades(mods);
+        setPlazos(plzs);
+        setSedes(sds);
+        setOtrosValores(otros);
+      } catch (err) {
+        mostrarAlerta(err instanceof Error ? err.message : 'Error al cargar datos del servidor.');
+      }
     } finally {
       setLoading(false);
     }
   }, [mostrarAlerta]);
 
-  useEffect(() => { cargar(); }, [cargar]);
+  // Recarga mostrando el indicador (después de crear, editar o eliminar).
+  const cargar = useCallback(async () => {
+    setLoading(true);
+    await obtener();
+  }, [obtener]);
+
+  useEffect(() => { void obtener(); }, [obtener]);
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 

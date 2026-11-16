@@ -175,7 +175,7 @@ Rutas anidadas bajo `ProgramaLayout` (con sidebar). Redirige a `/programa/inicio
     - Componente: [src/vistas/programa/ProgramaLogin.tsx](src/vistas/programa/ProgramaLogin.tsx)
 
 - **`/programa/inicio`**
-    - Dashboard con resumen de cohorte activa y avance de aspirantes por etapas (paz y salvo, validados, calificados, admitidos).
+    - Dashboard con resumen de cohorte activa y avance de aspirantes por etapas (paz y salvo, validados, calificados, admitidos, legalizados).
     - Componente: [src/vistas/programa/ProgramaInicio.tsx](src/vistas/programa/ProgramaInicio.tsx)
 
 - **`/programa/cohortes`**

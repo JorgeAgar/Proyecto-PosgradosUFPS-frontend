@@ -31,23 +31,32 @@ const ESTILOS: Record<TipoAlerta, { contenedor: string; colorIcono: string; colo
 };
 
 export default function Alerta({ isOpen, mensaje, tipo = "error", onClose, duracion = 5000 }: AlertaProps) {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(isOpen);
   const [closing, setClosing] = useState(false);
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
 
-  useEffect(() => {
+  // Al cambiar `isOpen` se ajusta el estado durante el render (no en un efecto):
+  // abrir muestra la alerta y cerrar arranca la animación de salida.
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setVisible(true);
       setClosing(false);
     } else if (visible) {
       setClosing(true);
-      const id = setTimeout(() => {
-        setVisible(false);
-        setClosing(false);
-      }, 250);
-      return () => clearTimeout(id);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  }
+
+  // Al terminar la animación de salida se desmonta. Si se vuelve a abrir antes,
+  // `closing` pasa a false y la limpieza cancela el temporizador.
+  useEffect(() => {
+    if (!closing) return;
+    const id = setTimeout(() => {
+      setVisible(false);
+      setClosing(false);
+    }, 250);
+    return () => clearTimeout(id);
+  }, [closing]);
 
   useEffect(() => {
     if (!isOpen) return;

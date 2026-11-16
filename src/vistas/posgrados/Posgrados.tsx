@@ -166,20 +166,22 @@ export default function Posgrados() {
 
   // ── Carga ─────────────────────────────────────────────────────────────────
 
+  // Solo se usa en la carga inicial: `loading` ya arranca en true y `pageError`
+  // en null, así que el estado solo cambia cuando llega la respuesta.
   const cargar = useCallback(async () => {
-    setLoading(true);
-    setPageError(null);
     try {
-      const [facs, progs, cohs] = await Promise.all([
-        posgradosProgramasService.listarFacultades(),
-        posgradosProgramasService.listarProgramas(),
-        posgradosProgramasService.listarCohortes(),
-      ]);
-      setFacultades(facs);
-      setProgramas(progs);
-      setCohortes(cohs);
-    } catch (err) {
-      setPageError(err instanceof Error ? err.message : 'Error al cargar datos del servidor.');
+      try {
+        const [facs, progs, cohs] = await Promise.all([
+          posgradosProgramasService.listarFacultades(),
+          posgradosProgramasService.listarProgramas(),
+          posgradosProgramasService.listarCohortes(),
+        ]);
+        setFacultades(facs);
+        setProgramas(progs);
+        setCohortes(cohs);
+      } catch (err) {
+        setPageError(err instanceof Error ? err.message : 'Error al cargar datos del servidor.');
+      }
     } finally {
       setLoading(false);
     }

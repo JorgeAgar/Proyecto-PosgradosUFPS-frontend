@@ -71,25 +71,31 @@ export function TimePicker({
 	const hoursRef     = useRef<HTMLDivElement>(null);
 	const minsRef      = useRef<HTMLDivElement>(null);
 
-	// Refs para capturar los valores actuales sin agregar dependencias al efecto de scroll
+	// Refs para capturar los valores actuales sin agregar dependencias al efecto de scroll.
+	// Se actualizan en un efecto (antes del efecto de scroll, que se declara después).
 	const selHourSnap = useRef(selHour);
 	const selMinSnap  = useRef(selMin);
-	selHourSnap.current = selHour;
-	selMinSnap.current  = selMin;
+	useEffect(() => {
+		selHourSnap.current = selHour;
+		selMinSnap.current  = selMin;
+	});
 
 	const displayValue = parsed
 		? `${parsed.hour12}:${String(parsed.minute).padStart(2, "0")} ${parsed.period}`
 		: null;
 
 	// Sincronizar estado interno cuando el valor cambia desde fuera
-	useEffect(() => {
+	// (ajuste durante el render guardando el valor previo, en lugar de un efecto).
+	const [prevValue, setPrevValue] = useState(value);
+	if (value !== prevValue) {
+		setPrevValue(value);
 		const p = parseTime(value);
 		if (p) {
 			setPeriod(p.period);
 			setSelHour(p.hour12);
 			setSelMin(p.minute);
 		}
-	}, [value]);
+	}
 
 	// Al abrir, hacer scroll hasta el ítem seleccionado en cada lista
 	useEffect(() => {
@@ -160,7 +166,6 @@ export function TimePicker({
 			window.removeEventListener("scroll", updatePos, true);
 			window.removeEventListener("resize", updatePos);
 		};
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [open]);
 
 	function handleToggle() {
