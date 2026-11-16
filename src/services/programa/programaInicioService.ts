@@ -12,8 +12,8 @@ export interface CohorteActual {
   id: number;
   nombre: string;
   activa: boolean;
-  fechaLimiteDocumentos: string; // formato DD/MM/YYYY para UI
-  fechaLimitePago: string; // formato DD/MM/YYYY para UI
+  fechaLimiteDocumentos: string;
+  fechaLimitePago: string;
   // Plazos completos (inicio y fin) de documentación, inscripción y pago.
   fechaInicioDocumentacion?: string;
   fechaFinDocumentacion?: string;
@@ -23,43 +23,81 @@ export interface CohorteActual {
   fechaFinPago?: string;
 }
 
-export interface ValidacionStats {
-  totalInscritos: number;
-  aspirantesValidados: number;
-}
-
-export interface CalificacionStats {
-  totalValidados: number;
-  aspirantesCalificados: number;
-}
-
+/**
+ * Totales tal como los envía el backend. Salvo `totalInscritos` (total fijo),
+ * cada total cuenta solo a los aspirantes que están actualmente en esa etapa.
+ */
 export interface ProgramaInicioData {
   cohorteActual: CohorteActual;
-  validacion: ValidacionStats;
-  calificacion: CalificacionStats;
+  totalInscritos: number;
+  totalPazysalvo: number;
+  totalValidados: number;
+  totalCalificados: number;
+  totalAdmitidos: number;
 }
 
 export type ProgramaInicioItem = ProgramaInicioData;
 
-// NOTE: Removed MOCK fallback data — service now delegates to backend and
-// relies on `programaApiClient` (which adds auth headers and refresh logic).
+/**
+ * Embudo acumulado: cada etapa incluye a los aspirantes que ya pasaron a
+ * etapas posteriores (un admitido ya fue calificado, validado y está a paz y salvo).
+ */
+export interface EmbudoAspirantes {
+  inscritos: number;
+  pazYSalvo: number;
+  validados: number;
+  calificados: number;
+  admitidos: number;
+}
 
-function isProgramaInicioData(value: unknown): value is ProgramaInicioData {
-  if (!value || typeof value !== 'object') return false;
+export function calcularEmbudo(item: ProgramaInicioData): EmbudoAspirantes {
+  const admitidos = item.totalAdmitidos;
+  const calificados = item.totalCalificados + admitidos;
+  const validados = item.totalValidados + calificados;
+  const pazYSalvo = item.totalPazysalvo + validados;
+  return {
+    inscritos: item.totalInscritos,
+    pazYSalvo,
+    validados,
+    calificados,
+    admitidos,
+  };
+}
+
+function toNumber(value: unknown): number {
+  const n = Number(value ?? 0);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function toProgramaInicioData(value: unknown): ProgramaInicioData | null {
+  if (!value || typeof value !== 'object') return null;
   const item = value as Record<string, unknown>;
-  return Boolean(item.cohorteActual && item.validacion && item.calificacion);
+  if (!item.cohorteActual || typeof item.cohorteActual !== 'object') return null;
+  return {
+    cohorteActual: item.cohorteActual as CohorteActual,
+    totalInscritos: toNumber(item.totalInscritos),
+    totalPazysalvo: toNumber(item.totalPazysalvo),
+    totalValidados: toNumber(item.totalValidados),
+    totalCalificados: toNumber(item.totalCalificados),
+    totalAdmitidos: toNumber(item.totalAdmitidos),
+  };
+}
+
+function normalizarLista(values: unknown[]): ProgramaInicioData[] {
+  return values
+    .map(toProgramaInicioData)
+    .filter((item): item is ProgramaInicioData => item !== null);
 }
 
 function normalizeProgramaInicioResponse(response: unknown): ProgramaInicioData[] {
-  if (Array.isArray(response)) {
-    return response.filter(isProgramaInicioData);
-  }
+  if (Array.isArray(response)) return normalizarLista(response);
 
   if (response && typeof response === 'object') {
     const record = response as Record<string, unknown>;
-    if (Array.isArray(record.items)) return record.items.filter(isProgramaInicioData);
-    if (Array.isArray(record.cohortes)) return record.cohortes.filter(isProgramaInicioData);
-    if (isProgramaInicioData(response)) return [response];
+    if (Array.isArray(record.items)) return normalizarLista(record.items);
+    if (Array.isArray(record.cohortes)) return normalizarLista(record.cohortes);
+    const single = toProgramaInicioData(response);
+    if (single) return [single];
   }
 
   return [];
@@ -78,31 +116,34 @@ export async function fetchProgramaInicioData(): Promise<ProgramaInicioData[]> {
 }
 
 /*
-  Requisitos de backend para que esta vista funcione:
+  Contrato del backend:
 
-  1) GET /api/dev/endpoint/programa/:programaId/inicio
-     Respuesta sugerida:
-     {
-       "cohorteActual": {
-         "id": 3,
-         "nombre": "Cohorte-3 2025-1",
-         "activa": true,
-         "fechaLimiteDocumentos": "2026-05-15",
-         "fechaLimitePago": "2026-05-20"
-       },
-       "validacion": {
-         "totalInscritos": 45,
-         "aspirantesValidados": 6
-       },
-       "calificacion": {
-         "totalValidados": 6,
-         "aspirantesCalificados": 2
-       }
-     }
+  GET /api/application/case/director-programa/programa/{programaId}/inicio
+  Respuesta (una entrada por cohorte):
+  [
+    {
+      "cohorteActual": {
+        "id": 8,
+        "nombre": "Cohorte 2027-2",
+        "activa": true,
+        "fechaLimiteDocumentos": "2027-07-31",
+        "fechaLimitePago": "2027-07-31",
+        "fechaInicioDocumentacion": "2027-07-01",
+        "fechaFinDocumentacion": "2027-07-31",
+        "fechaInicioInscripcion": "2027-07-01",
+        "fechaFinInscripcion": "2027-07-31",
+        "fechaInicioPago": "2027-07-01",
+        "fechaFinPago": "2027-07-31"
+      },
+      "totalInscritos": 3,
+      "totalPazysalvo": 0,
+      "totalValidados": 0,
+      "totalCalificados": 0,
+      "totalAdmitidos": 1
+    }
+  ]
 
-  Notas backend:
-  - Idealmente devolver fechas ISO y en frontend formatearlas. En este mock se usa DD/MM/YYYY para simplicidad.
-  - Validar autenticación por token y permisos de programa.
-  - Recomendado incluir `programaId` derivado del token para evitar fuga entre programas.
-  - Manejar errores con códigos claros: 401, 403, 404, 500.
+  Etapas (en orden): paz y salvo (pagó inscripción) → validados (documentos
+  aprobados) → calificados (notas en criterios) → admitidos. Cada total cuenta
+  solo la etapa actual; el frontend acumula hacia atrás con `calcularEmbudo`.
 */

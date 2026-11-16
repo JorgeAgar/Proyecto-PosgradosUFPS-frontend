@@ -4,7 +4,7 @@ import { TIPOS_PAGO, type TipoPago } from "./tipoPago";
 
 const METRICAS: Record<TipoPago, (c: CohortePagos) => MetricaCohorte[]> = {
   inscripcion: (c) => [
-    { etiqueta: "Por pagar", valor: c.totalConfirmados },
+    { etiqueta: "Por pagar", valor: c.totalInscritos },
     { etiqueta: "Paz y salvo", valor: c.totalPazysalvo, oculta: c.totalPazysalvo === 0 },
   ],
   matricula: (c) => [
@@ -18,7 +18,7 @@ const PROGRESO: Record<TipoPago, (c: CohortePagos) => ProgresoCohorte> = {
     titulo: "A paz y salvo / Total por pagar",
     etiqueta: "A paz y salvo",
     actual: c.totalPazysalvo,
-    total: c.totalConfirmados + c.totalPazysalvo,
+    total: c.totalInscritos + c.totalPazysalvo,
   }),
   matricula: (c) => ({
     titulo: "Legalizados / Total por legalizar",
