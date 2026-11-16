@@ -25,7 +25,10 @@ export interface CohorteActual {
 
 /**
  * Totales tal como los envía el backend. Salvo `totalInscritos` (total fijo),
- * cada total cuenta solo a los aspirantes que están actualmente en esa etapa.
+ * cada total de paz y salvo a calificados cuenta solo a los aspirantes que están
+ * actualmente en esa etapa. `totalAdmitidos` incluye ADMITIDO, POR LEGALIZAR y
+ * LEGALIZADO, por lo que `totalLegalizados` es un subconjunto de los admitidos
+ * (no se suman).
  */
 export interface ProgramaInicioData {
   cohorteActual: CohorteActual;
@@ -34,6 +37,7 @@ export interface ProgramaInicioData {
   totalValidados: number;
   totalCalificados: number;
   totalAdmitidos: number;
+  totalLegalizados: number;
 }
 
 export type ProgramaInicioItem = ProgramaInicioData;
@@ -48,6 +52,8 @@ export interface EmbudoAspirantes {
   validados: number;
   calificados: number;
   admitidos: number;
+  /** Valor directo del backend: ya está contenido dentro de `admitidos`. */
+  legalizados: number;
 }
 
 export function calcularEmbudo(item: ProgramaInicioData): EmbudoAspirantes {
@@ -61,6 +67,7 @@ export function calcularEmbudo(item: ProgramaInicioData): EmbudoAspirantes {
     validados,
     calificados,
     admitidos,
+    legalizados: item.totalLegalizados,
   };
 }
 
@@ -80,6 +87,7 @@ function toProgramaInicioData(value: unknown): ProgramaInicioData | null {
     totalValidados: toNumber(item.totalValidados),
     totalCalificados: toNumber(item.totalCalificados),
     totalAdmitidos: toNumber(item.totalAdmitidos),
+    totalLegalizados: toNumber(item.totalLegalizados),
   };
 }
 
@@ -139,11 +147,15 @@ export async function fetchProgramaInicioData(): Promise<ProgramaInicioData[]> {
       "totalPazysalvo": 0,
       "totalValidados": 0,
       "totalCalificados": 0,
-      "totalAdmitidos": 1
+      "totalAdmitidos": 1,
+      "totalLegalizados": 1
     }
   ]
 
   Etapas (en orden): paz y salvo (pagó inscripción) → validados (documentos
-  aprobados) → calificados (notas en criterios) → admitidos. Cada total cuenta
-  solo la etapa actual; el frontend acumula hacia atrás con `calcularEmbudo`.
+  aprobados) → calificados (notas en criterios) → admitidos → legalizados
+  (pagó la matrícula). De paz y salvo a calificados cada total cuenta solo la
+  etapa actual; el frontend acumula hacia atrás con `calcularEmbudo`.
+  `totalAdmitidos` ya incluye a los legalizados, así que `totalLegalizados` se
+  muestra directo sobre los admitidos, sin sumar.
 */

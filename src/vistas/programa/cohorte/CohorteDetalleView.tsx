@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router';
 import {
   ArrowLeftIcon,
@@ -47,9 +47,13 @@ export default function CohorteDetalleView({
   const [cerrandoConfirmarEstado, setCerrandoConfirmarEstado] = useState(false);
   const [nextEstadoPendiente, setNextEstadoPendiente] = useState<boolean>(false);
 
-  useEffect(() => {
+  // Si llega una cohorte nueva por props se copia durante el render
+  // (guardando la previa) en lugar de hacerlo en un efecto.
+  const [prevCohorte, setPrevCohorte] = useState(cohorte);
+  if (cohorte !== prevCohorte) {
+    setPrevCohorte(cohorte);
     setEditedData(cohorte);
-  }, [cohorte]);
+  }
 
   const totalCriterios = (editedData.criterios ?? []).reduce((acc, criterio) => acc + (Number(criterio.peso ?? 0) || 0), 0);
 

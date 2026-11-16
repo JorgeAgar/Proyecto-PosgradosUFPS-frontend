@@ -175,17 +175,109 @@ export default function CalificacionAspirante() {
   const [cargandoLimpiar, setCargandoLimpiar] = useState<number | null>(null);
 
   // ── Carga de datos ────────────────────────────────────────────────────────
+  // Las funciones `obtener*` traen datos sin activar los indicadores: la carga
+  // inicial ya arranca con todo en "cargando" y, si la ruta cambia a otro
+  // aspirante, el reinicio se hace durante el render (bloque de abajo).
+  // Las funciones `cargar*` son las recargas (botones y después de acciones):
+  // activan el indicador y limpian la lista antes de pedir los datos.
 
-  const cargarDatos = useCallback(async () => {
-    if (!aspiranteId) return;
+  const [prevAspiranteId, setPrevAspiranteId] = useState(aspiranteId);
+  if (aspiranteId !== prevAspiranteId) {
+    setPrevAspiranteId(aspiranteId);
     setCargandoDatos(true);
+    setCargandoEntrevistas(true);
+    setEntrevistas([]);
+    setCargandoCriterios(true);
+    setCriterios([]);
+    setPuntajeTotalBackend(0);
+    setCargandoPruebas(true);
+    setPruebas([]);
+  }
+
+  const obtenerDatos = useCallback(async () => {
+    if (!aspiranteId) return;
     try {
-      const data = await getDatosAspirante(aspiranteId);
-      setDatosAspirante(data);
-    } catch (err) {
-      mostrarAlerta(err instanceof Error ? err.message : "Hubo un error");
+      try {
+        const data = await getDatosAspirante(aspiranteId);
+        setDatosAspirante(data);
+      } catch (err) {
+        mostrarAlerta(err instanceof Error ? err.message : "Hubo un error");
+      }
     } finally {
       setCargandoDatos(false);
+    }
+  }, [aspiranteId, mostrarAlerta]);
+
+  const obtenerEntrevistas = useCallback(async () => {
+    if (!aspiranteId) return;
+    try {
+      try {
+        const data = await getEntrevistasByAspirante(aspiranteId);
+        setEntrevistas(
+          (data ?? []).map(e => ({
+            id: String(e.id),
+            fecha: e.fecha ?? "",
+            hora: e.tiempo ?? "",
+            modalidad: mapModalidad(e.idTipoentrevista),
+            lugar: e.ubicacion ?? "",
+            estado: mapEstadoEntrevista(e.estado),
+            motivo: e.motivocambio ?? undefined,
+          }))
+        );
+      } catch (err) {
+        mostrarAlerta(err instanceof Error ? err.message : "Hubo un error");
+      }
+    } finally {
+      setCargandoEntrevistas(false);
+    }
+  }, [aspiranteId, mostrarAlerta]);
+
+  const obtenerCriterios = useCallback(async () => {
+    if (!aspiranteId) return;
+    try {
+      try {
+        const res = await getCriteriosByAspirante(aspiranteId);
+        setCriterios(
+          (res?.criterios ?? []).map(c => ({
+            id: c.id,
+            nombre: c.nombreCriterio,
+            peso: c.peso,
+            puntaje: c.puntajeObtenido,
+            puntajeGuardado: c.puntajeObtenido,
+          }))
+        );
+        setPuntajeTotalBackend(res?.puntajeTotal ?? 0);
+      } catch (err) {
+        mostrarAlerta(err instanceof Error ? err.message : "Hubo un error");
+      }
+    } finally {
+      setCargandoCriterios(false);
+    }
+  }, [aspiranteId, mostrarAlerta]);
+
+  const obtenerPruebas = useCallback(async () => {
+    if (!aspiranteId) return;
+    try {
+      try {
+        const data = await getPruebasByAspirante(aspiranteId);
+        setPruebas(
+          (data ?? []).map(p => ({
+            id: String(p.id),
+            nombre: p.nombre ?? "",
+            descripcion: p.descripcion ?? "",
+            fecha: p.fecha ?? "",
+            hora: p.tiempo ?? "",
+            modalidad: mapModalidad(p.idTipoprueba),
+            lugar: p.ubicacion ?? "",
+            estado: mapEstadoEntrevista(p.estado),
+            motivo: p.motivocambio ?? undefined,
+          }))
+        );
+      } catch (err) {
+        mostrarAlerta(err instanceof Error ? err.message : "Hubo un error");
+      }
+    } finally {
+      setCargandoPruebas(false);
     }
   }, [aspiranteId, mostrarAlerta]);
 
@@ -193,82 +285,30 @@ export default function CalificacionAspirante() {
     if (!aspiranteId) return;
     setCargandoEntrevistas(true);
     setEntrevistas([]);
-    try {
-      const data = await getEntrevistasByAspirante(aspiranteId);
-      setEntrevistas(
-        (data ?? []).map(e => ({
-          id: String(e.id),
-          fecha: e.fecha ?? "",
-          hora: e.tiempo ?? "",
-          modalidad: mapModalidad(e.idTipoentrevista),
-          lugar: e.ubicacion ?? "",
-          estado: mapEstadoEntrevista(e.estado),
-          motivo: e.motivocambio ?? undefined,
-        }))
-      );
-    } catch (err) {
-      mostrarAlerta(err instanceof Error ? err.message : "Hubo un error");
-    } finally {
-      setCargandoEntrevistas(false);
-    }
-  }, [aspiranteId, mostrarAlerta]);
+    await obtenerEntrevistas();
+  }, [aspiranteId, obtenerEntrevistas]);
 
   const cargarCriterios = useCallback(async () => {
     if (!aspiranteId) return;
     setCargandoCriterios(true);
     setCriterios([]);
     setPuntajeTotalBackend(0);
-    try {
-      const res = await getCriteriosByAspirante(aspiranteId);
-      setCriterios(
-        (res?.criterios ?? []).map(c => ({
-          id: c.id,
-          nombre: c.nombreCriterio,
-          peso: c.peso,
-          puntaje: c.puntajeObtenido,
-          puntajeGuardado: c.puntajeObtenido,
-        }))
-      );
-      setPuntajeTotalBackend(res?.puntajeTotal ?? 0);
-    } catch (err) {
-      mostrarAlerta(err instanceof Error ? err.message : "Hubo un error");
-    } finally {
-      setCargandoCriterios(false);
-    }
-  }, [aspiranteId, mostrarAlerta]);
+    await obtenerCriterios();
+  }, [aspiranteId, obtenerCriterios]);
 
   const cargarPruebas = useCallback(async () => {
     if (!aspiranteId) return;
     setCargandoPruebas(true);
     setPruebas([]);
-    try {
-      const data = await getPruebasByAspirante(aspiranteId);
-      setPruebas(
-        (data ?? []).map(p => ({
-          id: String(p.id),
-          nombre: p.nombre ?? "",
-          descripcion: p.descripcion ?? "",
-          fecha: p.fecha ?? "",
-          hora: p.tiempo ?? "",
-          modalidad: mapModalidad(p.idTipoprueba),
-          lugar: p.ubicacion ?? "",
-          estado: mapEstadoEntrevista(p.estado),
-          motivo: p.motivocambio ?? undefined,
-        }))
-      );
-    } catch (err) {
-      mostrarAlerta(err instanceof Error ? err.message : "Hubo un error");
-    } finally {
-      setCargandoPruebas(false);
-    }
-  }, [aspiranteId, mostrarAlerta]);
+    await obtenerPruebas();
+  }, [aspiranteId, obtenerPruebas]);
 
   useEffect(() => {
-    cargarDatos();
-    cargarEntrevistas();
-    cargarCriterios();
-    cargarPruebas();
-  }, [cargarDatos, cargarEntrevistas, cargarCriterios, cargarPruebas]);
+    void obtenerDatos();
+    void obtenerEntrevistas();
+    void obtenerCriterios();
+    void obtenerPruebas();
+  }, [obtenerDatos, obtenerEntrevistas, obtenerCriterios, obtenerPruebas]);
 
   // ── Handlers entrevista ───────────────────────────────────────────────────
 

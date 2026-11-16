@@ -96,15 +96,22 @@ export function DatePicker({
 		? `${String(validParsed.getDate()).padStart(2, "0")}/${String(validParsed.getMonth() + 1).padStart(2, "0")}/${validParsed.getFullYear()}`
 		: null;
 
-	useEffect(() => {
-		if (!value) {
-			if (maxDate) { const d = new Date(maxDate + "T00:00:00"); if (!isNaN(d.getTime())) { setViewYear(d.getFullYear()); setViewMonth(d.getMonth()); return; } }
-			if (minDate) { const d = new Date(minDate + "T00:00:00"); if (!isNaN(d.getTime())) { setViewYear(d.getFullYear()); setViewMonth(d.getMonth()); return; } }
-			setViewYear(TODAY.getFullYear()); setViewMonth(TODAY.getMonth()); return;
-		}
-		const d = new Date(value + "T00:00:00");
-		if (!isNaN(d.getTime())) { setViewYear(d.getFullYear()); setViewMonth(d.getMonth()); }
-	}, [value, maxDate, minDate]);
+	// Cuando cambian value/minDate/maxDate desde fuera se reposiciona el calendario.
+	// Se hace durante el render (guardando los valores previos) en lugar de en un efecto.
+	const [prevRango, setPrevRango] = useState({ value, maxDate, minDate });
+	if (prevRango.value !== value || prevRango.maxDate !== maxDate || prevRango.minDate !== minDate) {
+		setPrevRango({ value, maxDate, minDate });
+		const sincronizarVista = () => {
+			if (!value) {
+				if (maxDate) { const d = new Date(maxDate + "T00:00:00"); if (!isNaN(d.getTime())) { setViewYear(d.getFullYear()); setViewMonth(d.getMonth()); return; } }
+				if (minDate) { const d = new Date(minDate + "T00:00:00"); if (!isNaN(d.getTime())) { setViewYear(d.getFullYear()); setViewMonth(d.getMonth()); return; } }
+				setViewYear(TODAY.getFullYear()); setViewMonth(TODAY.getMonth()); return;
+			}
+			const d = new Date(value + "T00:00:00");
+			if (!isNaN(d.getTime())) { setViewYear(d.getFullYear()); setViewMonth(d.getMonth()); }
+		};
+		sincronizarVista();
+	}
 
 	// Calcula la posición inicial (siempre hacia abajo) para el primer render invisible
 	function computeInitialPos(): DropdownPos {
@@ -136,10 +143,8 @@ export function DatePicker({
 		setDropdownReady(true);
 	}, [open]);
 
-	// Limpia el estado de visibilidad al cerrar
-	useEffect(() => {
-		if (!open) setDropdownReady(false);
-	}, [open]);
+	// Limpia el estado de visibilidad al cerrar (ajuste durante el render)
+	if (!open && dropdownReady) setDropdownReady(false);
 
 	function closeCalendar() {
 		setClosing(true);
@@ -179,7 +184,6 @@ export function DatePicker({
 			window.removeEventListener("scroll", updatePos, true);
 			window.removeEventListener("resize", updatePos);
 		};
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [open]);
 
 	function prevPeriod() {

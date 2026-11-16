@@ -50,7 +50,7 @@ function getUnidadValorGlobal(clave: string) {
 export default function SuperadminValoresGlobales() {
 	const { mostrarAlerta, mostrarConfirm } = useOutletContext<SuperadminOutletContext>();
 
-	const [valores, setValores] = useState<ValorGlobalOutput[]>(() => superadminGlobalesService.getCachedValoresGlobales());
+	const [valores, setValores] = useState<ValorGlobalOutput[]>(() => sortValoresGlobales(superadminGlobalesService.getCachedValoresGlobales()));
 	const [loading, setLoading] = useState(() => !superadminGlobalesService.hasCachedValoresGlobales());
 	const [searchTerm, setSearchTerm] = useState('');
 
@@ -60,6 +60,21 @@ export default function SuperadminValoresGlobales() {
 	const [submitting, setSubmitting] = useState(false);
 	const [formError, setFormError] = useState<string | null>(null);
 
+	// Pide los valores al backend sin activar el indicador de carga.
+	const obtener = useCallback(async () => {
+		try {
+			try {
+				const data = await superadminGlobalesService.listar();
+				setValores(sortValoresGlobales(data));
+			} catch (err) {
+				mostrarAlerta(err instanceof Error ? err.message : 'Error al cargar los valores globales.');
+			}
+		} finally {
+			setLoading(false);
+		}
+	}, [mostrarAlerta]);
+
+	// Recarga (después de acciones): usa la caché si existe.
 	const cargar = useCallback(async () => {
 		if (superadminGlobalesService.hasCachedValoresGlobales()) {
 			setValores(sortValoresGlobales(superadminGlobalesService.getCachedValoresGlobales()));
@@ -68,19 +83,15 @@ export default function SuperadminValoresGlobales() {
 		}
 
 		setLoading(true);
-		try {
-			const data = await superadminGlobalesService.listar();
-			setValores(sortValoresGlobales(data));
-		} catch (err) {
-			mostrarAlerta(err instanceof Error ? err.message : 'Error al cargar los valores globales.');
-		} finally {
-			setLoading(false);
-		}
-	}, [mostrarAlerta]);
+		await obtener();
+	}, [obtener]);
 
+	// Carga inicial: si hay caché, el estado ya arrancó con ella; si no, `loading`
+	// ya arranca en true y solo se cambia el estado cuando llega la respuesta.
 	useEffect(() => {
-		void cargar();
-	}, [cargar]);
+		if (superadminGlobalesService.hasCachedValoresGlobales()) return;
+		void obtener();
+	}, [obtener]);
 
 	const valoresOrdenados = useMemo(() => sortValoresGlobales(valores), [valores]);
 	const valoresFiltrados = useMemo(() => {

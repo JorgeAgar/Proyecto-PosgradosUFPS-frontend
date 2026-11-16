@@ -107,31 +107,47 @@ export default function ValidacionPagosDetalle({ tipo }: { tipo: TipoPago }) {
 		? `${ruta}/cohorte/${cohorteId}`
 		: ruta;
 
-	const cargarPagos = async () => {
+	// Si la ruta cambia a otro aspirante se reinicia el indicador durante el render
+	// (en la carga inicial `cargando` ya arranca en true).
+	const [prevAspiranteIdNum, setPrevAspiranteIdNum] = useState(aspiranteIdNum);
+	if (!Object.is(aspiranteIdNum, prevAspiranteIdNum)) {
+		setPrevAspiranteIdNum(aspiranteIdNum);
+		setCargando(true);
+	}
+
+	// Trae los pagos sin activar el indicador (lo usa la carga inicial).
+	const obtenerPagos = async () => {
 		if (!cohorteId) {
 			mostrarAlerta("No se encontró el identificador de la cohorte.", "error");
 			navigate(ruta);
 			return;
 		}
-		setCargando(true);
 		try {
-			const todos = await obtener(cohorteId);
-			const filtrados = todos.filter((p) => p.idAspirante === aspiranteIdNum);
-			if (filtrados.length === 0) {
-				mostrarAlerta("No se encontraron pagos para este aspirante.", "error");
-				navigate(rutaVolver);
-				return;
+			try {
+				const todos = await obtener(cohorteId);
+				const filtrados = todos.filter((p) => p.idAspirante === aspiranteIdNum);
+				if (filtrados.length === 0) {
+					mostrarAlerta("No se encontraron pagos para este aspirante.", "error");
+					navigate(rutaVolver);
+					return;
+				}
+				setPagos(filtrados);
+			} catch (err) {
+				if (!localStorage.getItem("ufps_programa_session")) {
+					navigate("/programa/login", { replace: true });
+					return;
+				}
+				mostrarAlerta(err instanceof Error ? err.message : "No se pudieron cargar los pagos.", "error");
 			}
-			setPagos(filtrados);
-		} catch (err) {
-			if (!localStorage.getItem("ufps_programa_session")) {
-				navigate("/programa/login", { replace: true });
-				return;
-			}
-			mostrarAlerta(err instanceof Error ? err.message : "No se pudieron cargar los pagos.", "error");
 		} finally {
 			setCargando(false);
 		}
+	};
+
+	// Recarga mostrando el indicador (después de aprobar o rechazar).
+	const cargarPagos = async () => {
+		if (cohorteId) setCargando(true);
+		await obtenerPagos();
 	};
 
 	useEffect(() => {
@@ -140,7 +156,7 @@ export default function ValidacionPagosDetalle({ tipo }: { tipo: TipoPago }) {
 			navigate(ruta);
 			return;
 		}
-		cargarPagos();
+		void obtenerPagos();
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [aspiranteIdNum]);
 
