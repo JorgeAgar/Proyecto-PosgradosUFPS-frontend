@@ -4,7 +4,7 @@ import { TIPOS_PAGO, type TipoPago } from "./tipoPago";
 
 const METRICAS: Record<TipoPago, (c: CohortePagos) => MetricaCohorte[]> = {
   inscripcion: (c) => [
-    { etiqueta: "Por pagar", valor: c.totalConfirmados },
+    { etiqueta: "Por pagar", valor: c.totalInscritos },
     { etiqueta: "Paz y salvo", valor: c.totalPazysalvo, oculta: c.totalPazysalvo === 0 },
   ],
   matricula: (c) => [
