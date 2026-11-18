@@ -440,6 +440,7 @@ export default function Registro() {
 	const esNacimientoExtranjero = esPaisExtranjero(form.paisNacimiento, selectOptions.paisNacimiento);
 	const esResidenciaExtranjera = esPaisExtranjero(form.paisResidencia, selectOptions.paisResidencia);
 	const esTrabajoExtranjero = esPaisExtranjero(form.paisTrabajo, selectOptions.paisTrabajo);
+	const esTrabajoNA = form.empresaTrabajo.trim().toUpperCase() === 'N/A';
 	const noHayCohortes = Boolean(form.programaInscripcion) && !loadingCohorteOptions && cohorteOptions.length === 0;
 
 	const fechaExpedicionMinDate = (() => {
@@ -665,6 +666,13 @@ export default function Registro() {
 				const extranjero = value && esPaisExtranjero(value as string, selectOptions.paisResidencia);
 				next.departamentoResidencia = extranjero ? SENTINEL_EXTRANJERO : "";
 				next.municipioResidencia = extranjero ? SENTINEL_EXTRANJERO : "";
+			}
+			if (field === "empresaTrabajo") {
+				if ((value as string).trim().toUpperCase() === 'N/A') {
+					next.paisTrabajo = "";
+					next.departamentoTrabajo = "";
+					next.municipioTrabajo = "";
+				}
 			}
 			if (field === "paisTrabajo") {
 				const extranjero = value && esPaisExtranjero(value as string, selectOptions.paisTrabajo);
@@ -1032,9 +1040,9 @@ export default function Registro() {
 
 									<div className="grid gap-4 md:grid-cols-2">
 										<Input id="empresaTrabajo" label="Empresa, entidad o institución donde trabaja" value={form.empresaTrabajo} onChange={(value) => updateField("empresaTrabajo", value)} error={errors.empresaTrabajo} placeholder="Si no laboras, escribe N/A" />
-										<Select id="paisTrabajo" label="País donde trabaja" value={form.paisTrabajo} onChange={(value) => updateField("paisTrabajo", value)} error={errors.paisTrabajo} options={selectOptions.paisTrabajo} loading={selectCatalogLoading.paises} />
-										<Select id="departamentoTrabajo" label="Departamento donde trabaja" value={form.departamentoTrabajo} onChange={(value) => updateField("departamentoTrabajo", value)} error={errors.departamentoTrabajo} options={selectOptions.departamentoTrabajo} loading={selectCatalogLoading.departamentosTrabajo} disabled={!form.paisTrabajo || esTrabajoExtranjero} fixedLabel={esTrabajoExtranjero ? "Extranjero" : undefined} />
-										<Select id="municipioTrabajo" label="Municipio donde trabaja" value={form.municipioTrabajo} onChange={(value) => updateField("municipioTrabajo", value)} error={errors.municipioTrabajo ?? municipioErrors.trabajo ?? undefined} options={municipioOptions.trabajo} loading={municipioLoading.trabajo} disabled={!form.departamentoTrabajo || esTrabajoExtranjero} fixedLabel={esTrabajoExtranjero ? "Extranjero" : undefined} />
+										<Select id="paisTrabajo" label="País donde trabaja" value={form.paisTrabajo} onChange={(value) => updateField("paisTrabajo", value)} error={errors.paisTrabajo} options={selectOptions.paisTrabajo} loading={selectCatalogLoading.paises} disabled={esTrabajoNA} />
+										<Select id="departamentoTrabajo" label="Departamento donde trabaja" value={form.departamentoTrabajo} onChange={(value) => updateField("departamentoTrabajo", value)} error={errors.departamentoTrabajo} options={selectOptions.departamentoTrabajo} loading={selectCatalogLoading.departamentosTrabajo} disabled={esTrabajoNA || !form.paisTrabajo || esTrabajoExtranjero} fixedLabel={esTrabajoExtranjero ? "Extranjero" : undefined} />
+										<Select id="municipioTrabajo" label="Municipio donde trabaja" value={form.municipioTrabajo} onChange={(value) => updateField("municipioTrabajo", value)} error={errors.municipioTrabajo ?? municipioErrors.trabajo ?? undefined} options={municipioOptions.trabajo} loading={municipioLoading.trabajo} disabled={esTrabajoNA || !form.departamentoTrabajo || esTrabajoExtranjero} fixedLabel={esTrabajoExtranjero ? "Extranjero" : undefined} />
 										<Input id="direccionTrabajo" label="Dirección del lugar de trabajo" value={form.direccionTrabajo} onChange={(value) => updateField("direccionTrabajo", value)} error={errors.direccionTrabajo} placeholder="Si no laboras, escribe N/A" />
 										<div className="md:col-span-2">
 											<TextArea id="experienciaLaboral" label="Información de la experiencia laboral" value={form.experienciaLaboral} onChange={(value) => updateField("experienciaLaboral", value)} error={errors.experienciaLaboral} placeholder="Escriba en orden, inicie con la más reciente. Puede incluir cargo, empresa, funciones y fechas." rows={6} />

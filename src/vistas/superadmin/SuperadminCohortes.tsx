@@ -674,6 +674,7 @@ export default function SuperadminCohortes() {
       return;
     }
     if (progForm.idFacultad === '') { setProgFormError('Selecciona una facultad.'); return; }
+    if (progForm.idOtros === '' || progForm.idOtros === 0) { setProgFormError('Selecciona los otros valores del programa.'); return; }
     if (programaRequiereSeleccionModalidad && progForm.idModalidad === '') {
       setProgFormError('Selecciona una modalidad para el tipo de registro estándar.');
       return;

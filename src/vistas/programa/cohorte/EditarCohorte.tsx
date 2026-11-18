@@ -569,7 +569,6 @@ export default function EditarCohorte({
             onChange={cambiarFecha('fechaInicioDocumentacion')}
             error={erroresFechas.fechaInicioDocumentacion}
             minDate={ventanaDocumentacion?.min}
-            maxDate={ventanaDocumentacion?.max}
           />
 
           <DatePicker

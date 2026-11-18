@@ -308,7 +308,6 @@ export default function CrearCohorte({ onSaved, onBack }: { onSaved?: () => void
                 onChange={cambiarFecha('fechaInicioDocumentacion')}
                 error={erroresFechas.fechaInicioDocumentacion}
                 minDate={ventanaDocumentacion?.min}
-                maxDate={ventanaDocumentacion?.max}
                 disabled={disabled}
               />
 

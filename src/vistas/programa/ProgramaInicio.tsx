@@ -55,7 +55,7 @@ function ProgressBar({ value }: { value: number }) {
     <div className="flex items-center gap-4">
       <span className="text-sm font-semibold text-red-700 whitespace-nowrap">{value}%</span>
       <div className="flex-1 bg-neutral-200 rounded-full h-3">
-        <div className="bg-red-700 h-3 rounded-full transition-all" style={{ width: `${value}%` }} />
+        <div className="bg-red-700 h-3 rounded-full" style={{ width: `${value}%` }} />
       </div>
     </div>
   );

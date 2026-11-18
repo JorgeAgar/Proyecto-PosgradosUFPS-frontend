@@ -34,7 +34,7 @@ export function BarraProgreso({ actual, total }: { actual: number; total: number
   return (
     <div className="w-full bg-neutral-200 rounded-full h-2 overflow-hidden">
       <div
-        className="h-2 bg-red-700 rounded-full transition-all duration-500"
+        className="h-2 bg-red-700 rounded-full"
         style={{ width: `${porcentaje(actual, total)}%` }}
       />
     </div>

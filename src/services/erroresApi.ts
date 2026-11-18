@@ -104,6 +104,15 @@ const MENSAJES_POR_CODIGO: Record<string, (param: unknown) => string> = {
   REGISTRO_DUPLICADO_CONFLICT: () => "Ya existe un registro con esos datos.",
   REFERENCIA_INEXISTENTE: () => "Uno de los datos seleccionados ya no existe.",
   INTEGRIDAD_DATOS_CONFLICT: () => "Los datos no cumplen las reglas de integridad del sistema.",
+  OTROSVALORES_NOT_FOUND: () => "Los otros valores configurados para este programa no existen. Selecciona una opción válida.",
+
+  // Pagos
+  PLAZO_PAGO_VENCIDO: (param) => {
+    const fecha = typeof param === "string" ? param : undefined;
+    return fecha
+      ? `El plazo de pago venció el ${fecha}. No es posible iniciar el pago.`
+      : "El plazo para realizar el pago ya venció.";
+  },
 };
 
 /** Texto para un `code` conocido del backend, o `undefined` si no se reconoce. */

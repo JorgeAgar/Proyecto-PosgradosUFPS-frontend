@@ -18,7 +18,7 @@ const PROGRESO: Record<TipoPago, (c: CohortePagos) => ProgresoCohorte> = {
     titulo: "A paz y salvo / Total por pagar",
     etiqueta: "A paz y salvo",
     actual: c.totalPazysalvo,
-    total: c.totalConfirmados + c.totalPazysalvo,
+    total: c.totalConfirmados,
   }),
   matricula: (c) => ({
     titulo: "Legalizados / Total por legalizar",
