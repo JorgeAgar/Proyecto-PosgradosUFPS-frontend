@@ -11,7 +11,7 @@ export default function ProgramaLogin() {
         titulo="Acceso Director de Programa"
         subtitulo="Inicia sesión con tu usuario y contraseña"
         placeholderUsuario="director.de.programa"
-        onLogin={async (usuario, password) => { await programaAuthService.login(usuario, password, "Director de programa"); }}
+        onLogin={async (usuario, password) => { await programaAuthService.login(usuario, password, "Director de Programa"); }}
         rutaExito="/programa"
         rutaRecuperar="/recuperar-password?loginRuta=/programa/login&rol=Director"
         pie={
