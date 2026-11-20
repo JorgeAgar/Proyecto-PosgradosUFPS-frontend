@@ -46,7 +46,7 @@ Describe los flujos de usuario por rol. Los pasos marcados con *cursiva* están 
 
 ### Flujo común
 1. En `/programa/login` inicia sesión y es redirigido a `/programa/inicio`.
-2. En `/programa/inicio` ve un resumen de la cohorte activa: total de inscritos, validaciones pendientes y estado de calificación.
+2. En `/programa/inicio` ve un resumen de la cohorte activa: fechas límite y el avance de aspirantes por etapas (inscritos → paz y salvo → validados → calificados → admitidos → legalizados).
 
 ### Flujo de gestión de cohortes
 1. En la sidebar le da click a "Cohortes", eso lo lleva a `/programa/cohortes`.

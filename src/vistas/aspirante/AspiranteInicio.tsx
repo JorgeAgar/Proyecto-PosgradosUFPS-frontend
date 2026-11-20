@@ -5,6 +5,8 @@ import { getCorreoAspirante, patchCorreoAspirante, enviarConfirmacionCorreo } fr
 import type { AspiranteOutletContext } from "../../layouts/AspiranteLayout";
 import { CalendarIcon, CheckCircleIcon, ClockIcon, SpinnerIcon, WarningTriangleIcon } from "../../assets/icons";
 
+const URL_SISTEMA_TRAMITES = (import.meta.env.VITE_URL_SISTEMA_TRAMITES as string | undefined ?? "").trim();
+
 // ── Íconos (Heroicons) ────────────────────────────────────────────────────────
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
@@ -106,38 +108,53 @@ export default function AspiranteInicio() {
   const [mensajeExito, setMensajeExito] = useState<string | null>(null);
   const [mensajeErrorCorreo, setMensajeErrorCorreo] = useState<string | null>(null);
 
+  const [prevNecesitaValidarCorreo, setPrevNecesitaValidarCorreo] = useState(false);
+
+  // Carga inicial: `cargando` ya arranca en true, así que solo se cambia el
+  // estado cuando llega la respuesta.
   const cargar = useCallback(async () => {
-    setCargando(true);
     try {
-      const data = await fetchEstadoProceso();
-      setPasos(data);
-    } catch (err) {
-      mostrarAlerta((err as Error).message ?? "No fue posible cargar la información del proceso.");
+      try {
+        const data = await fetchEstadoProceso();
+        setPasos(data);
+      } catch (err) {
+        mostrarAlerta((err as Error).message ?? "No fue posible cargar la información del proceso.");
+      }
     } finally {
       setCargando(false);
     }
   }, [mostrarAlerta]);
 
+  // El indicador `correoCargando` se activa durante el render cuando aparece la
+  // necesidad de validar el correo (ver abajo); aquí solo se trae el dato.
   const cargarCorreo = useCallback(async () => {
-    setCorreoCargando(true);
     try {
-      const c = await getCorreoAspirante();
-      setCorreo(c);
-    } catch (err) {
-      mostrarAlerta((err as Error).message ?? "No fue posible obtener el correo.");
+      try {
+        const c = await getCorreoAspirante();
+        setCorreo(c);
+      } catch (err) {
+        mostrarAlerta((err as Error).message ?? "No fue posible obtener el correo.");
+      }
     } finally {
       setCorreoCargando(false);
     }
   }, [mostrarAlerta]);
 
   useEffect(() => {
-    cargar();
+    void cargar();
   }, [cargar]);
 
   const necesitaValidarCorreo = pasos.some(p => p.nombre.toLowerCase().includes("inscri") && p.estado === "en-progreso");
 
+  // Al pasar a necesitar validación se muestra el indicador de carga del correo
+  // en el mismo render (antes lo activaba el efecto de abajo).
+  if (necesitaValidarCorreo !== prevNecesitaValidarCorreo) {
+    setPrevNecesitaValidarCorreo(necesitaValidarCorreo);
+    if (necesitaValidarCorreo) setCorreoCargando(true);
+  }
+
   useEffect(() => {
-    if (necesitaValidarCorreo) cargarCorreo();
+    if (necesitaValidarCorreo) void cargarCorreo();
   }, [necesitaValidarCorreo, cargarCorreo]);
 
   const tarjetas = buildTarjetas(pasos);
@@ -146,6 +163,7 @@ export default function AspiranteInicio() {
   const esAdmitido = pasos.some(p => p.nombre.toLowerCase().includes("result") && p.estado === "completado")
     || (pasos.length > 0 && pasos.every(p => p.estado === "completado"));
   const todoCompletado = pasos.length > 0 && pasos.every(p => p.estado === "completado");
+  const estaLegalizado = pasos.some(p => p.nombre.toLowerCase().includes("legaliz") && p.estado === "completado");
 
   return (
     <div className="p-6 bg-gray-100 min-h-full" style={{ fontFamily: "Segoe UI, sans-serif" }}>
@@ -283,6 +301,24 @@ export default function AspiranteInicio() {
                   <span className="font-semibold">código estudiantil</span> ha sido generado.
                   ¡Bienvenido oficialmente al programa de postgrado!
                 </p>
+              </div>
+            )}
+
+            {/* Acceso al sistema de trámites (solo estudiantes legalizados) */}
+            {estaLegalizado && URL_SISTEMA_TRAMITES && (
+              <div className="bg-white border border-gray-200 rounded-lg p-5 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 animate-fade-in-up delay-100">
+                <div>
+                  <h2 className="text-sm font-semibold text-gray-900 mb-1">Sistema de trámites</h2>
+                  <p className="text-sm text-neutral-400">
+                    Ya eres estudiante del programa. Realiza tus trámites académicos en el sistema de trámites.
+                  </p>
+                </div>
+                <a
+                  href={URL_SISTEMA_TRAMITES}
+                  className="w-full sm:w-auto text-center bg-red-700 text-white px-4 py-2 rounded-lg hover:bg-red-800 shrink-0"
+                >
+                  Ir a sistema de trámites
+                </a>
               </div>
             )}
             {esAdmitido && !todoCompletado && (

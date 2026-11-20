@@ -147,20 +147,23 @@ export default function AspiranteEstado() {
   const [cargando, setCargando] = useState(true);
   const [pasos, setPasos] = useState<PasoProceso[]>([]);
 
+  // Carga inicial: `cargando` ya arranca en true, así que solo se cambia el
+  // estado cuando llega la respuesta.
   const cargar = useCallback(async () => {
-    setCargando(true);
     try {
-      const data = await fetchEstadoProceso();
-      setPasos(data);
-    } catch (err) {
-      mostrarAlerta((err as Error).message ?? "No fue posible cargar el estado del proceso.");
+      try {
+        const data = await fetchEstadoProceso();
+        setPasos(data);
+      } catch (err) {
+        mostrarAlerta((err as Error).message ?? "No fue posible cargar el estado del proceso.");
+      }
     } finally {
       setCargando(false);
     }
   }, [mostrarAlerta]);
 
   useEffect(() => {
-    cargar();
+    void cargar();
   }, [cargar]);
 
   const completados = pasos.filter(p => p.estado === "completado").length;

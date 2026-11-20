@@ -116,12 +116,19 @@ export default function AspirantePagoDetalle({ tipo }: { tipo: TipoPagoAspirante
   const pagoRechazado  = estadoNorm === 'RECHAZADO';
   const puedeSubirFactura = estadoNorm === 'EN CURSO' || estadoNorm === 'RECHAZADO';
 
-  const cargarResumen = () => {
-    setLoadingResumen(true);
+  // Trae el resumen sin activar el indicador: en la carga inicial
+  // `loadingResumen` ya arranca en true.
+  const obtenerResumen = () => {
     cfg.resumen(aspiranteId)
       .then(setResumen)
       .catch(e => mostrarAlerta(e instanceof Error ? e.message : `No se pudo cargar el resumen de ${nombreMinuscula}.`))
       .finally(() => setLoadingResumen(false));
+  };
+
+  // Recarga mostrando el indicador (eventos de Wompi y acciones del usuario).
+  const cargarResumen = () => {
+    setLoadingResumen(true);
+    obtenerResumen();
   };
 
   useEffect(() => {
@@ -136,7 +143,7 @@ export default function AspirantePagoDetalle({ tipo }: { tipo: TipoPagoAspirante
 
   useEffect(() => {
     if (!aspiranteId) return;
-    cargarResumen();
+    obtenerResumen();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aspiranteId]);
 

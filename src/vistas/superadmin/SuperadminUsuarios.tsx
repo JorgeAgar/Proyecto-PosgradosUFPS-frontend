@@ -181,47 +181,50 @@ export default function SuperadminUsuarios() {
 
   // ── Carga inicial ─────────────────────────────────────────────────────────
 
-  const cargar = useCallback(async () => {
-    setLoading(true);
+  // Trae usuarios, roles y catálogos sin activar el indicador (lo usa la carga
+  // inicial, donde `loading` ya arranca en true).
+  const obtener = useCallback(async () => {
     try {
-      const [us, rs] = await Promise.all([
-        superadminUsuariosService.listar(),
-        superadminUsuariosService.listarRoles(),
-      ]);
-      setUsuarios(us);
-      setRoles(rs);
-      setCatalogosPersonaLoading(true);
       try {
-        const [
-          generos,
-          estadosCiviles,
-          gruposEtnicos,
-          pueblosIndigenas,
-          discapacidades,
-          capacidadesExcepcionales,
-        ] = await Promise.all([
-          listarSexosBiologicosRegistro(),
-          listarEstadosCivilesRegistro(),
-          listarGruposEtnicosRegistro(),
-          listarPueblosIndigenasRegistro(),
-          listarDiscapacidadesRegistro(),
-          listarCapacidadesExcepcionalesRegistro(),
+        const [us, rs] = await Promise.all([
+          superadminUsuariosService.listar(),
+          superadminUsuariosService.listarRoles(),
         ]);
-        setCatalogosPersona({
-          generos,
-          estadosCiviles,
-          gruposEtnicos,
-          pueblosIndigenas,
-          discapacidades,
-          capacidadesExcepcionales,
-        });
-      } catch {
-        setCatalogosPersona(EMPTY_CATALOGOS);
-      } finally {
-        setCatalogosPersonaLoading(false);
+        setUsuarios(us);
+        setRoles(rs);
+        setCatalogosPersonaLoading(true);
+        try {
+          const [
+            generos,
+            estadosCiviles,
+            gruposEtnicos,
+            pueblosIndigenas,
+            discapacidades,
+            capacidadesExcepcionales,
+          ] = await Promise.all([
+            listarSexosBiologicosRegistro(),
+            listarEstadosCivilesRegistro(),
+            listarGruposEtnicosRegistro(),
+            listarPueblosIndigenasRegistro(),
+            listarDiscapacidadesRegistro(),
+            listarCapacidadesExcepcionalesRegistro(),
+          ]);
+          setCatalogosPersona({
+            generos,
+            estadosCiviles,
+            gruposEtnicos,
+            pueblosIndigenas,
+            discapacidades,
+            capacidadesExcepcionales,
+          });
+        } catch {
+          setCatalogosPersona(EMPTY_CATALOGOS);
+        } finally {
+          setCatalogosPersonaLoading(false);
+        }
+      } catch (err) {
+        mostrarAlerta(err instanceof Error ? err.message : 'Error al cargar datos del servidor.');
       }
-    } catch (err) {
-      mostrarAlerta(err instanceof Error ? err.message : 'Error al cargar datos del servidor.');
     } finally {
       setLoading(false);
     }
@@ -241,7 +244,13 @@ export default function SuperadminUsuarios() {
     }
   }, []);
 
-  useEffect(() => { cargar(); }, [cargar]);
+  // Recarga mostrando el indicador (botón y después de acciones).
+  const cargar = useCallback(async () => {
+    setLoading(true);
+    await obtener();
+  }, [obtener]);
+
+  useEffect(() => { void obtener(); }, [obtener]);
 
   // ── Handlers: modal crear/editar ──────────────────────────────────────────
 

@@ -24,6 +24,8 @@ export interface CohorteItem {
   totalValidados: number;
   totalCalificados?: number;
   totalAdmitidos: number;
+  /** Aspirantes que legalizaron matrícula; ya están contenidos en `totalAdmitidos`. */
+  totalLegalizados: number;
   inscritos?: number;
   admitidos?: number;
   fechaInicioDocumentacion?: string;
@@ -159,6 +161,7 @@ export function normalizeCohorte(cohorte: Record<string, unknown>): CohorteItem 
     totalValidados: Number(cohorte.totalValidados ?? 0),
     totalCalificados: Number(cohorte.totalCalificados ?? 0),
     totalAdmitidos: Number(cohorte.totalAdmitidos ?? cohorte.admitidos ?? 0),
+    totalLegalizados: Number(cohorte.totalLegalizados ?? 0),
     inscritos: optionalNumber(cohorte.inscritos),
     admitidos: optionalNumber(cohorte.admitidos),
     fechaInicioDocumentacion: optionalString(cohorte.fechaInicioDocumentacion),

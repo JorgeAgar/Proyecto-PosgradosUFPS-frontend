@@ -85,15 +85,17 @@ export default function EditarCohorte({
   const [availableProgramaDocs, setAvailableProgramaDocs] = useState<RequiredDoc[]>([]);
   const [availableSemestres, setAvailableSemestres] = useState<SemestreItem[]>([]);
   const [availableModalidades, setAvailableModalidades] = useState<ModalidadItem[]>([]);
-  const [isLoadingDocs, setIsLoadingDocs] = useState(false);
-  const [isLoadingCriterios, setIsLoadingCriterios] = useState(false);
-  const [isLoadingSemestres, setIsLoadingSemestres] = useState(false);
-  const [isLoadingModalidades, setIsLoadingModalidades] = useState(false);
-  const [criterioError, setCriterioError] = useState<string | null>(null);
+  // Los indicadores arrancan en true: la carga de datos de edición empieza al montar.
+  const [isLoadingDocs, setIsLoadingDocs] = useState(true);
+  const [isLoadingCriterios, setIsLoadingCriterios] = useState(true);
+  const [isLoadingSemestres, setIsLoadingSemestres] = useState(true);
+  const [isLoadingModalidades, setIsLoadingModalidades] = useState(true);
   const [erroresFechas, setErroresFechas] = useState<ErroresFechasCohorte>({});
   const criterioIdMapRef = useRef<Record<string, string | number>>({});
   const onSavedConfirmedRef = useRef(onSavedConfirmed);
-  onSavedConfirmedRef.current = onSavedConfirmed;
+  useEffect(() => {
+    onSavedConfirmedRef.current = onSavedConfirmed;
+  });
   const [editedData, setEditedData] = useState<CohorteDetalle>(() => ({
     ...cohorte,
     documentos: (cohorte.documentos ?? []).map((d: DocumentoCohorte & Partial<{ __localId: string }>) => ({
@@ -105,21 +107,24 @@ export default function EditarCohorte({
     cohorte.cupos !== undefined ? String(cohorte.cupos) : ''
   );
 
-  useEffect(() => {
+  // Si llega otra cohorte (o cambian los criterios del padre) se reinicia el
+  // formulario durante el render, guardando las props previas. Al montar no hace
+  // falta: el estado inicial ya corresponde a estas props.
+  const [prevProps, setPrevProps] = useState({ cohorte, parentCriterios });
+  if (prevProps.cohorte !== cohorte || prevProps.parentCriterios !== parentCriterios) {
+    setPrevProps({ cohorte, parentCriterios });
     setEditClosing(false);
     setIsLoadingInitialData(true);
     setIsLoadingDocs(true);
     setIsLoadingCriterios(true);
     setIsLoadingSemestres(true);
     setIsLoadingModalidades(true);
-    setCriterioError(null);
     setErroresFechas({});
     setAvailableCriteriosState(parentCriterios && parentCriterios.length > 0 ? parentCriterios : undefined);
     setAvailableConsejoDocs([]);
     setAvailableProgramaDocs([]);
     setAvailableSemestres([]);
     setAvailableModalidades([]);
-    criterioIdMapRef.current = {};
     setCuposStr(cohorte.cupos !== undefined ? String(cohorte.cupos) : '');
     setEditedData({
       ...cohorte,
@@ -128,10 +133,11 @@ export default function EditarCohorte({
         __localId: (d as LocalDocumento).__localId ?? genLocalId(),
       })),
     } as CohorteDetalle);
-  }, [cohorte, parentCriterios]);
+  }
 
   useEffect(() => {
     let mounted = true;
+    criterioIdMapRef.current = {};
 
     const load = async () => {
       try {
@@ -266,16 +272,16 @@ export default function EditarCohorte({
 
   const selectedCriteriosCount = (editedData.criterios ?? []).length;
 
-  useEffect(() => {
-    if ((editedData.criterios ?? []).length > 0) {
-      if ((editedData.criterios ?? []).some((c: CriterioItem) => c.peso === undefined))
-        setCriterioError('Todos los criterios seleccionados deben tener un puntaje asignado.');
-      else if (totalPeso > 100) setCriterioError('La suma de los puntos de criterios no puede ser mayor a 100.');
-      else if (totalPeso < 100) setCriterioError('La suma de los puntos de criterios debe ser exactamente 100.');
-      else setCriterioError(null);
-    } else {
-      setCriterioError(null);
-    }
+  // El error de criterios se deriva de los criterios seleccionados (antes se
+  // copiaba a un estado desde un efecto, con un render de retraso).
+  const criterioError = useMemo<string | null>(() => {
+    const criterios = editedData.criterios ?? [];
+    if (criterios.length === 0) return null;
+    if (criterios.some((c: CriterioItem) => c.peso === undefined))
+      return 'Todos los criterios seleccionados deben tener un puntaje asignado.';
+    if (totalPeso > 100) return 'La suma de los puntos de criterios no puede ser mayor a 100.';
+    if (totalPeso < 100) return 'La suma de los puntos de criterios debe ser exactamente 100.';
+    return null;
   }, [totalPeso, editedData.criterios]);
 
   const setDocumentoSeleccion = (nombre: string, checked: boolean) => {

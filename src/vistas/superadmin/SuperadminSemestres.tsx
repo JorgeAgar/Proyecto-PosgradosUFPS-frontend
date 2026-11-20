@@ -88,25 +88,34 @@ export default function SuperadminSemestres() {
 	const [semestreToDelete, setSemestreToDelete] = useState<SemestreOutput | null>(null);
 	const [deleting, setDeleting] = useState(false);
 
-	const cargar = useCallback(async () => {
-		setLoading(true);
+	// Trae semestres y estados sin activar el indicador (lo usa la carga inicial,
+	// donde `loading` ya arranca en true).
+	const obtener = useCallback(async () => {
 		try {
-			const [listaSemestres, listaEstados] = await Promise.all([
-				superadminSemestresService.listar(),
-				superadminSemestresService.listarEstados(),
-			]);
-			setSemestres(sortSemestres(listaSemestres));
-			setEstados(listaEstados);
-		} catch (err) {
-			mostrarAlerta(err instanceof Error ? err.message : 'Error al cargar los semestres.');
+			try {
+				const [listaSemestres, listaEstados] = await Promise.all([
+					superadminSemestresService.listar(),
+					superadminSemestresService.listarEstados(),
+				]);
+				setSemestres(sortSemestres(listaSemestres));
+				setEstados(listaEstados);
+			} catch (err) {
+				mostrarAlerta(err instanceof Error ? err.message : 'Error al cargar los semestres.');
+			}
 		} finally {
 			setLoading(false);
 		}
 	}, [mostrarAlerta]);
 
+	// Recarga mostrando el indicador (botón y después de acciones).
+	const cargar = useCallback(async () => {
+		setLoading(true);
+		await obtener();
+	}, [obtener]);
+
 	useEffect(() => {
-		void cargar();
-	}, [cargar]);
+		void obtener();
+	}, [obtener]);
 
 	const estadoMap = useMemo(() => new Map(estados.map((estado) => [estado.id, estado])), [estados]);
 	const semestresOrdenados = useMemo(() => sortSemestres(semestres), [semestres]);
